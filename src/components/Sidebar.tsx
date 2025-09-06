@@ -3,6 +3,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback } from 'react';
+import Link from "next/link";
 
 interface MenuItem {
   key: string;
@@ -106,13 +107,13 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         
         {/* Back to Home */}
         <li className="mt-6 px-6">
-          <a
+          <Link
             href="/"
             className="group flex items-center space-x-2 text-gray-500 hover:text-indigo-600 font-medium transition-all duration-300"
           >
             <span className="group-hover:translate-x-[-4px] transition-transform duration-300">←</span>
             <span>Back to Home</span>
-          </a>
+          </Link>
         </li>
       </ul>
     </nav>
