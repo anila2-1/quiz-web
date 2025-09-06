@@ -3,12 +3,13 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function ReferralPage({ params }: { params: { code: string } }) {
-  const router = useRouter()
+export default async function ReferralPage({ params }: { params: Promise<{ code: string }>}) {
+    const { code } = await params; // ← Await the promise
+  const router = useRouter();
 
   useEffect(() => {
-    router.push(`/auth/signup?ref=${params.code}`)
-  }, [params.code, router])
-  
-  return <p>Redirecting...</p>
+    router.push(`/auth/signup?ref=${code}`);
+  }, [code, router]);
+
+  return <p>Redirecting...</p>;
 }
