@@ -11,21 +11,21 @@ export const assignReferral: FieldHook = async ({ value, data, req, operation })
   const { payload } = req
 
   try {
-    // Find user with this referralCode
-    const users = await payload.find({
-      collection: 'users',
+    // Find member with this referralCode
+    const members = await payload.find({
+      collection: 'members',
       where: {
         referralCode: { equals: referralCode },
       },
       limit: 1,
     })
 
-    if (users.docs.length === 0) {
+    if (members.docs.length === 0) {
       payload.logger.warn(`Invalid referral code used: ${referralCode}`)
       return value
     }
 
-    const referrer = users.docs[0]
+    const referrer = members.docs[0]
 
     // ❌ Prevent self-referral
     if (referrer.id === req.user?.id) {
@@ -35,12 +35,12 @@ export const assignReferral: FieldHook = async ({ value, data, req, operation })
 
     // 🔐 Update referrer: Add points
     await payload.update({
-      collection: 'users',
+      collection: 'members',
       id: referrer.id,
       data: {
-        referralCount: (referrer.referralCount || 0) + 1,
-        referralEarnings: (referrer.referralEarnings || 0) + 100,
-        walletBalance: (referrer.walletBalance || 0) + 100,
+        referralsCount: (referrer.referralsCount || 0) + 1,
+        totalPoints: (referrer.totalPoints || 0) + 100,
+        wallet: (referrer.wallet || 0) + 100,
       },
     })
 
