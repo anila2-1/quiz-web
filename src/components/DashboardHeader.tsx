@@ -16,7 +16,7 @@ export default function DashboardHeader({ user, activeTab }: { user: any; active
 
   const selectedLabel = options.find(opt => opt.value === activeTab)?.label || 'Overview';
 
-  const handleSelect = (value) => {
+  const handleSelect = (value: string) => {
     router.push(`/dashboard/${value}`);
     setIsOpen(false);
   };
