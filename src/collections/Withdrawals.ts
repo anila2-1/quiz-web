@@ -1,7 +1,7 @@
 // src/collections/Withdrawals.ts
 import { CollectionConfig, getPayload } from 'payload';
 import { updateWallet } from '../hooks/updateWallet';
-import { config } from 'process';
+import config from '../payload.config';
 
 const Withdrawals: CollectionConfig = {
   slug: 'withdrawals',
@@ -32,7 +32,7 @@ const Withdrawals: CollectionConfig = {
       type: 'number',
       required: true,
       min: 500,
-      validate: async (value: number | null | undefined, { data, req }) => {
+      validate: async (value: number | null | undefined, { data, req }: { data: Record<string, unknown>; req: any }) => {
         if (value == null) return 'Amount is required.';
         if (value < 500) return 'Minimum withdrawal is 500 points.';
 
