@@ -1,16 +1,7 @@
 // src/app/(frontend)/referral/[code]/page.tsx
-"use client";
+import { redirect } from 'next/navigation';
 
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-
-export default function ReferralPage({ params }: { params: { code: string } }) {
-  const { code } = params; // No await needed — because it's not a Promise anymore
-  const router = useRouter();
-
-  useEffect(() => {
-    router.push(`/auth/signup?ref=${code}`);
-  }, [code, router]);
-
-  return <p>Redirecting...</p>;
+export default async function ReferralPage({ params }: { params: Promise<{ code: string }> }) {
+  const { code } = await params;
+  redirect(`/auth/signup?ref=${code}`);
 }
