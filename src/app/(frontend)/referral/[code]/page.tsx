@@ -1,10 +1,11 @@
-"use client"
+// src/app/(frontend)/referral/[code]/page.tsx
+"use client";
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-export default async function ReferralPage({ params }: { params: Promise<{ code: string }>}) {
-    const { code } = await params; // ← Await the promise
+export default function ReferralPage({ params }: { params: { code: string } }) {
+  const { code } = params; // No await needed — because it's not a Promise anymore
   const router = useRouter();
 
   useEffect(() => {
