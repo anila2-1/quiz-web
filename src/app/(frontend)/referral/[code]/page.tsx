@@ -9,6 +9,6 @@ export default function ReferralPage({ params }: { params: { code: string } }) {
   useEffect(() => {
     router.push(`/auth/signup?ref=${params.code}`)
   }, [params.code, router])
-
+  
   return <p>Redirecting...</p>
 }
