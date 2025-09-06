@@ -84,6 +84,17 @@ const Members: CollectionConfig = {
         },
       ],
     },
+    {
+      name: 'completedQuizIds',
+      type: 'array',
+      label: 'Completed Quiz IDs',
+      fields: [
+        {
+          name: 'quizId',
+          type: 'text',
+        },
+      ],
+    },
   ],
    hooks: {
     afterChange: [

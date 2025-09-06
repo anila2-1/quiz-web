@@ -61,9 +61,9 @@ export default function BlogPost({ params }: { params: Promise<Params> }) {
           const blog: Blog = json.docs[0];
           setPost(blog);
 
-          if (blog.quizzes?.length > 0) {
-            const initialQuizStates = blog.quizzes.reduce((acc, quiz) => {
-              const isCompleted = user?.completedQuizIds?.includes(quiz.id) || false;
+          if ((blog.quizzes?.length ?? 0) > 0) {
+            const initialQuizStates = blog.quizzes!.reduce((acc, quiz) => {
+              const isCompleted = user?.completedQuizIds?.some(item => item.quizId === quiz.id) || false;
               acc[quiz.id] = {
                 showQuiz: false,
                 answers: Array(quiz.questions.length).fill(null),

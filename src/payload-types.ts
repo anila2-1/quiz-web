@@ -383,6 +383,12 @@ export interface Member {
         id?: string | null;
       }[]
     | null;
+  completedQuizIds?:
+    | {
+        quizId?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -602,6 +608,12 @@ export interface MembersSelect<T extends boolean = true> {
         blog?: T;
         completedAt?: T;
         score?: T;
+        id?: T;
+      };
+  completedQuizIds?:
+    | T
+    | {
+        quizId?: T;
         id?: T;
       };
   updatedAt?: T;

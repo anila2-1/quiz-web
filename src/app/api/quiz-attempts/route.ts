@@ -62,6 +62,10 @@ const updatedMember = await payload.update({
         completedAt: new Date().toISOString(),
       },
     ],
+    completedQuizIds: [
+      ...(member.completedQuizIds || []).filter(item => item.quizId !== quizId),
+      { quizId },
+    ],
   },
 });
 
