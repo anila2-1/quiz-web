@@ -23,19 +23,23 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [isOpen, setIsOpen] = useState(true);
 
-  // Throttle function for performance
-  const throttle = (func: Function, delay: number) => {
+  // ✅ Fixed: Properly typed throttle with spread operator
+  const throttle = <T extends (...args: any[]) => void>(
+    func: T,
+    delay: number
+  ): ((...args: Parameters<T>) => void) => {
     let timeoutId: NodeJS.Timeout | undefined;
-    return (...args: any[]) => {
+
+    return (...args: Parameters<T>) => {
       if (timeoutId) return;
       timeoutId = setTimeout(() => {
-        func.apply(null, args);
+        func(...args); // ✅ No .apply() — safe and clean
         timeoutId = undefined;
       }, delay);
     };
   };
 
-  // Detect mobile screen with throttling
+  // Detect mobile screen
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
@@ -70,13 +74,14 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     setIsOpen(!isOpen);
   }, [isOpen]);
 
-  // Extracted components for better maintainability
+  // Brand Header
   const BrandHeader = () => (
     <div className="p-6">
-      
+      <h2 className="text-xl font-bold text-indigo-700">Dashboard</h2>
     </div>
   );
 
+  // Menu Item Component
   const MenuItemComponent = ({ item }: { item: MenuItem }) => (
     <li key={item.key}>
       <button
@@ -91,7 +96,7 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       >
         <span className="relative">
           {item.icon}
-          <span className={`absolute inset-0 opacity-0 group-hover:opacity-20 bg-gradient-to-r from-indigo-400 to-pink-400 blur-sm rounded-full transition-opacity duration-300`}></span>
+          <span className="absolute inset-0 opacity-0 group-hover:opacity-20 bg-gradient-to-r from-indigo-400 to-pink-400 blur-sm rounded-full transition-opacity duration-300"></span>
         </span>
         <span className="font-medium">{item.label}</span>
       </button>
@@ -149,7 +154,7 @@ export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           <Navigation />
         </div>
 
-        {/* Overlay when sidebar open */}
+        {/* Overlay */}
         {isOpen && (
           <div
             className="fixed inset-0 bg-black/50 z-30 md:hidden"
