@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import  Member  from './../payload-types';
+import  {Member}  from './../payload-types';
 
 
 export default function ProfileForm({ member }: { member: Member }) {
