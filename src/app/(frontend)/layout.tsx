@@ -34,47 +34,50 @@ async function getSiteSettings() {
 export default async function FrontendLayout({ children }: { children: ReactNode }) {
   const siteSettings = await getSiteSettings()
 
-  // Fallback values
-  const title = siteSettings?.siteTitle || 'Learn & Earn Quiz Platform'
-  const description = siteSettings?.tagline || 'Learn, Quiz, Earn Points, Withdraw USDT'
+  // Use SEO group if available, fallback to old fields
+  const seoTitle = siteSettings?.seo?.title || siteSettings?.siteTitle || 'Learn & Earn Quiz Platform'
+  const seoDescription = siteSettings?.seo?.description || siteSettings?.tagline || 'Learn, Quiz, Earn Points, Withdraw USDT'
+  const seoImage = siteSettings?.seo?.image 
+    ? `${process.env.NEXT_PUBLIC_SERVER_URL}/media/${siteSettings.seo.image.filename}`
+    : null
 
-  // Favicon URL (if exists)
   const faviconURL = siteSettings?.favicon
     ? `${process.env.NEXT_PUBLIC_SERVER_URL}/media/${siteSettings.favicon.filename}`
-    : '/favicon.ico' // Fallback favicon
+    : '/favicon.ico'
 
   return (
     <html lang="en">
       <head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
+        {/* Basic Meta */}
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDescription} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-        {/* Favicon */}
         <link rel="icon" href={faviconURL} />
-
-        {/* Optional: Apple Touch Icon */}
         <link rel="apple-touch-icon" href={faviconURL} />
 
-        {/* Open Graph / Social Sharing Meta Tags */}
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
+        {/* Open Graph / Facebook */}
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDescription} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={process.env.NEXT_PUBLIC_SERVER_URL} />
+        {seoImage && <meta property="og:image" content={seoImage} />}
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
 
         {/* Twitter */}
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:description" content={seoDescription} />
+        {seoImage && <meta name="twitter:image" content={seoImage} />}
+
+        {/* Canonical URL (for homepage) */}
+        <link rel="canonical" href={process.env.NEXT_PUBLIC_SERVER_URL} />
       </head>
       <body>
         <AuthProvider>
           <Navbar />
-            <main className="flex-1">{children}</main>
-           
-            </AuthProvider>
-
-            
+          <main className="flex-1">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   )

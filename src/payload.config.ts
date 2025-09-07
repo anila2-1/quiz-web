@@ -2,6 +2,9 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb' // database-adapter-import
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { seoPlugin } from '@payloadcms/plugin-seo'
+
+
 import Hero from './blocks/Hero';
 import RichTextBlock from './blocks/RichTextBlock';
 import ImageBlock from './blocks/ImageBlock';
@@ -61,6 +64,8 @@ export default buildConfig({
   plugins: [
     payloadCloudPlugin(),
     // storage-adapter-placeholder
+        seoPlugin({ collections: ['blogs'], globals: ['site-settings'] }),
+       
   ],
   
 })

@@ -324,6 +324,21 @@ export interface Blog {
    * Is blog se related quizzes
    */
   quizzes?: (string | Quiz)[] | null;
+  seo?: {
+    /**
+     * Leave blank to auto-generate from title
+     */
+    title?: string | null;
+    /**
+     * Leave blank to auto-generate from excerpt
+     */
+    description?: string | null;
+    image?: (string | null) | Media;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -585,6 +600,19 @@ export interface BlogsSelect<T extends boolean = true> {
   category?: T;
   status?: T;
   quizzes?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -760,6 +788,15 @@ export interface SiteSetting {
     };
     [k: string]: unknown;
   } | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    image?: (string | null) | Media;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -787,6 +824,19 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   referralPoints?: T;
   quizPointsPerCorrect?: T;
   announcement?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

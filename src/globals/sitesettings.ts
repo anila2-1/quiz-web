@@ -127,10 +127,36 @@ const SiteSettings: GlobalConfig = {
         description: 'Show a banner at the top of the site (optional)',
       },
     },
+    {
+  name: 'seo',
+  type: 'group',
+  label: 'SEO Settings',
+  fields: [
+    {
+      name: 'title',
+      type: 'text',
+      label: 'Meta Title',
+      defaultValue: 'Learn & Earn Quiz Platform',
+    },
+    {
+      name: 'description',
+      type: 'textarea',
+      label: 'Meta Description',
+      defaultValue: 'Learn, Quiz, Earn Points, Withdraw USDT',
+    },
+    {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Open Graph Image (1200x630)',
+    },
+  ],
+},
   ],
   admin: {
     description: 'Global settings for the entire site',
   },
 }
+
 
 export default SiteSettings

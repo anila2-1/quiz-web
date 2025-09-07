@@ -2,7 +2,6 @@
 
 import { CollectionConfig } from 'payload'
 import { slugField } from '../fields/slugField'
-import { seoFields } from '../fields/seoFields'
 import { generateSlug } from '../hooks/generateSlug'
 
 const Blogs: CollectionConfig = {
@@ -98,7 +97,36 @@ const Blogs: CollectionConfig = {
         description: 'Is blog se related quizzes',
       },
     },
-
+    // In Blogs.ts → fields array
+{
+  name: 'seo',
+  type: 'group',
+  label: 'SEO',
+  fields: [
+    {
+      name: 'title',
+      type: 'text',
+      label: 'Meta Title',
+      admin: {
+        description: 'Leave blank to auto-generate from title',
+      },
+    },
+    {
+      name: 'description',
+      type: 'textarea',
+      label: 'Meta Description',
+      admin: {
+        description: 'Leave blank to auto-generate from excerpt',
+      },
+    },
+    {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Open Graph Image (1200x630)',
+    },
+  ],
+},   
   ],
   hooks: {
     beforeChange: [
@@ -109,6 +137,7 @@ const Blogs: CollectionConfig = {
         }
         return data
       },
+
     ],
   },
   versions: {

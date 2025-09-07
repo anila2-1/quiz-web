@@ -1,6 +1,39 @@
 // src/app/(frontend)/blog/page.tsx
+import { Metadata } from 'next';
+
 import BlogGrid from './BlogGrid';
 import Footer from '../components/Footer';
+
+// ✅ Fetch blogs on server (already good)
+export const metadata: Metadata = {
+  title: 'Learn & Earn Blog | Discover Articles & Earn Rewards',
+  description: 'Explore insightful articles, tips, and guides to boost your knowledge and earn rewards through quizzes.',
+  openGraph: {
+    title: 'Learn & Earn Blog',
+    description: 'Discover insightful articles, tips, and guides to boost your knowledge and earn rewards.',
+    url: `${process.env.NEXT_PUBLIC_SERVER_URL}/blog`,
+    type: 'website',
+    images: [
+      {
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/og?title=Learn%20%E2%80%93%20Earn%20Blog`,
+        width: 1200,
+        height: 630,
+        alt: 'Learn & Earn Blog - Articles & Quizzes',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Learn & Earn Blog',
+    description: 'Discover insightful articles, tips, and guides to boost your knowledge and earn rewards.',
+    images: [
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/og?title=Learn%20%E2%80%93%20Earn%20Blog`,
+    ],
+  },
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_SERVER_URL}/blog`,
+  },
+};
 export default async function BlogList() {
   let posts = [];
 
