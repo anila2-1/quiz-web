@@ -4,6 +4,7 @@ import { useEffect, useState, use } from 'react';
 import { useAuth } from '../../../../_providers/Auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Footer from './../../components/Footer'
 import { RichText } from '../../../../components/RichText';
 
 interface Params {
@@ -207,20 +208,12 @@ export default function BlogPost({ params }: { params: Promise<Params> }) {
   if (!post) return <div className="text-center py-10">Blog not found.</div>;
 
   return (
+    <>
     <div className="max-w-4xl mx-auto py-12 px-4">
       {/* Blog Title */}
       <h1 className="text-4xl font-extrabold text-gray-900 mb-4 text-center leading-tight animate-blog-title">
         {post.title}
       </h1>
-
-      {/* Blog Image */}
-      {post.image && (
-        <img
-          src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image.url}`}
-          alt={post.title}
-          className="w-full h-72 object-cover rounded-2xl shadow-xl mb-8 transform hover:scale-[1.02] transition duration-700 animate-blog-image"
-        />
-      )}
 
       {/* Multiple Quizzes */}
       {post.quizzes?.map((quiz) => {
@@ -403,6 +396,15 @@ export default function BlogPost({ params }: { params: Promise<Params> }) {
                    rounded-3xl shadow-lg p-8 leading-relaxed text-gray-800
                    transition-all duration-500 hover:shadow-2xl"
       >
+          {/* Blog Image */}
+      {post.image && (
+        <img
+          src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image.url}`}
+          alt={post.title}
+          className="w-full h-72 object-cover rounded-2xl shadow-xl mb-8 transform hover:scale-[1.02] transition duration-700 animate-blog-image"
+        />
+      )}
+
         {post.content ? (
           <RichText content={post.content} />
         ) : (
@@ -417,7 +419,7 @@ export default function BlogPost({ params }: { params: Promise<Params> }) {
         </Link>
       </div>
     </div>
-    
-  );
-  
+    <Footer />
+    </>
+  );  
 }
