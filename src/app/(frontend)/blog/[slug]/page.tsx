@@ -10,6 +10,7 @@ import { RichText } from '../../../../components/RichText';
 interface Params {
   slug: string;
 }
+
 interface Question {
   id: string;
   questionText: string;
