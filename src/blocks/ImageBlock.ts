@@ -1,5 +1,5 @@
 // src/blocks/ImageBlock.ts
-import { Block } from 'payload';
+import { Block } from 'payload'
 
 const ImageBlock: Block = {
   slug: 'image',
@@ -17,7 +17,8 @@ const ImageBlock: Block = {
     {
       name: 'caption',
       type: 'text',
-      localized: true,
+      // 🔴 Remove `localized: true` unless you have localization enabled
+      // localized: true, // ❌ Remove this unless you use i18n
     },
     {
       name: 'size',

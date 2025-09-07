@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../../../_providers/Auth';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { RichText } from '../../../../components/RichText';
 
@@ -27,18 +26,26 @@ interface Blog {
   quizzes?: Quiz[];
 }
 
+interface QuizState {
+  showQuiz: boolean;
+  answers: (string | null)[];
+  currentQuestionIndex: number;
+  animationDirection: string;
+  result: null;
+  completed: boolean;
+}
+
 export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
   const { user, refreshUser } = useAuth();
-  const router = useRouter();
 
-  const [post, setPost] = useState(initialBlog);
-  const [quizStates, setQuizStates] = useState({});
+  const post = initialBlog;
+  const [quizStates, setQuizStates] = useState<Record<string, QuizState>>({});
 
   // Initialize quiz states
   useEffect(() => {
-    if (post.quizzes && post.quizzes.length > 0) {
-      const initial = post.quizzes.reduce((acc, quiz) => {
-        const isCompleted = user?.completedQuizIds?.some(item => item.quizId === quiz.id) || false;
+    if (post?.quizzes && post.quizzes.length > 0) {
+      const initial = post.quizzes.reduce((acc: Record<string, QuizState>, quiz: Quiz) => {
+        const isCompleted = user?.completedQuizIds?.some((item: any) => item.quizId === quiz.id) || false;
         acc[quiz.id] = {
           showQuiz: false,
           answers: Array(quiz.questions.length).fill(null),
@@ -48,47 +55,57 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
           completed: isCompleted,
         };
         return acc;
-      }, {} as Record<string, any>);
+      }, {});
       setQuizStates(initial);
     }
-  }, [post.quizzes, user]);
+  }, [post?.quizzes, user]);
 
   const handleAnswerChange = (quizId: string, index: number, value: string) => {
-    setQuizStates(prev => ({
-      ...prev,
-      [quizId]: {
-        ...prev[quizId],
-        answers: prev[quizId].answers.map((ans, i) => (i === index ? value : ans)),
-      },
-    }));
-  };
-
-  const goToNext = (quizId: string) => {
     setQuizStates(prev => {
-      const quiz = post.quizzes?.find(q => q.id === quizId);
-      if (!quiz || prev[quizId].currentQuestionIndex >= quiz.questions.length - 1) return prev;
+      if (!prev) return {};
+      const current = prev[quizId];
+      if (!current) return prev;
       return {
         ...prev,
         [quizId]: {
-          ...prev[quizId],
+          ...current,
+          answers: current.answers.map((ans, i) => (i === index ? value : ans)),
+        },
+      };
+    });
+  };
+
+  const goToNext = (quizId: string) => {
+    setQuizStates((prev: Record<string, QuizState>) => {
+      const quiz = post?.quizzes?.find((q: Quiz) => q.id === quizId);
+      const current = prev[quizId];
+      if (!quiz || !current || current.currentQuestionIndex >= quiz.questions.length - 1) return prev;
+      return {
+        ...prev,
+        [quizId]: {
+          ...current,
           animationDirection: 'next',
-          currentQuestionIndex: prev[quizId].currentQuestionIndex + 1,
+          currentQuestionIndex: current.currentQuestionIndex + 1,
         },
       };
     });
 
     setTimeout(() => {
-      setQuizStates(prev => ({
-        ...prev,
-        [quizId]: { ...prev[quizId], animationDirection: '' },
-      }));
+      setQuizStates((prev: Record<string, QuizState>) => {
+        const current = prev[quizId];
+        if (!current) return prev;
+        return {
+          ...prev,
+          [quizId]: { ...current, animationDirection: '' },
+        };
+      });
     }, 150);
   };
 
   const goToPrev = (quizId: string) => {
-    setQuizStates(prev => {
+    setQuizStates((prev: Record<string, QuizState>) => {
       const current = prev[quizId];
-      if (current.currentQuestionIndex <= 0) return prev;
+      if (!current || current.currentQuestionIndex <= 0) return prev;
       return {
         ...prev,
         [quizId]: {
@@ -100,16 +117,20 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
     });
 
     setTimeout(() => {
-      setQuizStates(prev => ({
-        ...prev,
-        [quizId]: { ...prev[quizId], animationDirection: '' },
-      }));
+      setQuizStates((prev: Record<string, QuizState>) => {
+        const current = prev[quizId];
+        if (!current) return prev;
+        return {
+          ...prev,
+          [quizId]: { ...current, animationDirection: '' },
+        };
+      });
     }, 150);
   };
 
   const handleSubmitQuiz = async (quizId: string) => {
     const currentState = quizStates[quizId];
-    if (!user || !currentState.answers[currentState.currentQuestionIndex]) return;
+    if (!user || !currentState || !currentState.answers[currentState.currentQuestionIndex] || !post) return;
 
     try {
       const res = await fetch('/api/quiz-attempts', {
@@ -126,10 +147,14 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
 
       if (res.ok) {
         refreshUser();
-        setQuizStates(prev => ({
-          ...prev,
-          [quizId]: { ...prev[quizId], completed: true },
-        }));
+        setQuizStates((prev: Record<string, QuizState>) => {
+          const current = prev[quizId];
+          if (!current) return prev;
+          return {
+            ...prev,
+            [quizId]: { ...current, completed: true },
+          };
+        });
       }
     } catch (err) {
       console.error('Failed to submit quiz');
@@ -143,7 +168,7 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
       </h1>
 
       {/* Quizzes */}
-      {post.quizzes?.map((quiz) => {
+      {post.quizzes?.map((quiz: Quiz) => {
         const state = quizStates[quiz.id] || {
           showQuiz: false,
           answers: [],
@@ -162,10 +187,14 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
               ) : (
                 <button
                   onClick={() =>
-                    setQuizStates((prev) => ({
-                      ...prev,
-                      [quiz.id]: { ...prev[quiz.id], showQuiz: !prev[quiz.id].showQuiz },
-                    }))
+                    setQuizStates((prev: Record<string, QuizState>) => {
+                      const current = prev[quiz.id];
+                      if (!current) return prev;
+                      return {
+                        ...prev,
+                        [quiz.id]: { ...current, showQuiz: !current.showQuiz },
+                      };
+                    })
                   }
                   className="px-7 py-3 bg-indigo-600 text-white rounded-xl"
                 >
@@ -178,11 +207,11 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
               <div className="mt-6">
                 {/* Progress */}
                 <div className="flex justify-center mb-8">
-                  {quiz.questions.map((_, idx) => (
+                  {quiz.questions.map((_: Question, idx: number) => (
                     <div
                       key={idx}
                       className={`w-4 h-4 rounded-full mx-1 ${
-                        idx < state.answers.filter((a) => a !== null).length
+                        idx < state.answers.filter((a: string | null) => a !== null).length
                           ? 'bg-green-500'
                           : idx === state.currentQuestionIndex
                           ? 'bg-blue-500'
@@ -198,7 +227,7 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
                     {state.currentQuestionIndex + 1}. {quiz.questions[state.currentQuestionIndex].questionText}
                   </h3>
                   <div className="space-y-4">
-                    {quiz.questions[state.currentQuestionIndex].options.map((opt, optIndex) => {
+                    {quiz.questions[state.currentQuestionIndex].options.map((opt: { label: string; value: string }, optIndex: number) => {
                       const safeValue = String(opt.value ?? `opt-${optIndex}`);
                       const isSelected = state.answers[state.currentQuestionIndex] === safeValue;
 

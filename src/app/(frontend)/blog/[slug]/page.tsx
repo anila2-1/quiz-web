@@ -4,12 +4,13 @@ import { getBlogBySlug } from '../../../../lib/getBlogBySlug';
 import { BlogClient } from './BlogClient'; // ← Client component
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 // ✅ SEO: Dynamic Metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const blog = await getBlogBySlug(params.slug);
+  const { slug } = await params;
+  const blog = await getBlogBySlug(slug);
 
   if (!blog) {
     return {
@@ -25,11 +26,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const canonicalUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/blog/${blog.slug}`;
 
   return {
-    title: blog.seo?.metaTitle || blog.title,
-    description: blog.seo?.metaDescription || blog.excerpt?.substring(0, 160),
+    title: blog.seo?.title || blog.title,
+    description: blog.seo?.description || blog.excerpt?.substring(0, 160),
     openGraph: {
-      title: blog.seo?.metaTitle || blog.title,
-      description: blog.seo?.metaDescription || blog.excerpt?.substring(0, 160),
+      title: blog.seo?.title || blog.title,
+      description: blog.seo?.description || blog.excerpt?.substring(0, 160),
       images: [imageUrl],
       url: canonicalUrl,
       type: 'article',
@@ -37,8 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: blog.seo?.metaTitle || blog.title,
-      description: blog.seo?.metaDescription || blog.excerpt?.substring(0, 160),
+      title: blog.seo?.title || blog.title,
+      description: blog.seo?.description || blog.excerpt?.substring(0, 160),
       images: [imageUrl],
     },
     alternates: {
@@ -49,7 +50,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // ✅ Server Component: Fetch data and pass to client
 export default async function BlogPage({ params }: Props) {
-  const blog = await getBlogBySlug(params.slug);
+  const { slug } = await params;
+  const blog = await getBlogBySlug(slug);
 
   if (!blog) {
     notFound();

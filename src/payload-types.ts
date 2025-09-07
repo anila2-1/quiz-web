@@ -294,9 +294,6 @@ export interface Blog {
    * Blog post ka title
    */
   title: string;
-  /**
-   * Unique identifier for the blog post
-   */
   slug: string;
   /**
    * Short summary shown in blog list
@@ -334,10 +331,6 @@ export interface Blog {
      */
     description?: string | null;
     image?: (string | null) | Media;
-  };
-  meta?: {
-    title?: string | null;
-    description?: string | null;
   };
   updatedAt: string;
   createdAt: string;
@@ -607,12 +600,6 @@ export interface BlogsSelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -793,10 +780,6 @@ export interface SiteSetting {
     description?: string | null;
     image?: (string | null) | Media;
   };
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -830,12 +813,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         image?: T;
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
       };
   updatedAt?: T;
   createdAt?: T;

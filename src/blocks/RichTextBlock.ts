@@ -12,7 +12,7 @@ const RichTextBlock: Block = {
     {
       name: 'content',
       type: 'richText',
-      // editor: lexicalEditor,
+      editor: lexicalEditor(), // ✅ Call the function!
       required: true,
     },
   ],

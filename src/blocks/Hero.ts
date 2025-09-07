@@ -1,9 +1,8 @@
 // src/blocks/Hero.ts
-import { Block } from 'payload';
-
+import { Block } from 'payload'
 const Hero: Block = {
   slug: 'hero',
-  labels: {
+  labels: { // ✅ Correct: plural 'labels'
     singular: 'Hero Section',
     plural: 'Hero Sections',
   },
@@ -55,4 +54,4 @@ const Hero: Block = {
   ],
 };
 
-export default Hero;
+export default Hero; // ✅ Default export

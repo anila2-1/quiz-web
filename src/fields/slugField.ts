@@ -1,11 +1,12 @@
-// src/fields/slugField.ts
-export const slugField = {
+import { Field } from 'payload'
+import { generateSlug } from '../hooks/generateSlug'
+
+export const slugField: Field = {
   name: 'slug',
   type: 'text',
-  label: 'Slug',
+  required: true,
   unique: true,
-  index: true,
-  admin: {
-    position: 'sidebar',
+  hooks: {
+    beforeChange: [generateSlug],
   },
 }

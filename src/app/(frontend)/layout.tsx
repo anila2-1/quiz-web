@@ -1,9 +1,8 @@
 // src/app/(frontend)/layout.tsx
 
 import { AuthProvider } from '../../_providers/Auth'
-import { ReactNode } from 'react'
+import React from 'react'
 import Navbar from '@/app/(frontend)/components/Navbar';
-
 
 import './globals.css'
 
@@ -31,7 +30,7 @@ async function getSiteSettings() {
   }
 }
 
-export default async function FrontendLayout({ children }: { children: ReactNode }) {
+export default async function FrontendLayout({ children }) {
   const siteSettings = await getSiteSettings()
 
   // Use SEO group if available, fallback to old fields

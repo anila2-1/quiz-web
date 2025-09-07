@@ -1,8 +1,7 @@
 // src/collections/Blogs.ts
-
 import { CollectionConfig } from 'payload'
-import { slugField } from '../fields/slugField'
 import { generateSlug } from '../hooks/generateSlug'
+import { slugField } from '../fields/slugField'
 
 const Blogs: CollectionConfig = {
   slug: 'blogs',
@@ -20,7 +19,6 @@ const Blogs: CollectionConfig = {
     // Sabhi ko read ki ijazat
     read: () => true,
 
-    // Sirf w1techy8@gmail.com create, update, delete kar sake
     create: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
     update: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
     delete: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
@@ -36,15 +34,7 @@ const Blogs: CollectionConfig = {
         description: 'Blog post ka title',
       },
     },
-    {
-      name: 'slug',
-      type: 'text',
-      required: true,
-      label: 'Slug',
-      admin: {
-        description: 'Unique identifier for the blog post',
-      },
-    },
+    slugField,
     {
       name: 'excerpt',
       type: 'textarea',
@@ -80,14 +70,14 @@ const Blogs: CollectionConfig = {
       defaultValue: 'education',
     },
     {
-  name: 'status',
-  type: 'select',
-  defaultValue: 'draft',
-  options: [
-    { label: 'Draft', value: 'draft' },
-    { label: 'Published', value: 'published' },
-  ],
-},
+      name: 'status',
+      type: 'select',
+      defaultValue: 'draft',
+      options: [
+        { label: 'Draft', value: 'draft' },
+        { label: 'Published', value: 'published' },
+      ],
+    },
     {
       name: 'quizzes',
       type: 'relationship',
@@ -97,47 +87,42 @@ const Blogs: CollectionConfig = {
         description: 'Is blog se related quizzes',
       },
     },
-    // In Blogs.ts → fields array
-{
-  name: 'seo',
-  type: 'group',
-  label: 'SEO',
-  fields: [
     {
-      name: 'title',
-      type: 'text',
-      label: 'Meta Title',
-      admin: {
-        description: 'Leave blank to auto-generate from title',
-      },
-    },
-    {
-      name: 'description',
-      type: 'textarea',
-      label: 'Meta Description',
-      admin: {
-        description: 'Leave blank to auto-generate from excerpt',
-      },
-    },
-    {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-      label: 'Open Graph Image (1200x630)',
-    },
+      name: 'seo',
+      type: 'group',
+      label: 'SEO',
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          label: 'Meta Title',
+          admin: { description: 'Leave blank to auto-generate from title' },
+        },
+        {
+          name: 'description',
+          type: 'textarea',
+          label: 'Meta Description',
+          admin: { description: 'Leave blank to auto-generate from excerpt' },
+        },
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Open Graph Image (1200x630)',
+        },
+      ],
+  },
   ],
-},   
-  ],
+
   hooks: {
     beforeChange: [
       async ({ data, req, operation }) => {
-        // Optional: Log who created/updated
+        // Log who created/updated
         if (operation === 'create') {
           req.payload.logger.info(`Blog created by: ${req.user?.email}`)
         }
         return data
       },
-
     ],
   },
   versions: {
