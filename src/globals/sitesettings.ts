@@ -2,6 +2,7 @@
 
 import { GlobalConfig } from 'payload'
 import { isAdmin } from '../access/isAdmin'
+import { updateSEOTitle } from '../hooks/updateSEOTitle'; // ✅ Import hook
 
 const SiteSettings: GlobalConfig = {
   slug: 'site-settings',
@@ -24,6 +25,22 @@ const SiteSettings: GlobalConfig = {
       label: 'Tagline',
       defaultValue: 'Learn, Quiz, Earn Points, Withdraw USDT',
     },
+    {
+      name: 'seo',
+      type: 'group',
+      label: 'SEO Settings',
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          label: 'Meta Title',
+          defaultValue: 'Learn & Earn Quiz Platform',
+          hooks: {
+            beforeChange: [updateSEOTitle], // ✅ Hook lag gaya
+          },
+        },
+  ],
+},
     {
       name: 'favicon',
       type: 'upload',
@@ -127,36 +144,9 @@ const SiteSettings: GlobalConfig = {
         description: 'Show a banner at the top of the site (optional)',
       },
     },
-    {
-  name: 'seo',
-  type: 'group',
-  label: 'SEO Settings',
-  fields: [
-    {
-      name: 'title',
-      type: 'text',
-      label: 'Meta Title',
-      defaultValue: 'Learn & Earn Quiz Platform',
-    },
-    {
-      name: 'description',
-      type: 'textarea',
-      label: 'Meta Description',
-      defaultValue: 'Learn, Quiz, Earn Points, Withdraw USDT',
-    },
-    {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-      label: 'Open Graph Image (1200x630)',
-    },
-  ],
-},
   ],
   admin: {
     description: 'Global settings for the entire site',
   },
-}
-
-
-export default SiteSettings
+};
+export default SiteSettings;

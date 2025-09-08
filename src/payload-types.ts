@@ -261,28 +261,81 @@ export interface User {
  */
 export interface Page {
   id: string;
+  /**
+   * Page ka title (SEO ke liye important)
+   */
   title: string;
+  /**
+   * URL ke liye unique identifier (e.g. "about", "contact")
+   */
+  slug: string;
+  /**
+   * Page ke sections ko drag & drop se arrange karein
+   */
   layout?:
-    | {
-        heading: string;
-        subheading?: string | null;
-        ctaText?: string | null;
-        ctaLink?: string | null;
-        /**
-         * Optional background image for the hero section
-         */
-        backgroundImage?: (string | null) | Media;
-        /**
-         * Choose the color theme
-         */
-        theme?: ('light' | 'dark') | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'hero';
-      }[]
+    | (
+        | {
+            heading: string;
+            subheading?: string | null;
+            ctaText?: string | null;
+            ctaLink?: string | null;
+            /**
+             * Optional background image for the hero section
+             */
+            backgroundImage?: (string | null) | Media;
+            /**
+             * Choose the color theme
+             */
+            theme?: ('light' | 'dark') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: string;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'richText';
+          }
+        | {
+            image: string | Media;
+            caption?: string | null;
+            size?: ('small' | 'medium' | 'large' | 'full') | null;
+            alignment?: ('left' | 'center' | 'right') | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'image';
+          }
+      )[]
     | null;
+  seo?: {
+    /**
+     * Google search result mein dikhne wala title
+     */
+    title?: string | null;
+    /**
+     * Search result mein description (160 characters tak)
+     */
+    description?: string | null;
+    image?: (string | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -561,6 +614,7 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
+  slug?: T;
   layout?:
     | T
     | {
@@ -576,9 +630,34 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        richText?:
+          | T
+          | {
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        image?:
+          | T
+          | {
+              image?: T;
+              caption?: T;
+              size?: T;
+              alignment?: T;
+              id?: T;
+              blockName?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
       };
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -725,6 +804,9 @@ export interface SiteSetting {
   id: string;
   siteTitle: string;
   tagline?: string | null;
+  seo?: {
+    title?: string | null;
+  };
   /**
    * Upload a 32x32 PNG image for favicon
    */
@@ -775,11 +857,6 @@ export interface SiteSetting {
     };
     [k: string]: unknown;
   } | null;
-  seo?: {
-    title?: string | null;
-    description?: string | null;
-    image?: (string | null) | Media;
-  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -790,6 +867,11 @@ export interface SiteSetting {
 export interface SiteSettingsSelect<T extends boolean = true> {
   siteTitle?: T;
   tagline?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+      };
   favicon?: T;
   logo?: T;
   logoDark?: T;
@@ -807,13 +889,6 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   referralPoints?: T;
   quizPointsPerCorrect?: T;
   announcement?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -30,22 +30,21 @@ interface QuizState {
   showQuiz: boolean;
   answers: (string | null)[];
   currentQuestionIndex: number;
-  animationDirection: string;
-  result: null;
+  animationDirection: 'next' | 'prev' | '';
+  result: { score: number; total: number; pointsEarned: number } | null;
   completed: boolean;
 }
 
-export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
+export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
   const { user, refreshUser } = useAuth();
-
-  const post = initialBlog;
+  const [post] = useState<Blog | null>(initialBlog || null);
   const [quizStates, setQuizStates] = useState<Record<string, QuizState>>({});
 
   // Initialize quiz states
   useEffect(() => {
-    if (post?.quizzes && post.quizzes.length > 0) {
-      const initial = post.quizzes.reduce((acc: Record<string, QuizState>, quiz: Quiz) => {
-        const isCompleted = user?.completedQuizIds?.some((item: any) => item.quizId === quiz.id) || false;
+    if (post?.quizzes?.length) {
+      const initial = post.quizzes.reduce((acc, quiz) => {
+        const isCompleted = user?.completedQuizIds?.some((item) => item.quizId === quiz.id) || false;
         acc[quiz.id] = {
           showQuiz: false,
           answers: Array(quiz.questions.length).fill(null),
@@ -55,82 +54,72 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
           completed: isCompleted,
         };
         return acc;
-      }, {});
+      }, {} as Record<string, QuizState>);
       setQuizStates(initial);
     }
   }, [post?.quizzes, user]);
 
   const handleAnswerChange = (quizId: string, index: number, value: string) => {
-    setQuizStates(prev => {
-      if (!prev) return {};
-      const current = prev[quizId];
-      if (!current) return prev;
-      return {
-        ...prev,
-        [quizId]: {
-          ...current,
-          answers: current.answers.map((ans, i) => (i === index ? value : ans)),
-        },
-      };
-    });
+    setQuizStates((prev) => ({
+      ...prev!,
+      [quizId]: {
+        ...prev![quizId],
+        answers: prev![quizId].answers.map((ans, i) => (i === index ? value : ans)),
+      },
+    }));
   };
 
   const goToNext = (quizId: string) => {
-    setQuizStates((prev: Record<string, QuizState>) => {
-      const quiz = post?.quizzes?.find((q: Quiz) => q.id === quizId);
-      const current = prev[quizId];
-      if (!quiz || !current || current.currentQuestionIndex >= quiz.questions.length - 1) return prev;
+    setQuizStates((prev) => {
+      const quiz = post?.quizzes?.find((q) => q.id === quizId);
+      if (!quiz || !prev![quizId]) return prev!;
+      const { currentQuestionIndex } = prev![quizId];
+      if (currentQuestionIndex >= quiz.questions.length - 1) return prev!;
+
       return {
-        ...prev,
+        ...prev!,
         [quizId]: {
-          ...current,
+          ...prev![quizId],
           animationDirection: 'next',
-          currentQuestionIndex: current.currentQuestionIndex + 1,
+          currentQuestionIndex: currentQuestionIndex + 1,
         },
       };
     });
 
     setTimeout(() => {
-      setQuizStates((prev: Record<string, QuizState>) => {
-        const current = prev[quizId];
-        if (!current) return prev;
-        return {
-          ...prev,
-          [quizId]: { ...current, animationDirection: '' },
-        };
-      });
+      setQuizStates((prev) => ({
+        ...prev!,
+        [quizId]: { ...prev![quizId], animationDirection: '' },
+      }));
     }, 150);
   };
 
   const goToPrev = (quizId: string) => {
-    setQuizStates((prev: Record<string, QuizState>) => {
-      const current = prev[quizId];
-      if (!current || current.currentQuestionIndex <= 0) return prev;
+    setQuizStates((prev) => {
+      const { currentQuestionIndex } = prev![quizId] || {};
+      if (currentQuestionIndex! <= 0) return prev!;
+
       return {
-        ...prev,
+        ...prev!,
         [quizId]: {
-          ...current,
+          ...prev![quizId],
           animationDirection: 'prev',
-          currentQuestionIndex: current.currentQuestionIndex - 1,
+          currentQuestionIndex: currentQuestionIndex! - 1,
         },
       };
     });
 
     setTimeout(() => {
-      setQuizStates((prev: Record<string, QuizState>) => {
-        const current = prev[quizId];
-        if (!current) return prev;
-        return {
-          ...prev,
-          [quizId]: { ...current, animationDirection: '' },
-        };
-      });
+      setQuizStates((prev) => ({
+        ...prev!,
+        [quizId]: { ...prev![quizId], animationDirection: '' },
+      }));
     }, 150);
   };
 
   const handleSubmitQuiz = async (quizId: string) => {
-    const currentState = quizStates[quizId];
-    if (!user || !currentState || !currentState.answers[currentState.currentQuestionIndex] || !post) return;
+    const currentState = quizStates![quizId];
+    if (!user || !currentState) return;
 
     try {
       const res = await fetch('/api/quiz-attempts', {
@@ -139,7 +128,7 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
         body: JSON.stringify({
           quizId,
           userId: user.id,
-          blogId: post.id,
+          blogId: post!.id,
           answers: currentState.answers,
           score: 10,
         }),
@@ -147,29 +136,30 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
 
       if (res.ok) {
         refreshUser();
-        setQuizStates((prev: Record<string, QuizState>) => {
-          const current = prev[quizId];
-          if (!current) return prev;
-          return {
-            ...prev,
-            [quizId]: { ...current, completed: true },
-          };
-        });
+        setQuizStates((prev) => ({
+          ...prev!,
+          [quizId]: { ...prev![quizId], completed: true },
+        }));
       }
     } catch (err) {
       console.error('Failed to submit quiz');
     }
   };
 
+  if (!post) {
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+  }
+
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
-      <h1 className="text-4xl font-extrabold text-gray-900 mb-4 text-center">
-        {post.title}
+      {/* Blog Title */}
+      <h1 className="text-4xl font-extrabold text-gray-900 mb-4 text-center leading-tight animate-blog-title">
+        {post!.title}
       </h1>
 
       {/* Quizzes */}
-      {post.quizzes?.map((quiz: Quiz) => {
-        const state = quizStates[quiz.id] || {
+      {post!.quizzes?.map((quiz) => {
+        const state = quizStates![quiz.id] || {
           showQuiz: false,
           answers: [],
           currentQuestionIndex: 0,
@@ -179,93 +169,117 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
         };
 
         return (
-          <div key={quiz.id} className="mb-8 p-8 bg-white border border-indigo-200 rounded-3xl shadow-lg">
+          <div
+            key={quiz.id}
+            className="mb-8 p-8 bg-gradient-to-br from-white to-indigo-50 border border-indigo-200 rounded-3xl shadow-xl"
+          >
+            {/* Quiz Header */}
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold text-indigo-800">🎯 {quiz.title}</h2>
+              <h2 className="text-3xl font-bold text-indigo-800 flex items-center gap-3">
+                <span className="bg-indigo-100 p-2 rounded-full text-indigo-600">🎯</span>
+                {quiz.title}
+              </h2>
               {state.completed ? (
-                <span className="px-5 py-3 bg-green-500 text-white rounded-full">✅ Completed</span>
+                <span className="px-5 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full text-sm font-bold shadow-md flex items-center gap-2">
+                  ✅ Completed
+                </span>
               ) : (
                 <button
                   onClick={() =>
-                    setQuizStates((prev: Record<string, QuizState>) => {
-                      const current = prev[quiz.id];
-                      if (!current) return prev;
-                      return {
-                        ...prev,
-                        [quiz.id]: { ...current, showQuiz: !current.showQuiz },
-                      };
-                    })
+                    setQuizStates((prev) => ({
+                      ...prev!,
+                      [quiz.id]: { ...prev![quiz.id], showQuiz: !prev![quiz.id]?.showQuiz },
+                    }))
                   }
-                  className="px-7 py-3 bg-indigo-600 text-white rounded-xl"
+                  className="px-7 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                 >
-                  {state.showQuiz ? 'Hide' : 'Start'} Quiz
+                  {state.showQuiz ? 'Hide Quiz' : 'Start Quiz'}
                 </button>
               )}
             </div>
 
+            {/* Quiz Flow */}
             {state.showQuiz && !state.completed && (
               <div className="mt-6">
-                {/* Progress */}
+                {/* Progress Dots */}
                 <div className="flex justify-center mb-8">
-                  {quiz.questions.map((_: Question, idx: number) => (
-                    <div
-                      key={idx}
-                      className={`w-4 h-4 rounded-full mx-1 ${
-                        idx < state.answers.filter((a: string | null) => a !== null).length
-                          ? 'bg-green-500'
-                          : idx === state.currentQuestionIndex
-                          ? 'bg-blue-500'
-                          : 'bg-gray-300'
-                      }`}
-                    />
-                  ))}
-                </div>
-
-                {/* Question */}
-                <div className="bg-white p-8 rounded-2xl shadow">
-                  <h3 className="text-2xl font-bold mb-6">
-                    {state.currentQuestionIndex + 1}. {quiz.questions[state.currentQuestionIndex].questionText}
-                  </h3>
-                  <div className="space-y-4">
-                    {quiz.questions[state.currentQuestionIndex].options.map((opt: { label: string; value: string }, optIndex: number) => {
-                      const safeValue = String(opt.value ?? `opt-${optIndex}`);
-                      const isSelected = state.answers[state.currentQuestionIndex] === safeValue;
-
-                      return (
-                        <label
-                          key={optIndex}
-                          className={`flex items-center p-5 rounded-xl border cursor-pointer ${
-                            isSelected ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name={`q${state.currentQuestionIndex}`}
-                            value={safeValue}
-                            checked={isSelected}
-                            onChange={() => handleAnswerChange(quiz.id, state.currentQuestionIndex, safeValue)}
-                            className="sr-only"
-                          />
-                          <div
-                            className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center ${
-                              isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-gray-400'
-                            }`}
-                          >
-                            {isSelected && <div className="w-3 h-3 rounded-full bg-white"></div>}
-                          </div>
-                          <span className="text-lg">{opt.label}</span>
-                        </label>
-                      );
-                    })}
+                  <div className="flex space-x-3">
+                    {quiz.questions.map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                          idx < state.answers.filter((a) => a !== null).length
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-600 scale-110 shadow-md'
+                            : idx === state.currentQuestionIndex
+                            ? 'bg-blue-500 scale-105 ring-2 ring-blue-300'
+                            : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
+                      />
+                    ))}
                   </div>
                 </div>
 
-                {/* Nav Buttons */}
+                {/* Question Card */}
+                <div
+                  className={`relative overflow-hidden rounded-2xl bg-white shadow-2xl min-h-80 transition-all duration-300 ${
+                    state.animationDirection === 'next'
+                      ? 'animate-slide-left'
+                      : state.animationDirection === 'prev'
+                      ? 'animate-slide-right'
+                      : ''
+                  }`}
+                >
+                  <div className="p-8">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6 leading-relaxed">
+                      {state.currentQuestionIndex + 1}. {quiz.questions[state.currentQuestionIndex].questionText}
+                    </h3>
+                    <div className="space-y-4">
+                      {quiz.questions[state.currentQuestionIndex].options.map((opt, optIndex) => {
+                        const safeValue = opt?.value !== undefined ? String(opt.value) : `opt-${optIndex}`;
+                        const isSelected = state.answers[state.currentQuestionIndex] === safeValue;
+
+                        return (
+                          <label
+                            key={optIndex}
+                            htmlFor={`q${state.currentQuestionIndex}-opt${optIndex}`}
+                            className={`flex items-center p-5 rounded-xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-102 ${
+                              isSelected
+                                ? 'border-indigo-600 bg-indigo-50 shadow-md'
+                                : 'border-gray-200 hover:border-indigo-300 hover:bg-indigo-25'
+                            }`}
+                          >
+                            <input
+                              id={`q${state.currentQuestionIndex}-opt${optIndex}`}
+                              type="radio"
+                              name={`q${state.currentQuestionIndex}`}
+                              value={safeValue}
+                              checked={isSelected}
+                              onChange={() => handleAnswerChange(quiz.id, state.currentQuestionIndex, safeValue)}
+                              className="sr-only"
+                            />
+                            <div
+                              className={`w-6 h-6 rounded-full border-2 mr-4 flex items-center justify-center ${
+                                isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-gray-400'
+                              }`}
+                            >
+                              {isSelected && <div className="w-3 h-3 rounded-full bg-white"></div>}
+                            </div>
+                            <span className="text-lg font-medium text-gray-800">
+                              {opt.label || `Option ${optIndex + 1}`}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Navigation */}
                 <div className="flex justify-between mt-8">
                   <button
                     onClick={() => goToPrev(quiz.id)}
                     disabled={state.currentQuestionIndex === 0}
-                    className="px-6 py-3 bg-gray-200"
+                    className="px-6 py-3 text-gray-700 bg-gray-200 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-300 font-medium transition-all duration-300 flex items-center gap-2"
                   >
                     ← Previous
                   </button>
@@ -273,14 +287,15 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
                     <button
                       onClick={() => goToNext(quiz.id)}
                       disabled={!state.answers[state.currentQuestionIndex]}
-                      className="px-6 py-3 bg-blue-600 text-white"
+                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl disabled:opacity-60 disabled:cursor-not-allowed hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-medium"
                     >
                       Next →
                     </button>
                   ) : (
                     <button
                       onClick={() => handleSubmitQuiz(quiz.id)}
-                      className="px-6 py-3 bg-green-600 text-white"
+                      disabled={!state.answers[state.currentQuestionIndex]}
+                      className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-xl transform hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 font-medium"
                     >
                       Submit Quiz
                     </button>
@@ -288,24 +303,55 @@ export function BlogClient({ initialBlog }: { initialBlog: Blog }) {
                 </div>
               </div>
             )}
+
+            {/* Quiz Result */}
+            {state.completed && (
+              <div className="mt-8 p-8 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-3xl shadow-lg text-center animate-fade-in">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <svg className="w-12 h-12 text-green-600 animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <h3 className="text-3xl font-bold text-green-700">Quiz Completed!</h3>
+                </div>
+                <p className="text-xl text-gray-800 mb-2">
+                  <strong>Congratulations!</strong>
+                </p>
+                <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  +10 points added to wallet!
+                </p>
+              </div>
+            )}
           </div>
         );
       })}
 
       {/* Blog Content */}
-      <article className="prose prose-lg max-w-none mb-12 bg-white p-8 rounded-3xl shadow">
-        {post.image && (
+      <article
+        className="relative prose prose-lg max-w-none mb-12 animate-blog-content
+                   bg-white/60 backdrop-blur-xl border border-gray-200 
+                   rounded-3xl shadow-lg p-8 leading-relaxed text-gray-800
+                   transition-all duration-500 hover:shadow-2xl"
+      >
+        {post!.image && (
           <img
-            src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image.url}`}
-            alt={post.title}
-            className="w-full h-72 object-cover rounded-2xl mb-8"
+            src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post!.image.url}`}
+            alt={post!.title}
+            className="w-full h-72 object-cover rounded-2xl shadow-xl mb-8 transform hover:scale-[1.02] transition duration-700 animate-blog-image"
           />
         )}
-        <RichText content={post.content} />
+        <RichText content={post!.content} />
       </article>
 
-      <div className="text-center">
-        <Link href="/dashboard" className="inline-block px-7 py-4 bg-gray-600 text-white rounded-xl">
+      {/* Back Button */}
+      <div className="mt-12 text-center animate-blog-button">
+        <Link
+          href="/dashboard"
+          className="inline-block px-7 py-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+        >
           ← Back to Dashboard
         </Link>
       </div>
