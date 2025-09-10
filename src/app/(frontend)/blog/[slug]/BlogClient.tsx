@@ -346,15 +346,43 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
         <RichText content={post!.content} />
       </article>
 
-      {/* Back Button */}
-      <div className="mt-12 text-center animate-blog-button">
-        <Link
-          href="/dashboard"
-          className="inline-block px-7 py-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white font-semibold rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-        >
-          ← Back to Dashboard
-        </Link>
-      </div>
+      {/* ✅ Back to Dashboard — PROFESSIONAL UPGRADE */}
+<div className="mt-10 pt-6 border-t border-gray-100">
+  <Link
+    href="/dashboard"
+    className="group inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-white border border-gray-200 
+               hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 text-gray-700 font-medium text-sm sm:text-base
+               focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+  >
+    {/* Animated Arrow */}
+    <span className="relative flex items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200 group-hover:bg-indigo-50 transition-all duration-300">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-4 w-4 text-gray-600 group-hover:text-indigo-600 transition-colors duration-300 group-hover:-translate-x-0.5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+      </svg>
+    </span>
+
+    <span className="font-semibold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent group-hover:from-indigo-600 group-hover:to-purple-600 transition-all duration-300">
+      Back to Dashboard
+    </span>
+</Link>
+</div>
+
+{/* Optional: Add Shine Animation */}
+<style>{`
+  @keyframes shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+  .animate-shine {
+    animation: shine 1.8s ease-in-out infinite;
+  }
+`}</style>
     </div>
   );
 }

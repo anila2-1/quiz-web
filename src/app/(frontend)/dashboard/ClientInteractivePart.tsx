@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import Sidebar from './../../../components/Sidebar';
 import DashboardHeader from './../../../components/DashboardHeader';
 import WalletCard from './../../../components/WalletCard';
-// import QuizHistory from './../../../components/QuizHistory';
 import ReferralStats from './../../../components/ReferralStats';
+import QuizStats from '../../../components/QuizStats';
 
 interface User {
   id: string;
@@ -16,6 +16,7 @@ interface User {
   totalPoints?: number | null;
   referralCode?: string | null;
   referralsCount?: number | null;
+
 }
 
 export default function ClientInteractivePart({ user }: { user: User }) {
@@ -43,10 +44,10 @@ export default function ClientInteractivePart({ user }: { user: User }) {
                 </div>
               </div>
 
-              {/* Quiz History
+              {/* Quiz History */}
               <div className="transform hover:translate-y-[-2px] transition-transform duration-300">
-                <QuizHistory userId={user.id} />
-              </div> */}
+                <QuizStats />          
+                    </div>
             </>
           )}
          

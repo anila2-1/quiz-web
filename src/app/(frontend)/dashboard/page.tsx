@@ -1,6 +1,7 @@
-import ClientInteractivePart from './ClientInteractivePart';
 
 // src/app/(frontend)/dashboard/page.tsx
+import ClientInteractivePart from './ClientInteractivePart';
+
 import { getServerSideMember } from '@/lib/getServerSideUser.server';
 import { redirect } from 'next/navigation';
 

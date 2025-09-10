@@ -8,7 +8,7 @@ import  {Member}  from './../payload-types';
 
 export default function ProfileForm({ member }: { member: Member }) {
   const [name, setName] = useState<string>(member.name || '');
-  const [username, setUsername] = useState<string>(member.username || '');
+  const [username] = useState<string>(member.username || '');
   const [walletAddress, setWalletAddress] = useState<string>(member.walletAddress || '');
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
@@ -22,7 +22,7 @@ export default function ProfileForm({ member }: { member: Member }) {
       const res = await fetch('/api/profile/update', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, username, walletAddress }),
+      body: JSON.stringify({ name, walletAddress }),
     });
 
       if (res.ok) {
@@ -104,7 +104,8 @@ export default function ProfileForm({ member }: { member: Member }) {
           <input
             type="text"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            // onChange={(e) => setUsername(e.target.value)}
+            disabled
             className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="Choose a username"
           />

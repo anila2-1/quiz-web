@@ -3,6 +3,42 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 
+export async function GET(req: NextRequest) {
+  try {
+    const memberId = req.cookies.get('member_id')?.value;
+
+    if (!memberId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const payload = await getPayload({ config });
+
+    // Fetch withdrawals for this member
+    const result = await payload.find({
+      collection: 'withdrawals',
+      where: {
+        user: {
+          equals: memberId,
+        },
+      },
+      sort: '-createdAt', // newest first
+    });
+
+    return NextResponse.json({
+      withdrawals: result.docs.map((doc: any) => ({
+        id: doc.id,
+        amount: doc.amount,
+        status: doc.status,
+        paymentInfo: doc.paymentInfo,
+        createdAt: doc.createdAt,
+      })),
+    });
+  } catch (error) {
+    console.error('Failed to fetch withdrawals:', error);
+    return NextResponse.json({ error: 'Failed to load history' }, { status: 500 });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { amount, paymentInfo } = await req.json();
@@ -19,11 +55,20 @@ export async function POST(req: NextRequest) {
 
     const withdrawal = await payload.create({
       collection: 'withdrawals',
-      data: { // ✅ Fixed: was `{`
+      data: {
         user: memberId,
         amount,
         paymentInfo,
         status: 'pending',
+      },
+    });
+
+    // ✅ Deduct from wallet
+    await payload.update({
+      collection: 'members',
+      id: memberId,
+      data: {
+        wallet: (member.wallet ?? 0) - amount,
       },
     });
 
