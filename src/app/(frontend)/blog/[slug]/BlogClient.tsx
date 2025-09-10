@@ -118,34 +118,40 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
   };
 
   const handleSubmitQuiz = async (quizId: string) => {
-    const currentState = quizStates![quizId];
-    if (!user || !currentState) return;
+  // ✅ Check if user is logged in
+  if (!user) {
+    // Redirect to login page
+    window.location.href = '/auth/login';
+    return;
+  }
 
-    try {
-      const res = await fetch('/api/quiz-attempts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          quizId,
-          userId: user.id,
-          blogId: post!.id,
-          answers: currentState.answers,
-          score: 10,
-        }),
-      });
+  const currentState = quizStates![quizId];
+  if (!currentState) return;
 
-      if (res.ok) {
-        refreshUser();
-        setQuizStates((prev) => ({
-          ...prev!,
-          [quizId]: { ...prev![quizId], completed: true },
-        }));
-      }
-    } catch (err) {
-      console.error('Failed to submit quiz');
+  try {
+    const res = await fetch('/api/quiz-attempts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quizId,
+        userId: user.id,
+        blogId: post!.id,
+        answers: currentState.answers,
+        score: 10,
+      }),
+    });
+
+    if (res.ok) {
+      refreshUser();
+      setQuizStates((prev) => ({
+        ...prev!,
+        [quizId]: { ...prev![quizId], completed: true },
+      }));
     }
-  };
-
+  } catch (err) {
+    console.error('Failed to submit quiz');
+  }
+};
   if (!post) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
   }
