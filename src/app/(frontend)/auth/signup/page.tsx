@@ -10,12 +10,12 @@ export default function SignupPage() {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [referredBy, setReferredBy] = useState<string>(''); // ✅ renamed
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError('');
+    setError(null);
 
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
