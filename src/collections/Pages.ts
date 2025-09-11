@@ -80,7 +80,7 @@ const Pages: CollectionConfig = {
   ],
   hooks: {
     beforeChange: [
-      async ({ data, req, operation }) => {
+      async ({ data, operation }) => {
         if (operation === 'create' && !data.slug && data.title) {
           // Auto-generate slug from title
           const slug = data.title

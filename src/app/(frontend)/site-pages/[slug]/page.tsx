@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { RichText } from '@/components/RichText';
 import { getBlockContent } from '@/components/BlockRenderer';
 
 async function getPageBySlug(slug: string) {

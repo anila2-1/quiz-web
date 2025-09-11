@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../../../_providers/Auth';
 import Link from 'next/link';
 import { RichText } from '../../../../components/RichText';
+import Image from 'next/image';
+
 
 interface Question {
   id: string;
@@ -343,7 +345,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                    transition-all duration-500 hover:shadow-2xl"
       >
         {post!.image && (
-          <img
+          <Image
             src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post!.image.url}`}
             alt={post!.title}
             className="w-full h-72 object-cover rounded-2xl shadow-xl mb-8 transform hover:scale-[1.02] transition duration-700 animate-blog-image"

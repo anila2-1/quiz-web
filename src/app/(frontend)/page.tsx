@@ -8,7 +8,7 @@ import Footer from './components/Footer';
 
 export default function HomePage() {
   const [member, setMember] = useState<any>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);

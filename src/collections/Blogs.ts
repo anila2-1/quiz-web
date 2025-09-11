@@ -1,6 +1,6 @@
 // src/collections/Blogs.ts
 import { CollectionConfig } from 'payload'
-import { generateSlug } from '../hooks/generateSlug'
+// import { generateSlug } from '../hooks/generateSlug'
 import { slugField } from '../fields/slugField'
 
 const Blogs: CollectionConfig = {

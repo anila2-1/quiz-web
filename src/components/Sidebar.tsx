@@ -17,7 +17,7 @@ interface SidebarProps {
   setActiveTab?: (tab: string) => void;
 }
 
-export default function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+export default function Sidebar({  }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
