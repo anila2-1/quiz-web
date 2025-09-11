@@ -1,7 +1,7 @@
 // src/app/(frontend)/layout.tsx
 
 import { AuthProvider } from '../../_providers/Auth';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Navbar from '@/app/(frontend)/components/Navbar';
 
 import './globals.css';
@@ -31,13 +31,13 @@ async function getSiteSettings() {
   }
 }
 
-export default async function FrontendLayout({ children }) {
+export default async function FrontendLayout({ children }: { children: ReactNode }) {
   const siteSettings = await getSiteSettings();
 
   // ✅ Fallback values for safety
   const siteTitle = siteSettings?.siteTitle || 'Learn & Earn Quiz Platform';
   const tagline = siteSettings?.tagline || 'Learn, Quiz, Earn Points, Withdraw USDT';
-  const logo = siteSettings?.logo;
+  // const logo = siteSettings?.logo;
   const favicon = siteSettings?.favicon;
 
   // ✅ SEO: Use SEO group first, fallback to global fields
@@ -82,7 +82,7 @@ export default async function FrontendLayout({ children }) {
       </head>
       <body>
         <AuthProvider>
-          <Navbar logo={logo} siteTitle={siteTitle} />
+          <Navbar />
           <main className="flex-1">{children}</main>
         </AuthProvider>
       </body>

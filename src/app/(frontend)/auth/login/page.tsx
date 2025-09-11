@@ -1,39 +1,37 @@
 // src/app/(frontend)/auth/login/page.tsx
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [email, setEmail] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
-    const memberId = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('member_id='));
-    if (memberId) router.push('/dashboard');
-  }, [router]);
+    const memberId = document.cookie.split('; ').find((row) => row.startsWith('member_id='))
+    if (memberId) router.push('/dashboard')
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError();
+    e.preventDefault()
+    setError(null)
 
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
       headers: { 'Content-Type': 'application/json' },
-    });
+    })
 
     if (res.ok) {
-      router.push('/dashboard');
+      router.push('/dashboard')
     } else {
-      const json = await res.json();
-      setError(json.error || 'Login failed');
+      const json = await res.json()
+      setError(json.error || 'Login failed')
     }
-  };
+  }
 
   return (
     <div className="relative flex items-center justify-center min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-hidden px-4">
@@ -54,7 +52,12 @@ export default function LoginPage() {
         {error && (
           <div className="mb-6 p-3 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-700 text-sm animate-fadeIn">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 20c-.77 1.333.192 3 1.732 3z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 20c-.77 1.333.192 3 1.732 3z"
+              />
             </svg>
             {error}
           </div>
@@ -63,7 +66,15 @@ export default function LoginPage() {
         {/* Email */}
         <div className="relative mb-5 group">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
@@ -82,7 +93,15 @@ export default function LoginPage() {
         {/* Password */}
         <div className="relative mb-6 group">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
@@ -98,7 +117,7 @@ export default function LoginPage() {
           />
         </div>
 
-       {/* Submit Button */}
+        {/* Submit Button */}
         <button
           type="submit"
           className="group w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] 
@@ -107,7 +126,17 @@ export default function LoginPage() {
           {/* Shine Effect */}
           <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform group-hover:animate-shine"></span>
           <span className="relative z-10 flex items-center justify-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
               <polyline points="10 17 15 12 10 7"></polyline>
               <line x1="15" y1="12" x2="3" y2="12"></line>
@@ -118,7 +147,10 @@ export default function LoginPage() {
 
         <p className="text-center text-gray-500 text-sm mt-6">
           Don’t have an account?{' '}
-          <a href="/auth/signup" className="font-medium text-indigo-600 hover:text-indigo-700 transition">
+          <a
+            href="/auth/signup"
+            className="font-medium text-indigo-600 hover:text-indigo-700 transition"
+          >
             Sign up
           </a>
         </p>
@@ -142,5 +174,5 @@ export default function LoginPage() {
         }
       `}</style>
     </div>
-  );
+  )
 }

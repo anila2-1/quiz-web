@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
-  const [member, setMember] = useState<any>(null);
+  const [member, setMember] = useState<any>();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [darkMode, setDarkMode] = useState<boolean>(false);

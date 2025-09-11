@@ -6,7 +6,7 @@ import config from '@payload-config';
 export const updateWallet = async ({
   userId,
   amount,
-  req,
+  // req,
 }: {
   userId: string;
   amount: number;

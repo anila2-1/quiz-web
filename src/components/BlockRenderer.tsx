@@ -1,7 +1,6 @@
 import React from 'react';
-import  Hero  from '../blocks/Hero';
 import RichText from '../components/RichText';
-import  ImageBlock  from '../blocks/ImageBlock';
+import Image from 'next/image';
 
 export const getBlockContent = (block: { blockType: any; id: React.Key | null | undefined; theme: string; heading: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; subheading: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; ctaText: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; content: any; alignment: any; size: string; image: { filename: any; }; }) => {
   switch (block.blockType) {
@@ -32,7 +31,7 @@ export const getBlockContent = (block: { blockType: any; id: React.Key | null | 
           key={block.id}
           className={`py-8 flex justify-${block.alignment} ${block.size === 'full' ? 'w-full' : 'max-w-4xl mx-auto'}`}
         >
-          <img
+          <Image
             src={`${process.env.NEXT_PUBLIC_SERVER_URL}/media/${block.image.filename}`}
             alt="Content Image"
             className={`${block.size === 'small' ? 'w-1/4' : block.size === 'medium' ? 'w-1/2' : block.size === 'large' ? 'w-3/4' : 'w-full'} rounded-lg`}
