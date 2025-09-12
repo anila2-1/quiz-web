@@ -2,17 +2,18 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb' // database-adapter-import
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 
-import Hero from './blocks/Hero';
-import RichTextBlock from './blocks/RichTextBlock';
-import ImageBlock from './blocks/ImageBlock';
+import Hero from './blocks/Hero'
+import RichTextBlock from './blocks/RichTextBlock'
+import ImageBlock from './blocks/ImageBlock'
 import path from 'path'
 import { buildConfig } from 'payload'
 // import { seoPlugin } from '@payloadcms/plugin-seo';
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
-import Users  from './collections/Users'
+import Users from './collections/Users'
 import { Media } from './collections/Media'
 import Blogs from './collections/Blogs'
 import Quizzes from './collections/Quizzes'
@@ -21,7 +22,6 @@ import Members from './collections/Members'
 import Pages from './collections/Pages'
 
 import SiteSettings from './globals/sitesettings'
-
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -33,23 +33,11 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [
-    Users,
-    Media,
-    Pages,
-    Blogs,
-    Members,
-    Quizzes,
-    Withdrawals
-  ],
+  collections: [Users, Media, Pages, Blogs, Members, Quizzes, Withdrawals],
   globals: [SiteSettings],
   editor: lexicalEditor(),
-  
-  blocks: [
-    Hero,
-    RichTextBlock,
-    ImageBlock,
-  ],
+
+  blocks: [Hero, RichTextBlock, ImageBlock],
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
@@ -63,8 +51,13 @@ export default buildConfig({
   plugins: [
     payloadCloudPlugin(),
     // storage-adapter-placeholder
-   
-       
+    vercelBlobStorage({
+      cacheControlMaxAge: 60 * 60 * 24 * 365, // 1 year
+      enabled: true,
+      collections: {
+        media: true,
+      },
+      token: process.env.BLOB_READ_WRITE_TOKEN || '',
+    }),
   ],
-  
 })
