@@ -262,15 +262,15 @@ export interface User {
 export interface Page {
   id: string;
   /**
-   * Page ka title (SEO ke liye important)
+   * Page title is very important for SEO
    */
   title: string;
   /**
-   * URL ke liye unique identifier (e.g. "about", "contact")
+   * URL Unique Identifier (e.g. "about", "contact")
    */
   slug: string;
   /**
-   * Page ke sections ko drag & drop se arrange karein
+   * Page sections can be arranged using drag & drop
    */
   layout?:
     | (
@@ -324,11 +324,11 @@ export interface Page {
     | null;
   seo?: {
     /**
-     * Google search result mein dikhne wala title
+     * Google search results in Title (60 characters tak)
      */
     title?: string | null;
     /**
-     * Search result mein description (160 characters tak)
+     * Meta Description (160 characters tak)
      */
     description?: string | null;
     image?: (string | null) | Media;
