@@ -136,12 +136,7 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="mb-8"
-        >
-          {/* <h1 className="text-6xl md:text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight">
-            QuizEarn
-          </h1>
-          <p className="mt-3 text-lg text-gray-600 font-medium">Learn. Quiz. Earn. Repeat.</p> */}
-        </motion.div>
+        ></motion.div>
 
         {/* Hero Content */}
         <AnimatePresence>
