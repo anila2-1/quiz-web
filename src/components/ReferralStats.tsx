@@ -1,41 +1,41 @@
 // src/app/(frontend)/components/ReferralStats.tsx
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'
 
 export default function ReferralStats({ count, code }: { count: number; code: string }) {
   // Har referral par kitne points milte hain?
-  const pointsPerReferral = 10;
-  const totalReferralPoints = count * pointsPerReferral;
-  const referralLink = `http://localhost:3000/referral/${code}`;
+  const pointsPerReferral = 10
+  const totalReferralPoints = count * pointsPerReferral
+  const referralLink = `https://quiz-learn-web.vercel.app/referral/${code}`
 
   // Copy function
   const handleCopy = () => {
     navigator.clipboard.writeText(referralLink).then(
       () => {
         // Optional: Show visual feedback (without alert)
-        const button = document.getElementById('copy-btn');
-        const originalText = button?.innerText;
-        if (button) button.innerText = 'Copied!';
+        const button = document.getElementById('copy-btn')
+        const originalText = button?.innerText
+        if (button) button.innerText = 'Copied!'
         setTimeout(() => {
-          if (button) button.innerText = originalText || 'Copy';
-        }, 2000);
+          if (button) button.innerText = originalText || 'Copy'
+        }, 2000)
       },
       (err) => {
-        console.error('Copy failed:', err);
-        alert('Failed to copy. Please manually copy the link.');
-      }
-    );
-  };
+        console.error('Copy failed:', err)
+        alert('Failed to copy. Please manually copy the link.')
+      },
+    )
+  }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
       className="bg-white/90 dark:bg-gray-800/70 top-6 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-5 transition-all duration-300 hover:shadow-2xl hover:scale-101 relative overflow-hidden"
     >
       {/* Background Gradient Blob */}
       <div className="pointer-events-none absolute -top-16 -right-16 w-32 h-30 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full blur-3xl opacity-70"></div>
-      
+
       {/* Card Content */}
       <div className="relative z-10">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
@@ -47,7 +47,7 @@ export default function ReferralStats({ count, code }: { count: number; code: st
         <p className="text-gray-600 dark:text-gray-400 text-sm mb-5">
           {count} referral{count !== 1 ? 's' : ''} joined via you
         </p>
-        
+
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -77,13 +77,17 @@ export default function ReferralStats({ count, code }: { count: number; code: st
 
       <style jsx>{`
         @keyframes shine {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(200%); }
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(200%);
+          }
         }
         .animate-shine {
           animation: shine 1.5s ease-in-out infinite;
         }
       `}</style>
     </motion.div>
-  );
+  )
 }
