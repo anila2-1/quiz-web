@@ -1,31 +1,32 @@
 // src/app/(frontend)/page.tsx
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import Footer from './components/Footer';
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
+import Footer from './components/Footer'
 
 export default function HomePage() {
-  const [member, setMember] = useState<any>(null);
-  const [, setIsVisible] = useState(false);
+  const [member, setMember] = useState<any>(null)
+  const [, setIsVisible] = useState(false)
 
   useEffect(() => {
-    setIsVisible(true);
+    setIsVisible(true)
     fetch('/api/get-member')
-      .then(res => res.json())
-      .then(data => setMember(data.member));
-  }, []);
+      .then((res) => res.json())
+      .then((data) => setMember(data.member))
+  }, [])
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Animated Gradient Background */}
-<div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Orb 1: Slow pulsing */}
-        <div 
+        <div
           className="absolute w-96 h-96 rounded-full blur-3xl opacity-70 animate-pulse"
           style={{
-            background: 'radial-gradient(circle at 30% 30%, rgba(79, 70, 229, 0.3), transparent 50%)',
+            background:
+              'radial-gradient(circle at 30% 30%, rgba(79, 70, 229, 0.3), transparent 50%)',
             left: '-10%',
             top: '-10%',
             animation: 'float 20s ease-in-out infinite',
@@ -33,10 +34,11 @@ export default function HomePage() {
         ></div>
 
         {/* Orb 2: Bouncing */}
-        <div 
+        <div
           className="absolute w-96 h-96 rounded-full blur-3xl opacity-60 animate-bounce"
           style={{
-            background: 'radial-gradient(circle at 70% 70%, rgba(192, 38, 211, 0.2), transparent 60%)',
+            background:
+              'radial-gradient(circle at 70% 70%, rgba(192, 38, 211, 0.2), transparent 60%)',
             right: '-10%',
             bottom: '-10%',
             animation: 'float 25s ease-in-out infinite reverse',
@@ -44,17 +46,18 @@ export default function HomePage() {
         ></div>
 
         {/* Orb 3: Rotating */}
-        <div 
+        <div
           className="absolute top-1/2 left-1/2 w-64 h-64 rounded-full blur-2xl opacity-40 animate-spin"
           style={{
-            background: 'radial-gradient(circle at center, rgba(14, 165, 233, 0.2), transparent 70%)',
+            background:
+              'radial-gradient(circle at center, rgba(14, 165, 233, 0.2), transparent 70%)',
             transform: 'translate(-50%, -50%)',
             animationDuration: '40s',
           }}
         ></div>
 
         {/* Subtle Grid Pattern */}
-        <div 
+        <div
           className="absolute inset-0 opacity-5"
           style={{
             backgroundImage: `
@@ -63,7 +66,9 @@ export default function HomePage() {
             `,
             backgroundSize: '50px 50px',
           }}
-        > </div>
+        >
+          {' '}
+        </div>
       </div>
 
       {/* Animated Ink Smoke Clouds */}
@@ -132,10 +137,10 @@ export default function HomePage() {
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="mb-8"
         >
-          <h1 className="text-6xl md:text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight">
+          {/* <h1 className="text-6xl md:text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight">
             QuizEarn
           </h1>
-          <p className="mt-3 text-lg text-gray-600 font-medium">Learn. Quiz. Earn. Repeat.</p>
+          <p className="mt-3 text-lg text-gray-600 font-medium">Learn. Quiz. Earn. Repeat.</p> */}
         </motion.div>
 
         {/* Hero Content */}
@@ -157,11 +162,13 @@ export default function HomePage() {
               Read blogs, test your knowledge, and earn rewards. Refer friends and earn extra{' '}
               <span className="font-bold text-indigo-600">100 points</span> per signup!
             </p>
-            
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-blue-300 to-purple-300 rounded-full opacity-20 animate-pulse"></div>
-<div className="absolute -bottom-40 -left-40 w-86 h-86 
+
+            <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-blue-300 to-purple-300 rounded-full opacity-20 animate-pulse"></div>
+            <div
+              className="absolute -bottom-40 -left-40 w-86 h-86 
      bg-gradient-to-l from-pink-300 to-indigo-300 
-     rounded-full opacity-20 animate-bounce-slow"></div>
+     rounded-full opacity-20 animate-bounce-slow"
+            ></div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
@@ -214,7 +221,9 @@ export default function HomePage() {
               transition={{ delay: 0.5 + idx * 0.1 }}
               className="bg-white/90 backdrop-blur-lg p-8 rounded-3xl shadow-xl hover:shadow-2xl border border-gray-200/50 transition-all duration-300 transform hover:-translate-y-2"
             >
-              <h3 className={`text-4xl font-extrabold text-${stat.color}-600 mb-2`}>{stat.number}</h3>
+              <h3 className={`text-4xl font-extrabold text-${stat.color}-600 mb-2`}>
+                {stat.number}
+              </h3>
               <p className="text-gray-600 font-medium">{stat.label}</p>
             </motion.div>
           ))}
@@ -256,7 +265,6 @@ export default function HomePage() {
               transition={{ delay: 0.9 + idx * 0.1 }}
               className="flex items-start space-x-4 p-6 bg-white/70 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              
               <span className="text-3xl">{feature.icon}</span>
               <div className="text-left">
                 <h4 className="text-xl font-semibold text-gray-800">{feature.title}</h4>
@@ -265,17 +273,16 @@ export default function HomePage() {
             </motion.div>
           ))}
         </motion.div>
-         
       </div>
 
       {/* Footer */}
       <Footer />
     </div>
-  );
+  )
 }
 
 // Add animation to grow underline
-<style>{`
+;<style>{`
   @keyframes grow {
     0% { transform: scaleX(0); }
     100% { transform: scaleX(1); }
