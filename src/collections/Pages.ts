@@ -1,8 +1,8 @@
 // src/collections/Pages.ts
-import { CollectionConfig } from 'payload';
-import Hero from '../blocks/Hero';
-import RichTextBlock from '../blocks/RichTextBlock';
-import ImageBlock from '../blocks/ImageBlock';
+import { CollectionConfig } from 'payload'
+import Hero from '../blocks/Hero'
+import RichTextBlock from '../blocks/RichTextBlock'
+import ImageBlock from '../blocks/ImageBlock'
 
 const Pages: CollectionConfig = {
   slug: 'pages',
@@ -21,7 +21,7 @@ const Pages: CollectionConfig = {
       label: 'Page Title',
       required: true,
       admin: {
-        description: 'Page ka title (SEO ke liye important)',
+        description: 'Page title is very important for SEO',
       },
     },
     {
@@ -31,7 +31,7 @@ const Pages: CollectionConfig = {
       required: true,
       unique: true,
       admin: {
-        description: 'URL ke liye unique identifier (e.g. "about", "contact")',
+        description: 'URL Unique Identifier (e.g. "about", "contact")',
         position: 'sidebar',
       },
     },
@@ -39,13 +39,9 @@ const Pages: CollectionConfig = {
       name: 'layout',
       type: 'blocks',
       label: 'Page Layout',
-      blocks: [
-        Hero,
-        RichTextBlock,
-        ImageBlock,
-      ],
+      blocks: [Hero, RichTextBlock, ImageBlock],
       admin: {
-        description: 'Page ke sections ko drag & drop se arrange karein',
+        description: 'Page sections can be arranged using drag & drop',
       },
     },
     {
@@ -58,7 +54,7 @@ const Pages: CollectionConfig = {
           type: 'text',
           label: 'Meta Title',
           admin: {
-            description: 'Google search result mein dikhne wala title',
+            description: 'Google search results in Title (60 characters tak)',
           },
         },
         {
@@ -66,7 +62,7 @@ const Pages: CollectionConfig = {
           type: 'textarea',
           label: 'Meta Description',
           admin: {
-            description: 'Search result mein description (160 characters tak)',
+            description: 'Meta Description (160 characters tak)',
           },
         },
         {
@@ -87,10 +83,10 @@ const Pages: CollectionConfig = {
             .toLowerCase()
             .replace(/[^a-z0-9\s-]/g, '')
             .trim()
-            .replace(/\s+/g, '-');
-          return { ...data, slug };
+            .replace(/\s+/g, '-')
+          return { ...data, slug }
         }
-        return data;
+        return data
       },
     ],
   },
@@ -99,6 +95,6 @@ const Pages: CollectionConfig = {
     maxPerDoc: 50,
   },
   timestamps: true,
-};
+}
 
-export default Pages;
+export default Pages
