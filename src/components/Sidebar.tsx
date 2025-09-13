@@ -93,7 +93,7 @@ export default function Sidebar() {
       {isMobile && (
         <button
           onClick={toggleSidebar}
-          className="fixed top-16 left-4 z-50 p-2 bg-indigo-600 text-white rounded-lg shadow-lg md:hidden"
+          className="fixed top-11 left-4 z-50 p-2 bg-indigo-600 text-white rounded-lg shadow-lg md:hidden"
           aria-label="Toggle Sidebar"
         >
           {isOpen ? (
