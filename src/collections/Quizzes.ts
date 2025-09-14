@@ -29,7 +29,17 @@ const Quizzes: CollectionConfig = {
         description: 'Enter a clear and engaging title for the quiz.',
       },
     },
-
+    {
+      name: 'points',
+      type: 'number',
+      label: 'Points for Correct Answer',
+      defaultValue: 10,
+      min: 1,
+      required: true,
+      admin: {
+        description: 'How many points users earn for each correct answer.',
+      },
+    },
     {
       name: 'questions',
       type: 'array',
@@ -67,17 +77,6 @@ const Quizzes: CollectionConfig = {
             description: 'Index (starting at 0) of the correct option from the list above.',
             condition: () => true,
             readOnly: false,
-          },
-        },
-        {
-          name: 'points',
-          type: 'number',
-          label: 'Points for Correct Answer',
-          defaultValue: 10,
-          min: 1,
-          required: true,
-          admin: {
-            description: 'How many points user earns if correct.',
           },
         },
       ],

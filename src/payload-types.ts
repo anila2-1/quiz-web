@@ -399,6 +399,10 @@ export interface Quiz {
    * Enter a clear and engaging title for the quiz.
    */
   title: string;
+  /**
+   * How many points users earn for each correct answer.
+   */
+  points: number;
   questions?:
     | {
         questionText: string;
@@ -412,10 +416,6 @@ export interface Quiz {
          * Index (starting at 0) of the correct option from the list above.
          */
         correctAnswerIndex?: number | null;
-        /**
-         * How many points user earns if correct.
-         */
-        points: number;
         id?: string | null;
       }[]
     | null;
@@ -733,6 +733,7 @@ export interface MembersSelect<T extends boolean = true> {
  */
 export interface QuizzesSelect<T extends boolean = true> {
   title?: T;
+  points?: T;
   questions?:
     | T
     | {
@@ -744,7 +745,6 @@ export interface QuizzesSelect<T extends boolean = true> {
               id?: T;
             };
         correctAnswerIndex?: T;
-        points?: T;
         id?: T;
       };
   updatedAt?: T;

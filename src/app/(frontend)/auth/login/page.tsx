@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>('')
@@ -147,12 +148,12 @@ export default function LoginPage() {
 
         <p className="text-center text-gray-500 text-sm mt-6">
           Don’t have an account?{' '}
-          <a
+          <Link
             href="/auth/signup"
             className="font-medium text-indigo-600 hover:text-indigo-700 transition"
           >
             Sign up
-          </a>
+          </Link>
         </p>
       </form>
 
