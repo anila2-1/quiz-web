@@ -4,7 +4,7 @@ import { generateSlug } from '../hooks/generateSlug'
 export const slugField: Field = {
   name: 'slug',
   type: 'text',
-  required: true,
+  required: false,
   unique: true,
   hooks: {
     beforeChange: [generateSlug],

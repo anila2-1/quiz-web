@@ -347,7 +347,7 @@ export interface Blog {
    * Blog post ka title
    */
   title: string;
-  slug: string;
+  slug?: string | null;
   /**
    * Short summary shown in blog list
    */
