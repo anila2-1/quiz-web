@@ -16,6 +16,19 @@ export default function HomePage() {
       .then((res) => res.json())
       .then((data) => setMember(data.member))
   }, [])
+  if (!member) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        {/* Spinner */}
+        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+
+        {/* Text */}
+        <p className="text-lg font-semibold text-gray-700 animate-pulse text-center px-4">
+          Loading your content...
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50">

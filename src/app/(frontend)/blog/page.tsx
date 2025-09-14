@@ -1,89 +1,97 @@
 // src/app/(frontend)/blog/page.tsx
-import { Metadata } from 'next';
+import { Metadata } from 'next'
+import BlogGrid from './BlogGrid'
+import Footer from '../components/Footer'
+import Link from 'next/link'
 
-import BlogGrid from './BlogGrid';
-import Footer from '../components/Footer';
-
-// ✅ Fetch blogs on server (already good)
+// ✅ SEO metadata
 export const metadata: Metadata = {
   title: 'Learn & Earn Blog | Discover Articles & Earn Rewards',
-  description: 'Explore insightful articles, tips, and guides to boost your knowledge and earn rewards through quizzes.',
-  openGraph: {
-    title: 'Learn & Earn Blog',
-    description: 'Discover insightful articles, tips, and guides to boost your knowledge and earn rewards.',
-    url: `${process.env.NEXT_PUBLIC_SERVER_URL}/blog`,
-    type: 'website',
-    images: [
-      {
-        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/og?title=Learn%20%E2%80%93%20Earn%20Blog`,
-        width: 1200,
-        height: 630,
-        alt: 'Learn & Earn Blog - Articles & Quizzes',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Learn & Earn Blog',
-    description: 'Discover insightful articles, tips, and guides to boost your knowledge and earn rewards.',
-    images: [
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/og?title=Learn%20%E2%80%93%20Earn%20Blog`,
-    ],
-  },
-  alternates: {
-    canonical: `${process.env.NEXT_PUBLIC_SERVER_URL}/blog`,
-  },
-};
-export default async function BlogList() {
-  let posts = [];
+  description:
+    'Explore insightful articles, tips, and guides to boost your knowledge and earn rewards through quizzes.',
+}
 
+async function fetchBlogs(page: number = 1, limit: number = 6) {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/blogs?where[status][equals]=published&sort=createdAt`,
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/blogs?where[status][equals]=published&sort=-createdAt&page=${page}&limit=${limit}`,
       {
-        next: { revalidate: 60 },
-      }
-    );
-
-    if (!res.ok) throw new Error('Failed to fetch blogs');
-
-    const json = await res.json();
-    posts = json.docs || [];
+        cache: 'no-store',
+      },
+    )
+    if (!res.ok) throw new Error('Failed to fetch blogs')
+    return res.json()
   } catch (error) {
-    console.error('Fetch blogs error:', error);
-    posts = [];
+    console.error('Fetch blogs error:', error)
+    return { docs: [], totalPages: 0, page: 1 }
   }
+}
+
+export default async function BlogList({ searchParams }: { searchParams: { page?: string } }) {
+  const currentPage = parseInt(searchParams?.page || '1', 10)
+  const limit = 6 // ✅ number of blogs per page
+  const { docs: posts, totalPages } = await fetchBlogs(currentPage, limit)
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-80 -right-80 w-96 h-96 bg-gradient-to-br from-indigo-200 to-purple-200 rounded-full opacity-50 blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-80 -left-80 w-96 h-96 bg-gradient-to-tr from-pink-200 to-indigo-200 rounded-full opacity-50 blur-3xl animate-bounce delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-56 h-56 bg-gradient-to-r from-cyan-200 to-blue-200 rounded-full opacity-30 blur-2xl animate-spin" style={{ animationDuration: '20s' }}></div>
-      </div>
-
       {/* Hero Section */}
-      <div className="relative py-24 text-center">
-        <h1 className="text-7xl md:text-6xl p-2.5 font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight">
+      <div className="relative px-6 py-16 sm:py-20 md:py-24 text-center">
+        <h1 className="text-4xl p-2.5 sm:text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight">
           Learn & Earn Blog
-          </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+        </h1>
+        <p className="mt-6 text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
           Discover insightful articles, tips, and guides to boost your knowledge and earn rewards.
         </p>
-        {/* <div className="flex flex-wrap justify-center gap-4">
-          <span className="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Learning</span>
-          <span className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">Quizzes</span>
-          <span className="px-4 py-2 bg-pink-100 text-pink-800 rounded-full text-sm font-medium">Earnings</span>
-          <span className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">Tips</span>
-        </div> */}
       </div>
 
-      {/* Blog Posts (Client Component) */}
-      <div className='-mt-8'>
-      <BlogGrid  posts={posts} />
+      {/* Blog Posts */}
+      <div className="px-4 sm:px-6 lg:px-8 pb-12">
+        <BlogGrid posts={posts} />
+
+        {/* ✅ Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-10 gap-3">
+            {/* Prev Button */}
+            {currentPage > 1 && (
+              <Link
+                href={`/blog?page=${currentPage - 1}`}
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 transition"
+              >
+                ← Prev
+              </Link>
+            )}
+
+            {/* Page Numbers */}
+            <div className="flex gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Link
+                  key={page}
+                  href={`/blog?page=${page}`}
+                  className={`px-4 py-2 rounded-lg transition ${
+                    page === currentPage
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+                      : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                  }`}
+                >
+                  {page}
+                </Link>
+              ))}
+            </div>
+
+            {/* Next Button */}
+            {currentPage < totalPages && (
+              <Link
+                href={`/blog?page=${currentPage + 1}`}
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 transition"
+              >
+                Next →
+              </Link>
+            )}
+          </div>
+        )}
       </div>
-<Footer />
+
+      <Footer />
     </div>
-  );
+  )
 }

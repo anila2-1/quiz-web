@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
-import { getBlogBySlug } from '../../../../lib/getBlogBySlug'
+import { getBlogBySlug } from '../../../lib/getBlogBySlug'
 import { BlogClient } from './BlogClient' // ← Client component
+import Footer from '../components/Footer'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -9,16 +10,16 @@ type Props = {
 
 // ✅ SEO: Dynamic Metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const blog = await getBlogBySlug(slug);
+  const { slug } = await params
+  const blog = await getBlogBySlug(slug)
 
-  if (!blog) return { title: 'Blog Not Found' };
+  if (!blog) return { title: 'Blog Not Found' }
 
   const imageUrl = blog.image?.url
     ? `${process.env.NEXT_PUBLIC_SERVER_URL}${blog.image.url}`
-    : `${process.env.NEXT_PUBLIC_SERVER_URL}/api/og?title=${encodeURIComponent(blog.title)}`;
+    : `${process.env.NEXT_PUBLIC_SERVER_URL}/api/og?title=${encodeURIComponent(blog.title)}`
 
-  const canonicalUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/blog/${blog.slug}`;
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/blog/${blog.slug}`
 
   return {
     title: blog.seo?.title || blog.title,
@@ -53,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: canonicalUrl,
     },
-  };
+  }
 }
 
 // ✅ Server Component: Fetch data and pass to client
@@ -65,5 +66,10 @@ export default async function BlogPage({ params }: Props) {
     notFound()
   }
 
-  return <BlogClient initialBlog={blog} />
+  return (
+    <div>
+      <BlogClient initialBlog={blog} />
+      <Footer />
+    </div>
+  )
 }

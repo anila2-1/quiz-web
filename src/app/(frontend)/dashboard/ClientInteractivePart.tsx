@@ -1,7 +1,7 @@
-// src/app/(frontend)/dashboard/ClientInteractivePart.tsx
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { Menu } from 'lucide-react'
 import Sidebar from './../../../components/Sidebar'
 import DashboardHeader from './../../../components/DashboardHeader'
 import WalletCard from './../../../components/WalletCard'
@@ -18,43 +18,74 @@ interface User {
   referralsCount?: number | null
 }
 
-export default function ClientInteractivePart({ user }: { user: User }) {
-  const [activeTab, setActiveTab] = useState<string>('overview')
+export default function ClientInteractivePart({ user: serverUser }: { user: User | null }) {
+  const [user, setUser] = useState<User | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  useEffect(() => {
+    // Simulate client-side loading
+    setTimeout(() => {
+      setUser(serverUser) // replace with API call if needed
+    }, 1000)
+  }, [serverUser])
+
+  if (!user) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-lg font-semibold text-gray-700 animate-pulse">Loading your content...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      {/* Sidebar */}
-      <Sidebar />
-
-      {/* Main Content */}
-      <div className="flex-1 ml-64 p-6 transition-all duration-300">
-        <DashboardHeader user={user} activeTab={activeTab!} />
-
-        <div className="mt-8 space-y-8">
-          {activeTab === 'overview' && (
-            <>
-              {/* Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div className="transform hover:scale-105 transition-transform duration-300">
-                  <WalletCard />
-                </div>
-                <div className="transform hover:scale-105 transition-transform duration-300">
-                  <ReferralStats count={user.referralsCount || 0} code={user.referralCode || ''} />
-                </div>
-              </div>
-
-              {/* Quiz History */}
-              <div className="transform hover:translate-y-[-2px] transition-transform duration-300">
-                <QuizStats />
-              </div>
-            </>
-          )}
-        </div>
+      {/* Sidebar Desktop */}
+      <div className="hidden lg:block">
+        <Sidebar />
       </div>
 
-      {/* Background Decorative Elements */}
-      <div className="fixed -top-20 -left-20 w-80 h-80 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full opacity-50 blur-3xl pointer-events-none"></div>
-      <div className="fixed bottom-0 right-0 w-96 h-96 bg-gradient-to-l from-pink-100 to-indigo-100 rounded-full opacity-50 blur-3xl pointer-events-none"></div>
+      {/* Sidebar Mobile */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-40 flex">
+          <div className="relative w-64 bg-white shadow-lg">
+            <Sidebar />
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="flex-1 bg-black bg-opacity-50" onClick={() => setSidebarOpen(false)} />
+        </div>
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 w-full">
+        {/* Mobile Header */}
+        <div className="flex items-center justify-between lg:hidden px-4 py-3 border-b bg-white shadow-sm">
+          <h1 className="text-lg font-bold text-gray-900">Sidebar</h1>
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2 rounded-md text-gray-600 hover:text-gray-900"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 sm:p-6 lg:ml-64 transition-all duration-300">
+          <DashboardHeader user={user} activeTab="overview" />
+          <div className="mt-8 space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <WalletCard />
+              <ReferralStats count={user.referralsCount || 0} code={user.referralCode || ''} />
+            </div>
+            <QuizStats />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

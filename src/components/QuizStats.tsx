@@ -1,50 +1,50 @@
 // src/app/(frontend)/components/QuizStats.tsx
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 
 interface QuizStatsData {
-  totalQuizPoints: number;
-  quizCount: number;
+  totalQuizPoints: number
+  quizCount: number
   latestQuiz: {
-    title: string;
-    date: string;
-    score: number;
-    points: number;
-  } | null;
+    title: string
+    date: string
+    score: number
+    points: number
+  } | null
 }
 
 export default function QuizStats() {
-  const [stats, setStats] = useState<QuizStatsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<QuizStatsData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchQuizStats = async () => {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
       try {
-        const res = await fetch('/api/quiz-stats');
-        
+        const res = await fetch('/api/quiz-stats')
+
         if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error || 'Failed to load quiz stats');
+          const errorData = await res.json()
+          throw new Error(errorData.error || 'Failed to load quiz stats')
         }
 
-        const data = await res.json();
-        setStats(data);
+        const data = await res.json()
+        setStats(data)
       } catch (err: any) {
-        console.error('Error fetching quiz stats:', err);
-        setError(err.message);
+        console.error('Error fetching quiz stats:', err)
+        setError(err.message)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchQuizStats();
-  }, []);
+    fetchQuizStats()
+  }, [])
 
   if (loading) {
     return (
@@ -59,7 +59,7 @@ export default function QuizStats() {
         </h3>
         <div className="h-8 bg-gray-200 rounded animate-pulse w-32"></div>
       </motion.div>
-    );
+    )
   }
 
   if (error) {
@@ -70,23 +70,21 @@ export default function QuizStats() {
         transition={{ duration: 0.4 }}
         className="bg-white/90 dark:bg-gray-800/70 backdrop-blur-lg rounded-2xl shadow-xl border border-red-200 dark:border-red-700 p-5"
       >
-        <div className="text-red-600 dark:text-red-400 text-center">
-          ❌ {error}
-        </div>
+        <div className="text-red-600 dark:text-red-400 text-center">❌ {error}</div>
       </motion.div>
-    );
+    )
   }
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      transition={{ duration: 0.4, ease: 'easeOut' }}
       className="bg-white/90 dark:bg-gray-800/70 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-5 transition-all duration-300 hover:shadow-2xl hover:scale-101 relative overflow-hidden"
     >
       {/* Background Gradient Blob */}
       <div className="pointer-events-none absolute -top-16 -right-16 w-32 h-30 bg-gradient-to-br from-yellow-100 to-pink-100 rounded-full blur-3xl opacity-70"></div>
-      
+
       {/* Card Content */}
       <div className="relative z-10">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
@@ -101,8 +99,7 @@ export default function QuizStats() {
 
         {stats?.latestQuiz && (
           <div className="text-xs text-gray-500 dark:text-gray-400">
-            <strong>Latest:</strong> {stats.latestQuiz.title} — Score: {stats.latestQuiz.score}/10 —{' '}
-            {new Date(stats.latestQuiz.date).toLocaleDateString()}
+            <strong>Latest:</strong> — {new Date(stats.latestQuiz.date).toLocaleDateString()}
           </div>
         )}
       </div>
@@ -115,13 +112,17 @@ export default function QuizStats() {
 
       <style jsx>{`
         @keyframes shine {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(200%); }
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(200%);
+          }
         }
         .animate-shine {
           animation: shine 1.5s ease-in-out infinite;
         }
       `}</style>
     </motion.div>
-  );
+  )
 }

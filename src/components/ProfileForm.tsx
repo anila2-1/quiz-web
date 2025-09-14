@@ -20,7 +20,7 @@ export default function ProfileForm({ member }: { member: Member }) {
       const res = await fetch('/api/profile/update', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, walletAddress }),
+        body: JSON.stringify({ name, username, walletAddress }),
       })
 
       if (res.ok) {

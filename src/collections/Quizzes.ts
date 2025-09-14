@@ -1,6 +1,6 @@
 // src/collections/Quizzes.ts
 
-import { CollectionConfig } from 'payload';
+import { CollectionConfig } from 'payload'
 
 const Quizzes: CollectionConfig = {
   slug: 'quizzes',
@@ -29,15 +29,7 @@ const Quizzes: CollectionConfig = {
         description: 'Enter a clear and engaging title for the quiz.',
       },
     },
-    // {
-    //   name: 'relatedBlog',
-    //   type: 'relationship',
-    //   relationTo: 'blogs',
-    //   label: 'Related Blog Post',
-    //   admin: {
-    //     description: 'Select the blog post this quiz is attached to.',
-    //   },
-    // },
+
     {
       name: 'questions',
       type: 'array',
@@ -66,7 +58,6 @@ const Quizzes: CollectionConfig = {
           ],
         },
         {
-        
           name: 'correctAnswerIndex',
           type: 'number',
           required: true,
@@ -99,15 +90,15 @@ const Quizzes: CollectionConfig = {
         if (req.user && req.user.email !== 'w1techy8@gmail.com') {
           doc.questions?.forEach((q: any) => {
             if (q.correctAnswerIndex !== undefined) {
-              delete q.correctAnswerIndex;
+              delete q.correctAnswerIndex
             }
-          });
+          })
         }
-        return doc;
+        return doc
       },
     ],
   },
   timestamps: true,
-};
+}
 
-export default Quizzes;
+export default Quizzes

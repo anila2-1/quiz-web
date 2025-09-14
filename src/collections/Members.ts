@@ -1,4 +1,4 @@
-import { CollectionConfig } from 'payload';
+import { CollectionConfig } from 'payload'
 
 const Members: CollectionConfig = {
   slug: 'members',
@@ -49,7 +49,6 @@ const Members: CollectionConfig = {
       defaultValue: 0,
     },
     {
-     
       name: 'referredBy',
       type: 'relationship',
       relationTo: 'members',
@@ -62,7 +61,7 @@ const Members: CollectionConfig = {
       type: 'text',
       required: false,
     },
-    
+
     {
       name: 'completedBlogs',
       type: 'array',
@@ -96,21 +95,21 @@ const Members: CollectionConfig = {
       ],
     },
   ],
-   hooks: {
+  hooks: {
     afterChange: [
       async ({ doc, req, operation }) => {
         if (operation === 'create' && !doc.referralCode) {
-          const code = `REF${doc.id.slice(0, 6).toUpperCase()}`;
+          const code = `REF${doc.id.slice(0, 6).toUpperCase()}`
           await req.payload.update({
             collection: 'members',
             id: doc.id,
             data: { referralCode: code },
-          });
+          })
         }
-        return doc;
+        return doc
       },
     ],
   },
-};
+}
 
-export default Members;
+export default Members

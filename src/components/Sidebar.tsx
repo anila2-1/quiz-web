@@ -2,7 +2,7 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 interface MenuItem {
@@ -93,7 +93,7 @@ export default function Sidebar() {
       {isMobile && (
         <button
           onClick={toggleSidebar}
-          className="fixed top-11 left-4 z-50 p-2 bg-indigo-600 text-white rounded-lg shadow-lg md:hidden"
+          className="fixed top-13 left-3 z-50 p-2 text-black rounded-lg shadow-lg md:hidden"
           aria-label="Toggle Sidebar"
         >
           {isOpen ? (

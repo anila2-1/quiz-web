@@ -26,7 +26,7 @@ export default function DashboardHeader({ user, activeTab }: { user: any; active
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="bg-white/90 top-2.5 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/60 dark:border-gray-800 p-6 md:p-8 transition-all duration-300 hover:shadow-2xl relative"
+      className="bg-white/90  top-2.5 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/60 dark:border-gray-800 p-6 md:p-8 transition-all duration-300 hover:shadow-2xl relative"
     >
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">

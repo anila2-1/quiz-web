@@ -1,56 +1,56 @@
 // src/app/(frontend)/layout.tsx
 
-import { AuthProvider } from '../../_providers/Auth';
-import React, { ReactNode } from 'react';
-import Navbar from '@/app/(frontend)/components/Navbar';
+import { AuthProvider } from '../../_providers/Auth'
+import React, { ReactNode } from 'react'
+import Navbar from '@/app/(frontend)/components/Navbar'
 
-import './globals.css';
+import './globals.css'
 
 // Fetch site settings from Payload CMS
 async function getSiteSettings() {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000';
+    const API_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
     const res = await fetch(`${API_URL}/api/globals/site-settings`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
       next: { tags: ['site-settings'], revalidate: 60 }, // Revalidate every 60 seconds
-    });
+    })
 
     if (!res.ok) {
-      console.error('Failed to fetch site settings:', res.status, res.statusText);
-      return null;
+      console.error('Failed to fetch site settings:', res.status, res.statusText)
+      return null
     }
 
-    const json = await res.json();
-    return json;
+    const json = await res.json()
+    return json
   } catch (error) {
-    console.error('Error fetching site settings:', error);
-    return null;
+    console.error('Error fetching site settings:', error)
+    return null
   }
 }
 
 export default async function FrontendLayout({ children }: { children: ReactNode }) {
-  const siteSettings = await getSiteSettings();
+  const siteSettings = await getSiteSettings()
 
   // ✅ Fallback values for safety
-  const siteTitle = siteSettings?.siteTitle || 'Learn & Earn Quiz Platform';
-  const tagline = siteSettings?.tagline || 'Learn, Quiz, Earn Points, Withdraw USDT';
+  const siteTitle = siteSettings?.siteTitle || 'Learn & Earn Quiz Platform'
+  const tagline = siteSettings?.tagline || 'Learn, Quiz, Earn Points, Withdraw USDT'
   // const logo = siteSettings?.logo;
-  const favicon = siteSettings?.favicon;
+  const favicon = siteSettings?.favicon
 
   // ✅ SEO: Use SEO group first, fallback to global fields
-  const seoTitle = siteSettings?.seo?.title || siteTitle;
-  const seoDescription = siteSettings?.seo?.description || tagline;
+  const seoTitle = siteSettings?.seo?.title || siteTitle
+  const seoDescription = siteSettings?.seo?.description || tagline
   const seoImage = siteSettings?.seo?.image
     ? `${process.env.NEXT_PUBLIC_SERVER_URL}/media/${siteSettings.seo.image.filename}`
-    : null;
+    : null
 
   // ✅ Favicon URL
   const faviconURL = favicon
     ? `${process.env.NEXT_PUBLIC_SERVER_URL}/media/${favicon.filename}`
-    : '/favicon.ico';
+    : '/favicon.ico'
 
   return (
     <html lang="en">
@@ -87,5 +87,5 @@ export default async function FrontendLayout({ children }: { children: ReactNode
         </AuthProvider>
       </body>
     </html>
-  );
+  )
 }

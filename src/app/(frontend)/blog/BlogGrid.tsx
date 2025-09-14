@@ -1,8 +1,8 @@
 // src/app/(frontend)/blog/BlogGrid.tsx
-'use client';
+'use client'
 
-import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function BlogGrid({ posts }: { posts: any[] }) {
   return (
@@ -31,10 +31,12 @@ export default function BlogGrid({ posts }: { posts: any[] }) {
                   </div>
                 )}
                 <div className="p-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{post.title}</h2>
+                  <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                    {post.title}
+                  </h2>
                   <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
                   <Link
-                    href={`/blog/${post.slug}`}
+                    href={`/${post.slug}`}
                     className="inline-block px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow hover:shadow-md transition-all duration-300 transform hover:scale-105"
                   >
                     Read More →
@@ -56,5 +58,5 @@ export default function BlogGrid({ posts }: { posts: any[] }) {
         </AnimatePresence>
       </div>
     </div>
-  );
+  )
 }
