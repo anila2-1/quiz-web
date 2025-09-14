@@ -1,4 +1,3 @@
-// src/app/(frontend)/blog/page.tsx
 import { Metadata } from 'next'
 import BlogGrid from './BlogGrid'
 import Footer from '../components/Footer'
@@ -11,6 +10,12 @@ export const metadata: Metadata = {
     'Explore insightful articles, tips, and guides to boost your knowledge and earn rewards through quizzes.',
 }
 
+// ✅ Define type for searchParams
+type SearchParams = {
+  page?: string
+}
+
+// ✅ Fetch blogs function
 async function fetchBlogs(page: number = 1, limit: number = 6) {
   try {
     const res = await fetch(
@@ -27,9 +32,10 @@ async function fetchBlogs(page: number = 1, limit: number = 6) {
   }
 }
 
-export default async function BlogList({ searchParams }: { searchParams: { page?: string } }) {
+// ✅ Fixed: Now it accepts searchParams with correct type
+export default async function BlogList({ searchParams }: { searchParams: SearchParams }) {
   const currentPage = parseInt(searchParams?.page || '1', 10)
-  const limit = 6 // ✅ number of blogs per page
+  const limit = 6
   const { docs: posts, totalPages } = await fetchBlogs(currentPage, limit)
 
   return (
