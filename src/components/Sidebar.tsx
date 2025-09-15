@@ -1,8 +1,7 @@
-// Sidebar.tsx (fixed responsive toggle)
+// Sidebar.tsx — Pure Static UI (No Mobile Logic)
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
 interface MenuItem {
@@ -14,22 +13,6 @@ interface MenuItem {
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const router = useRouter()
-  const [isMobile, setIsMobile] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
-
-  // Detect mobile screen
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-      if (window.innerWidth >= 768) {
-        setIsOpen(true) // desktop always open
-      }
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
 
   const menuItems: MenuItem[] = [
     { key: 'overview', label: 'Overview', icon: '📊', href: '/dashboard' },
@@ -37,24 +20,17 @@ export default function Sidebar() {
     { key: 'profile', label: 'Profile', icon: '👤', href: '/dashboard/profile' },
   ]
 
-  const handleNavigation = (href: string) => {
-    router.push(href)
-    if (isMobile) setIsOpen(false)
-  }
-
-  const toggleSidebar = () => setIsOpen((prev) => !prev)
-
   // Brand Header
   const BrandHeader = () => (
     <div className="p-6">
-      <h2 className="text-xl font-bold text-indigo-700">Sidebar</h2>
+      <h2 className="text-xl font-bold text-indigo-700">Dashboard</h2>
     </div>
   )
 
   const MenuItemComponent = ({ item }: { item: MenuItem }) => (
     <li key={item.key}>
-      <button
-        onClick={() => handleNavigation(item.href)}
+      <Link
+        href={item.href}
         className={`group w-full flex items-center space-x-3 px-6 py-3 text-left rounded-xl transition-all
           ${
             pathname === item.href
@@ -64,7 +40,7 @@ export default function Sidebar() {
       >
         <span>{item.icon}</span>
         <span className="font-medium">{item.label}</span>
-      </button>
+      </Link>
     </li>
   )
 
@@ -88,49 +64,9 @@ export default function Sidebar() {
   )
 
   return (
-    <>
-      {/* ✅ Toggle Button (Mobile only) */}
-      {isMobile && (
-        <button
-          onClick={toggleSidebar}
-          className="fixed top-13 left-3 z-50 p-2 text-black rounded-lg shadow-lg md:hidden"
-          aria-label="Toggle Sidebar"
-        >
-          {isOpen ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path d="M18 6L6 18M6 6l12 12" strokeWidth={2} />
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path d="M3 12h18M3 6h18M3 18h18" strokeWidth={2} />
-            </svg>
-          )}
-        </button>
-      )}
-
-      {/* ✅ Sidebar */}
-      <div
-        className={`fixed h-full w-64 bg-white/95 backdrop-blur-lg shadow-xl border-r border-gray-200 transition-transform duration-300 z-40
-        ${isMobile ? (isOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}`}
-      >
-        <BrandHeader />
-        <Navigation />
-      </div>
-
-      {/* ✅ Overlay for mobile */}
-      {isMobile && isOpen && (
-        <div className="fixed inset-0 bg-black/40 z-30 md:hidden" onClick={toggleSidebar}></div>
-      )}
-    </>
+    <div className="fixed h-full w-64 bg-white/95 backdrop-blur-lg shadow-xl border-r border-gray-200 transition-transform duration-300 z-40">
+      <BrandHeader />
+      <Navigation />
+    </div>
   )
 }

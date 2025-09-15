@@ -47,25 +47,26 @@ export default function ClientInteractivePart({ user: serverUser }: { user: User
       </div>
       {/* Sidebar Mobile */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 flex">
-          <div className="relative w-64 bg-white shadow-lg h-full">
+        <>
+          <div className="fixed top-0 left-0 z-50 h-full w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:hidden">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-bold text-gray-800">Menu</h2>
+              <button
+                onClick={() => setSidebarOpen(false)}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                ✕
+              </button>
+            </div>
             <Sidebar />
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
-            >
-              ✕
-            </button>
           </div>
-          <div className="flex-1 bg-black bg-opacity-50" onClick={() => setSidebarOpen(false)} />
-        </div>
+        </>
       )}
       {/* Main Content */}
       <div className="flex-1 w-full">
         {/* Mobile Header */}
-        {/* Mobile Header */}
-        <div className="flex items-center justify-between lg:hidden px-4 py-3 border-b bg-white shadow-sm sticky top-0 z-10">
-          <h1 className="text-lg font-bold text-gray-900">Dashboard</h1>
+        <div className="flex items-center justify-between lg:hidden px-4 py-3 border-b bg-white shadow-sm">
+          <h1 className="text-lg font-bold text-gray-900">Sidebar</h1>
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-md text-gray-600 hover:text-gray-900"
@@ -73,6 +74,7 @@ export default function ClientInteractivePart({ user: serverUser }: { user: User
             <Menu className="w-6 h-6" />
           </button>
         </div>
+
         {/* Content */}
         <div className="p-4 sm:p-6 lg:ml-64 transition-all duration-300">
           <DashboardHeader user={user} activeTab="overview" />
