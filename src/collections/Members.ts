@@ -92,6 +92,15 @@ const Members: CollectionConfig = {
           name: 'quizId',
           type: 'text',
         },
+        {
+          name: 'completedAt',
+          type: 'date',
+          defaultValue: () => new Date().toISOString(),
+        },
+        {
+          name: 'score',
+          type: 'number',
+        },
       ],
     },
   ],

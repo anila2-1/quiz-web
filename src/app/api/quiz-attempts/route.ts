@@ -6,7 +6,7 @@ import { cookies } from 'next/headers'
 
 export async function POST(req: NextRequest) {
   try {
-    const { quizId, answers } = await req.json()
+    const { quizId, answers, userId, blogId } = await req.json()
     const memberId = (await cookies()).get('member_id')?.value
 
     if (!memberId) {
@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
 
     const payload = await getPayload({ config })
 
+    // Get the quiz with all details including points
     const quiz = await payload.findByID({
       collection: 'quizzes',
       id: quizId,
@@ -36,7 +37,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Answers length mismatch' }, { status: 400 })
     }
 
-    const pointsEarned = 10
+    // ✅ Give full points regardless of correctness
+    const pointsEarned = quiz.points || 10
+    const totalQuestions = quiz.questions.length
 
     const member = await payload.findByID({
       collection: 'members',
@@ -57,26 +60,24 @@ export async function POST(req: NextRequest) {
         completedBlogs: [
           ...(member.completedBlogs || []),
           {
-            blog: null,
+            blog: blogId,
             score: pointsEarned,
             completedAt: new Date().toISOString(),
           },
         ],
         completedQuizIds: [
-          ...(member.completedQuizIds || []).filter((item) => item.quizId !== quizId),
-          { quizId },
+          ...(member.completedQuizIds || []).filter((item: any) => item.quizId !== quizId),
+          { quizId, score: pointsEarned, completedAt: new Date().toISOString() },
         ],
       },
     })
 
-    const updatedTotalPoints = (member.totalPoints || 0) + pointsEarned
-
     return NextResponse.json({
       result: {
-        score: pointsEarned,
-        totalPoints: updatedTotalPoints,
+        score: totalQuestions, // 👈 Show full score in UI
+        total: totalQuestions,
         pointsEarned,
-        member: updatedMember, // 👈 send back updated member
+        member: updatedMember,
       },
     })
   } catch (error: any) {

@@ -447,6 +447,8 @@ export interface Member {
   completedQuizIds?:
     | {
         quizId?: string | null;
+        completedAt?: string | null;
+        score?: number | null;
         id?: string | null;
       }[]
     | null;
@@ -708,6 +710,8 @@ export interface MembersSelect<T extends boolean = true> {
     | T
     | {
         quizId?: T;
+        completedAt?: T;
+        score?: T;
         id?: T;
       };
   updatedAt?: T;

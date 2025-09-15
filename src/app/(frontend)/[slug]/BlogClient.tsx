@@ -47,9 +47,11 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
         (acc, quiz) => {
           const isCompleted =
             user?.completedQuizIds?.some((item) => item.quizId === quiz.id) || false
+          const questionsLength = quiz.questions?.length || 0
+
           acc[quiz.id] = {
             showQuiz: false,
-            answers: Array(quiz.questions.length).fill(null),
+            answers: Array(questionsLength).fill(null),
             currentQuestionIndex: 0,
             animationDirection: '',
             result: null,
@@ -78,7 +80,8 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
       const quiz = post?.quizzes?.find((q) => q.id === quizId)
       if (!quiz || !prev![quizId]) return prev!
       const { currentQuestionIndex } = prev![quizId]
-      if (currentQuestionIndex >= quiz.questions.length - 1) return prev!
+      if (!Array.isArray(quiz.questions) || currentQuestionIndex >= quiz.questions.length - 1)
+        return prev!
 
       return {
         ...prev!,
@@ -100,27 +103,27 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
 
   const goToPrev = (quizId: string) => {
     setQuizStates((prev) => {
-      const { currentQuestionIndex } = prev![quizId] || {}
-      if (currentQuestionIndex! <= 0) return prev!
+      if (!prev[quizId] || prev[quizId].currentQuestionIndex <= 0) return prev
 
       return {
-        ...prev!,
+        ...prev,
         [quizId]: {
-          ...prev![quizId],
+          ...prev[quizId],
           animationDirection: 'prev',
-          currentQuestionIndex: currentQuestionIndex! - 1,
+          currentQuestionIndex: prev[quizId].currentQuestionIndex - 1,
         },
       }
     })
 
     setTimeout(() => {
       setQuizStates((prev) => ({
-        ...prev!,
-        [quizId]: { ...prev![quizId], animationDirection: '' },
+        ...prev,
+        [quizId]: { ...prev[quizId], animationDirection: '' },
       }))
     }, 150)
   }
 
+  // In your BlogClient component, update the handleSubmitQuiz function:
   const handleSubmitQuiz = async (quizId: string) => {
     if (!user) {
       window.location.href = '/auth/login'
@@ -139,22 +142,31 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
           userId: user.id,
           blogId: post!.id,
           answers: currentState.answers,
-          score: 10,
         }),
       })
 
       if (res.ok) {
+        const data = await res.json()
         refreshUser()
         setQuizStates((prev) => ({
           ...prev!,
-          [quizId]: { ...prev![quizId], completed: true },
+          [quizId]: {
+            ...prev![quizId],
+            completed: true,
+            result: {
+              score: data.result.score,
+              total: data.result.total,
+              pointsEarned: data.result.pointsEarned,
+            },
+          },
         }))
+      } else {
+        console.error('Failed to submit quiz:', await res.text())
       }
     } catch (err) {
-      console.error('Failed to submit quiz')
+      console.error('Failed to submit quiz:', err)
     }
   }
-
   // inside your component:
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -187,11 +199,10 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
     <div className="max-w-5xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       {/* Blog Title */}
       <h1
-        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl 
+        className="text-2xl sm:text-3xl md:text-4xl mb-6 lg:text-5xl 
              font-extrabold 
              text-transparent bg-clip-text 
-             bg-gradient-to-r from-blue-600 via-violet-600 to-fuchsia-700
-             drop-shadow-lg 
+             bg-gradient-to-r from-blue-800 via-violet-800 to-fuchsia-800
              text-center leading-snug sm:leading-tight 
              px-4 py-2 
              animate-fade-in-up"
@@ -235,16 +246,15 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                 </button>
               )}
             </div>
-
             {/* Quiz Flow */}
             {state.showQuiz && !state.completed && (
               <div className="mt-4 sm:mt-6">
                 {/* Progress Dots */}
                 <div className="flex justify-center mb-6 sm:mb-8">
                   <div className="flex space-x-2 sm:space-x-3">
-                    {quiz.questions.map((_, idx) => (
+                    {(Array.isArray(quiz.questions) ? quiz.questions : []).map((_, idx) => (
                       <div
-                        key={idx}
+                        key={`${quiz.id}-dot-${idx}`} // Add unique key here
                         className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-all duration-300 ${
                           idx < state.answers.filter((a) => a !== null).length
                             ? 'bg-gradient-to-r from-green-500 to-emerald-600 scale-110 shadow-md'
@@ -256,7 +266,6 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                     ))}
                   </div>
                 </div>
-
                 {/* Question Card */}
                 <div
                   className={`relative overflow-hidden rounded-xl sm:rounded-2xl bg-white shadow-lg sm:shadow-2xl min-h-64 sm:min-h-80 transition-all duration-300 ${
@@ -270,50 +279,60 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                   <div className="p-4 sm:p-6 md:p-8">
                     <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 leading-relaxed">
                       {state.currentQuestionIndex + 1}.{' '}
-                      {quiz.questions[state.currentQuestionIndex].questionText}
+                      {Array.isArray(quiz.questions) &&
+                      quiz.questions[state.currentQuestionIndex] ? (
+                        <span>{quiz.questions[state.currentQuestionIndex].questionText}</span>
+                      ) : (
+                        <span className="text-red-500">Invalid question</span>
+                      )}
                     </h3>
                     <div className="space-y-3 sm:space-y-4">
-                      {quiz.questions[state.currentQuestionIndex].options.map((opt, optIndex) => {
-                        const safeValue =
-                          opt?.value !== undefined ? String(opt.value) : `opt-${optIndex}`
-                        const isSelected = state.answers[state.currentQuestionIndex] === safeValue
+                      {Array.isArray(quiz.questions) &&
+                      quiz.questions[state.currentQuestionIndex]?.options ? (
+                        quiz.questions[state.currentQuestionIndex].options.map((opt, optIndex) => {
+                          const safeValue =
+                            opt?.value !== undefined ? String(opt.value) : `opt-${optIndex}`
+                          const isSelected = state.answers[state.currentQuestionIndex] === safeValue
 
-                        return (
-                          <label
-                            key={optIndex}
-                            htmlFor={`q${state.currentQuestionIndex}-opt${optIndex}`}
-                            className={`flex items-center p-4 sm:p-5 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-[1.02] ${
-                              isSelected
-                                ? 'border-indigo-600 bg-indigo-50 shadow-md'
-                                : 'border-gray-200 hover:border-indigo-300 hover:bg-indigo-25'
-                            }`}
-                          >
-                            <input
-                              id={`q${state.currentQuestionIndex}-opt${optIndex}`}
-                              type="radio"
-                              name={`q${state.currentQuestionIndex}`}
-                              value={safeValue}
-                              checked={isSelected}
-                              onChange={() =>
-                                handleAnswerChange(quiz.id, state.currentQuestionIndex, safeValue)
-                              }
-                              className="sr-only"
-                            />
-                            <div
-                              className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 mr-3 sm:mr-4 flex items-center justify-center ${
-                                isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-gray-400'
+                          return (
+                            <label
+                              key={`${quiz.id}-${state.currentQuestionIndex}-opt-${optIndex}`}
+                              htmlFor={`q${state.currentQuestionIndex}-opt${optIndex}`}
+                              className={`flex items-center p-4 sm:p-5 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-[1.02] ${
+                                isSelected
+                                  ? 'border-indigo-600 bg-indigo-50 shadow-md'
+                                  : 'border-gray-200 hover:border-indigo-300 hover:bg-indigo-25'
                               }`}
                             >
-                              {isSelected && (
-                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white"></div>
-                              )}
-                            </div>
-                            <span className="text-base sm:text-lg font-medium text-gray-800">
-                              {opt.label || `Option ${optIndex + 1}`}
-                            </span>
-                          </label>
-                        )
-                      })}
+                              <input
+                                id={`q${state.currentQuestionIndex}-opt${optIndex}`}
+                                type="radio"
+                                name={`q${state.currentQuestionIndex}`}
+                                value={safeValue}
+                                checked={isSelected}
+                                onChange={() =>
+                                  handleAnswerChange(quiz.id, state.currentQuestionIndex, safeValue)
+                                }
+                                className="sr-only"
+                              />
+                              <div
+                                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 mr-3 sm:mr-4 flex items-center justify-center ${
+                                  isSelected ? 'bg-indigo-600 border-indigo-600' : 'border-gray-400'
+                                }`}
+                              >
+                                {isSelected && (
+                                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-white"></div>
+                                )}
+                              </div>
+                              <span className="text-base sm:text-lg font-medium text-gray-800">
+                                {opt.label || `Option ${optIndex + 1}`}
+                              </span>
+                            </label>
+                          )
+                        })
+                      ) : (
+                        <p className="text-gray-500">No options available.</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -327,7 +346,9 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                   >
                     ← Previous
                   </button>
-                  {state.currentQuestionIndex < quiz.questions.length - 1 ? (
+
+                  {Array.isArray(quiz.questions) &&
+                  state.currentQuestionIndex < (quiz.questions?.length || 0) - 1 ? (
                     <button
                       onClick={() => goToNext(quiz.id)}
                       disabled={!state.answers[state.currentQuestionIndex]}
@@ -340,10 +361,10 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                       onClick={() => handleDelayedSubmit(quiz.id)}
                       disabled={!state.answers[state.currentQuestionIndex] || isSubmitting}
                       className={`px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base 
-              bg-gradient-to-r from-green-600 to-emerald-600 text-white 
-              rounded-lg sm:rounded-xl 
-              transition-all duration-300 font-medium
-              ${isSubmitting ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-xl transform hover:scale-105'}`}
+        bg-gradient-to-r from-green-600 to-emerald-600 text-white 
+        rounded-lg sm:rounded-xl 
+        transition-all duration-300 font-medium
+        ${isSubmitting ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-xl transform hover:scale-105'}`}
                     >
                       {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
                     </button>
@@ -351,8 +372,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                 </div>
               </div>
             )}
-
-            {/* Quiz Result */}
+            {/* In the result section of your BlogClient component: */}
             {state.completed && (
               <div className="mt-6 sm:mt-8 p-6 sm:p-8 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl sm:rounded-3xl shadow-md sm:shadow-lg text-center animate-fade-in">
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
@@ -372,8 +392,9 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                 <p className="text-lg sm:text-xl text-gray-800 mb-2">
                   <strong>Congratulations!</strong>
                 </p>
+                {/* <p className="text-lg sm:text-xl text-gray-800 mb-2">You got Points!</p> */}
                 <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  +10 points added to wallet!
+                  points added to wallet!
                 </p>
               </div>
             )}

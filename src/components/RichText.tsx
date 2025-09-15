@@ -10,12 +10,7 @@ export const RichText: React.FC<Props> = ({ content }) => {
 
   // Case 1: String (HTML)
   if (typeof content === 'string') {
-    return (
-      <div
-        className="prose max-w-none"
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
-    )
+    return <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
   }
 
   // Case 2: Array (Lexical blocks)
@@ -45,7 +40,9 @@ export const RichText: React.FC<Props> = ({ content }) => {
             case 'h1':
               return (
                 <h1 key={i} className="text-3xl font-bold mt-6 mb-4">
-                  {node.children?.map((child: any, index: number) => <span key={index}>{child.text}</span>)}
+                  {node.children?.map((child: any, index: number) => (
+                    <span key={index}>{child.text}</span>
+                  ))}
                 </h1>
               )
 
@@ -70,9 +67,7 @@ export const RichText: React.FC<Props> = ({ content }) => {
             return (
               <p key={i} className="mb-4">
                 {paragraph.children?.map((child: any, index: number) => (
-                  <span key={index}>
-                    {child.text}
-                  </span>
+                  <span key={index}>{child.text}</span>
                 ))}
               </p>
             )
