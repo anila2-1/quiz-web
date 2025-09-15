@@ -479,6 +479,9 @@ export interface Withdrawal {
   user: string | Member;
   amount: number;
   paymentInfo: string;
+  /**
+   * Change to "Approved" to deduct points from wallet
+   */
   status?: ('pending' | 'approved' | 'rejected') | null;
   updatedAt: string;
   createdAt: string;

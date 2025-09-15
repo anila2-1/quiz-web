@@ -147,8 +147,7 @@ export default function WithdrawalsPage() {
           setSuccess('Withdrawal request submitted successfully!')
           setFormData({ amount: '', paymentInfo: '' })
 
-          // Optimistic update
-          setMember((prev) => (prev ? { ...prev, wallet: prev.wallet - numAmount } : null))
+          // ✅ Add new pending request to UI — NO WALLET DEDUCTION
           setWithdrawals((prev) => [
             {
               id: data.id || Date.now().toString(),
@@ -159,6 +158,13 @@ export default function WithdrawalsPage() {
             },
             ...prev,
           ])
+
+          // ✅ Refetch member to ensure UI matches server (in case of race conditions)
+          const memberRes = await fetch('/api/get-member')
+          if (memberRes.ok) {
+            const memberData = await memberRes.json()
+            setMember(memberData.member)
+          }
         } else {
           const json = await res.json()
           throw new Error(json.error || 'Withdrawal request failed')
@@ -171,7 +177,6 @@ export default function WithdrawalsPage() {
     },
     [member, formData, clearMessages],
   )
-
   const sortedWithdrawals = useMemo(() => {
     return [...withdrawals].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
