@@ -47,7 +47,7 @@ export default function Sidebar() {
   // Brand Header
   const BrandHeader = () => (
     <div className="p-6">
-      <h2 className="text-xl font-bold text-indigo-700">Dashboard</h2>
+      <h2 className="text-xl font-bold text-indigo-700">Sidebar</h2>
     </div>
   )
 

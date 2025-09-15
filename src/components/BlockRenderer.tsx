@@ -1,29 +1,67 @@
-import React from 'react';
-import RichText from '../components/RichText';
-import Image from 'next/image';
+import React from 'react'
+import RichText from '../components/RichText'
+import Image from 'next/image'
 
-export const getBlockContent = (block: { blockType: any; id: React.Key | null | undefined; theme: string; heading: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; subheading: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; ctaText: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; content: any; alignment: any; size: string; image: { filename: any; }; }) => {
+export const getBlockContent = (block: {
+  blockType: any
+  id: React.Key | null | undefined
+  theme: string
+  heading:
+    | string
+    | number
+    | bigint
+    | boolean
+    | React.ReactElement
+    | Iterable<React.ReactNode>
+    | React.ReactPortal
+    | Promise<any>
+    | null
+    | undefined
+  subheading:
+    | string
+    | number
+    | bigint
+    | boolean
+    | React.ReactElement
+    | Iterable<React.ReactNode>
+    | React.ReactPortal
+    | Promise<any>
+    | null
+    | undefined
+  ctaText:
+    | string
+    | number
+    | bigint
+    | boolean
+    | React.ReactElement
+    | Iterable<React.ReactNode>
+    | React.ReactPortal
+    | Promise<any>
+    | null
+    | undefined
+  content: any
+  alignment: any
+  size: string
+  image: { filename: any }
+}) => {
   switch (block.blockType) {
     case 'hero':
       return (
-        <div
-          key={block.id}
-          className={`py-24 text-center bg-${block.theme === 'dark' ? 'gray-900 text-white' : 'gray-50'} `}
-        >
-          <h1 className="text-5xl font-bold mb-4">{block.heading}</h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">{block.subheading}</p>
-          <button className="bg-indigo-600 text-white px-8 py-3 rounded-lg">
+        <div key={block.id} className="py-24 text-center bg-gray-50">
+          <h1 className="text-5xl font-bold mb-4 text-gray-900">{block.heading}</h1>
+          <p className="text-xl mb-8 max-w-2xl mx-auto text-gray-700">{block.subheading}</p>
+          <button className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 transition">
             {block.ctaText}
           </button>
         </div>
-      );
+      )
 
     case 'richText':
       return (
         <div key={block.id} className="py-12 px-4 max-w-4xl mx-auto">
           <RichText content={block.content} />
         </div>
-      );
+      )
 
     case 'image':
       return (
@@ -37,9 +75,9 @@ export const getBlockContent = (block: { blockType: any; id: React.Key | null | 
             className={`${block.size === 'small' ? 'w-1/4' : block.size === 'medium' ? 'w-1/2' : block.size === 'large' ? 'w-3/4' : 'w-full'} rounded-lg`}
           />
         </div>
-      );
+      )
 
     default:
-      return null;
+      return null
   }
-};
+}

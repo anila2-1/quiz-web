@@ -26,7 +26,7 @@ export default function DashboardHeader({ user, activeTab }: { user: any; active
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="bg-white/90  top-2.5 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/60 dark:border-gray-800 p-6 md:p-8 transition-all duration-300 hover:shadow-2xl relative"
+      className="bg-white/90 top-2.5 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/60 p-6 md:p-8 transition-all duration-300 hover:shadow-2xl relative"
     >
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
@@ -37,14 +37,12 @@ export default function DashboardHeader({ user, activeTab }: { user: any; active
       <div className="relative z-10 flex flex-col md:flex-row justify-between gap-4 md:gap-0 items-start md:items-center mb-4 md:mb-6">
         {/* Title */}
         <div className="w-full md:w-auto">
-          <h2 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-white dark:to-gray-200 bg-clip-text text-transparent transition-all duration-300 hover:from-indigo-500 hover:to-purple-500">
+          <h2 className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent transition-all duration-300 hover:from-indigo-500 hover:to-purple-500">
             Dashboard Overview
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm md:text-base">
+          <p className="text-gray-600 mt-2 text-sm md:text-base">
             Welcome back,{' '}
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-              {user.name || 'User'}
-            </span>
+            <span className="font-semibold text-indigo-600">{user.name || 'User'}</span>
           </p>
         </div>
 
@@ -52,7 +50,7 @@ export default function DashboardHeader({ user, activeTab }: { user: any; active
         <div className="w-full md:w-auto mt-2 md:mt-0 relative">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="w-full md:w-44 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-800 dark:text-gray-200 font-medium shadow-sm transition-all duration-300 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="w-full md:w-44 bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-gray-800 font-medium shadow-sm transition-all duration-300 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <span className="flex items-center gap-2 truncate">{selectedLabel}</span>
             <svg
@@ -77,7 +75,7 @@ export default function DashboardHeader({ user, activeTab }: { user: any; active
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                 transition={{ duration: 0.2 }}
-                className="absolute mt-2 w-full md:w-44 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-50"
+                className="absolute mt-2 w-full md:w-44 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden z-50"
               >
                 <div className="py-1">
                   {options.map((option) => (
@@ -86,8 +84,8 @@ export default function DashboardHeader({ user, activeTab }: { user: any; active
                       onClick={() => handleSelect(option.value)}
                       className={`w-full text-left px-5 py-3 flex items-center gap-2 text-sm transition-all duration-200 ${
                         activeTab === option.value
-                          ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 font-medium'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                          ? 'bg-indigo-50 text-indigo-700 font-medium'
+                          : 'text-gray-700 hover:bg-gray-100'
                       }`}
                     >
                       {option.label}

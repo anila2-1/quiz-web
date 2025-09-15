@@ -40,15 +40,15 @@ export default function ClientInteractivePart({ user: serverUser }: { user: User
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      {' '}
       {/* Sidebar Desktop */}
       <div className="hidden lg:block">
         <Sidebar />
       </div>
-
       {/* Sidebar Mobile */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 flex">
-          <div className="relative w-64 bg-white shadow-lg">
+          <div className="relative w-64 bg-white shadow-lg h-full">
             <Sidebar />
             <button
               onClick={() => setSidebarOpen(false)}
@@ -60,12 +60,12 @@ export default function ClientInteractivePart({ user: serverUser }: { user: User
           <div className="flex-1 bg-black bg-opacity-50" onClick={() => setSidebarOpen(false)} />
         </div>
       )}
-
       {/* Main Content */}
       <div className="flex-1 w-full">
         {/* Mobile Header */}
-        <div className="flex items-center justify-between lg:hidden px-4 py-3 border-b bg-white shadow-sm">
-          <h1 className="text-lg font-bold text-gray-900">Sidebar</h1>
+        {/* Mobile Header */}
+        <div className="flex items-center justify-between lg:hidden px-4 py-3 border-b bg-white shadow-sm sticky top-0 z-10">
+          <h1 className="text-lg font-bold text-gray-900">Dashboard</h1>
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-md text-gray-600 hover:text-gray-900"
@@ -73,7 +73,6 @@ export default function ClientInteractivePart({ user: serverUser }: { user: User
             <Menu className="w-6 h-6" />
           </button>
         </div>
-
         {/* Content */}
         <div className="p-4 sm:p-6 lg:ml-64 transition-all duration-300">
           <DashboardHeader user={user} activeTab="overview" />

@@ -46,7 +46,7 @@ export default function ProfileForm({ member }: { member: Member }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         onSubmit={handleSubmit}
-        className="bg-white/90 w-full dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/60 dark:border-gray-700 p-4 sm:p-6 md:p-8 transition-all duration-300 hover:shadow-2xl"
+        className="bg-white/90 w-full backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/60 p-4 sm:p-6 md:p-8 transition-all duration-300 hover:shadow-2xl"
       >
         {/* Message */}
         {message && (
@@ -55,8 +55,8 @@ export default function ProfileForm({ member }: { member: Member }) {
             animate={{ opacity: 1, y: 0 }}
             className={`mb-6 p-4 text-sm rounded-xl border ${
               message.includes('successfully')
-                ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300'
-                : 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300'
+                ? 'bg-green-50 border-green-200 text-green-800'
+                : 'bg-red-50 border-red-200 text-red-800'
             }`}
           >
             {message}
@@ -66,44 +66,38 @@ export default function ProfileForm({ member }: { member: Member }) {
         {/* Fields */}
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Full Name
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Enter your full name"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Email
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
             <input
               type="email"
               value={member.email}
               disabled
-              className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-500 dark:text-gray-400 cursor-not-allowed select-none"
+              className="w-full bg-gray-100 border border-gray-300 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed select-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Username
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
             <input
               type="text"
               value={username}
               disabled
-              className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Wallet Address (USDT / Crypto)
             </label>
             <input
@@ -111,7 +105,7 @@ export default function ProfileForm({ member }: { member: Member }) {
               value={walletAddress}
               onChange={(e) => setWalletAddress(e.target.value)}
               placeholder="your@upi or wallet address"
-              className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
         </div>
