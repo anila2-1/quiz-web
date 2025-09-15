@@ -1,7 +1,7 @@
 // src/collections/Blogs.ts
 import { CollectionConfig } from 'payload'
-// import { generateSlug } from '../hooks/generateSlug'
 import { slugField } from '../fields/slugField'
+import { isAdmin } from '../access/isAdmin'
 
 const Blogs: CollectionConfig = {
   slug: 'blogs',
@@ -16,13 +16,11 @@ const Blogs: CollectionConfig = {
     },
   },
   access: {
-    // Sabhi ko read ki ijazat
     read: () => true,
-
-    create: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
-    update: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
-    delete: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
-    readVersions: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+    readVersions: isAdmin,
   },
   fields: [
     {
@@ -111,7 +109,7 @@ const Blogs: CollectionConfig = {
           label: 'Open Graph Image (1200x630)',
         },
       ],
-  },
+    },
   ],
 
   hooks: {

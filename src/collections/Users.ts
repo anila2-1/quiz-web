@@ -1,4 +1,6 @@
-import { CollectionConfig } from 'payload';
+// src/collections/Users.ts
+import { CollectionConfig } from 'payload'
+import { isAdmin } from '../access/isAdmin'
 
 const Users: CollectionConfig = {
   slug: 'users',
@@ -7,12 +9,12 @@ const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   access: {
-    read: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
-    create: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
-    update: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
-    delete: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
+    read: isAdmin,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
-  fields: []
-};
+  fields: [],
+}
 
-export default Users;
+export default Users

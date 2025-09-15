@@ -1,6 +1,6 @@
 // src/collections/Quizzes.ts
-
 import { CollectionConfig } from 'payload'
+import { isAdmin } from '../access/isAdmin'
 
 const Quizzes: CollectionConfig = {
   slug: 'quizzes',
@@ -10,14 +10,11 @@ const Quizzes: CollectionConfig = {
     defaultColumns: ['title', 'active', 'questionsCount', 'updatedAt'],
   },
   access: {
-    // Sabhi users blog ke saath quiz dekh sakte hain (lekin answers nahi)
     read: () => true,
-
-    // Sirf w1techy8@gmail.com create, edit, delete kar sake
-    create: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
-    update: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
-    delete: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
-    readVersions: ({ req }) => req.user?.email === 'w1techy8@gmail.com',
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
+    readVersions: isAdmin,
   },
   fields: [
     {
@@ -86,7 +83,7 @@ const Quizzes: CollectionConfig = {
     afterRead: [
       ({ doc, req }) => {
         // 🔐 Hide correct answers from non-admins
-        if (req.user && req.user.email !== 'w1techy8@gmail.com') {
+        if (req.user && !isAdmin({ req })) {
           doc.questions?.forEach((q: any) => {
             if (q.correctAnswerIndex !== undefined) {
               delete q.correctAnswerIndex
