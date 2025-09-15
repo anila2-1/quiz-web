@@ -10,7 +10,7 @@ export default function WalletCard() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="group bg-white/90 top-6 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/60 p-7 transition-all duration-300 hover:shadow-2xl hover:scale-101 relative overflow-hidden"
+      className="group bg-white/90 top-10 mb-6 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/60 p-7 transition-all duration-300 hover:shadow-2xl hover:scale-101 relative overflow-hidden"
     >
       <div className="pointer-events-none absolute -top-16 -right-16 w-32 h-32 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full blur-3xl opacity-70"></div>
 

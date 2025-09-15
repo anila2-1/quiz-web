@@ -83,7 +83,9 @@ export default function ClientInteractivePart({ user: serverUser }: { user: User
               <WalletCard />
               <ReferralStats count={user.referralsCount || 0} code={user.referralCode || ''} />
             </div>
-            <QuizStats />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <QuizStats />
+            </div>
           </div>
         </div>
       </div>
