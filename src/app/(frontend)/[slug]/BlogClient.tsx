@@ -526,8 +526,8 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
 
                 {/* ✅ Polished Subtitle */}
                 <p className="text-base sm:text-lg text-gray-700 mb-3 font-medium max-w-md mx-auto leading-relaxed">
-                  You've earned <span className="font-bold text-emerald-600">points</span> added to
-                  your wallet!
+                  You&#39;ve earned <span className="font-bold text-emerald-600">points</span> added
+                  to your wallet!
                 </p>
 
                 {/* ✅ Highlighted Reward Badge */}
