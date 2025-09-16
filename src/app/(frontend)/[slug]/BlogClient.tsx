@@ -39,15 +39,8 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
   const { user, refreshUser } = useAuth()
   const [post] = useState<Blog | null>(initialBlog || null)
   const [quizStates, setQuizStates] = useState<Record<string, QuizState>>({})
-  const [isLoading, setIsLoading] = useState(!initialBlog)
+
   // Initialize quiz states
-
-  useEffect(() => {
-    if (!initialBlog) {
-      setIsLoading(true)
-    }
-  }, [initialBlog])
-
   useEffect(() => {
     if (post?.quizzes?.length) {
       const initial = post.quizzes.reduce(
@@ -69,51 +62,8 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
         {} as Record<string, QuizState>,
       )
       setQuizStates(initial)
-      setIsLoading(false)
     }
   }, [post?.quizzes, user])
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-lg font-semibold text-gray-700 animate-pulse text-center px-4">
-          Loading your content...
-        </p>
-      </div>
-    )
-  }
-
-  // Error state - if no post after loading
-  if (!post) {
-    return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="text-center">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400 mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Content not found</h3>
-          <p className="text-gray-500 mb-4">
-            The blog post you&#39;re looking for doesn&#39;t exist.
-          </p>
-          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-500 font-medium">
-            Return to Dashboard
-          </Link>
-        </div>
-      </div>
-    )
-  }
 
   const handleAnswerChange = (quizId: string, index: number, value: string) => {
     setQuizStates((prev) => ({
@@ -229,16 +179,19 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
     })
   }
 
-  // if (!post || (post && Object.keys(post).length === 0)) {
-  //   return (
-  //     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-  //       <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-  //       <p className="text-lg font-semibold text-gray-700 animate-pulse text-center px-4">
-  //         Loading your content...
-  //       </p>
-  //     </div>
-  //   )
-  // }
+  if (!post || Object.keys(post).length === 0) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        {/* Spinner */}
+        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+
+        {/* Text */}
+        <p className="text-lg font-semibold text-gray-700 animate-pulse text-center px-4">
+          Loading your content...
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-5xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
