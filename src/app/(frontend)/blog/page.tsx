@@ -4,11 +4,29 @@ import BlogGrid from './BlogGrid'
 import Footer from '../components/Footer'
 import Link from 'next/link'
 
-// ✅ SEO metadata
-export const metadata: Metadata = {
-  title: 'Learn & Earn Blog | Discover Articles & Earn Rewards',
-  description:
-    'Explore insightful articles, tips, and guides to boost your knowledge and earn rewards through quizzes.',
+//  ADD THIS INSTEAD
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Learn & Earn Blog | Discover Articles & Earn Rewards',
+    description:
+      'Explore insightful articles, tips, and guides to boost your knowledge and earn rewards through quizzes.',
+    // Optional: Open Graph / Twitter
+    openGraph: {
+      title: 'Learn & Earn Blog | QuizEarn',
+      description: 'Boost your knowledge and earn rewards through quizzes.',
+      type: 'website',
+      url: '/blog',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Learn & Earn Blog | QuizEarn',
+      description: 'Boost your knowledge and earn rewards through quizzes.',
+    },
+    // This prevents merging with parent metadata
+    alternates: {
+      canonical: '/blog',
+    },
+  }
 }
 
 async function fetchBlogs(page: number = 1, limit: number = 6) {
@@ -34,7 +52,7 @@ export default async function BlogList({
 }) {
   const params = await searchParams
   const currentPage = parseInt(params?.page || '1', 10)
-  const limit = 6 // ✅ number of blogs per page
+  const limit = 6
   const { docs: posts, totalPages } = await fetchBlogs(currentPage, limit)
 
   return (
@@ -53,10 +71,9 @@ export default async function BlogList({
       <div className="px-4 sm:px-6 lg:px-8 pb-12">
         <BlogGrid posts={posts} />
 
-        {/* ✅ Pagination */}
+        {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex justify-center items-center mt-10 gap-3">
-            {/* Prev Button */}
             {currentPage > 1 && (
               <Link
                 href={`/blog?page=${currentPage - 1}`}
@@ -66,7 +83,6 @@ export default async function BlogList({
               </Link>
             )}
 
-            {/* Page Numbers */}
             <div className="flex gap-2">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <Link
@@ -83,7 +99,6 @@ export default async function BlogList({
               ))}
             </div>
 
-            {/* Next Button */}
             {currentPage < totalPages && (
               <Link
                 href={`/blog?page=${currentPage + 1}`}
