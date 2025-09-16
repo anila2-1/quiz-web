@@ -1,4 +1,3 @@
-// Sidebar.tsx — Pure Static UI (No Mobile Logic)
 'use client'
 
 import { usePathname } from 'next/navigation'
@@ -16,6 +15,7 @@ export default function Sidebar() {
 
   const menuItems: MenuItem[] = [
     { key: 'overview', label: 'Overview', icon: '📊', href: '/dashboard' },
+    { key: 'blog', label: 'Blog', icon: '📝', href: '/blog' }, // ADDED BLOG
     { key: 'withdrawals', label: 'Withdrawals', icon: '💰', href: '/dashboard/withdrawals' },
     { key: 'profile', label: 'Profile', icon: '👤', href: '/dashboard/profile' },
   ]

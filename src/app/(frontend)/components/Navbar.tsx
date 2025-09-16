@@ -1,35 +1,35 @@
 // src/app/(frontend)/components/Navbar.tsx
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Navbar() {
-  const [member, setMember] = useState<any>();
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [member, setMember] = useState<any>()
+  const [isOpen, setIsOpen] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     const fetchMember = async () => {
       try {
-        const res = await fetch('/api/get-member');
-        const data = await res.json();
-        setMember(data.member);
+        const res = await fetch('/api/get-member')
+        const data = await res.json()
+        setMember(data.member)
       } catch (err) {
-        console.error('Failed to fetch member:', err);
+        console.error('Failed to fetch member:', err)
       } finally {
-        setIsLoaded(true);
+        setIsLoaded(true)
       }
-    };
+    }
 
-    fetchMember();
-  }, []);
+    fetchMember()
+  }, [])
 
   const handleLogout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = '/';
-  };
+    await fetch('/api/auth/logout', { method: 'POST' })
+    window.location.href = '/'
+  }
 
   return (
     <nav
@@ -83,15 +83,15 @@ export default function Navbar() {
                     <span className="absolute inset-0 rounded-full bg-gradient-to-r from-red-50 to-pink-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></span>
                     <span className="absolute inset-0 rounded-full border border-red-200 group-hover:border-red-300 opacity-0 group-hover:opacity-60 transition-all duration-300 animate-pulse"></span>
                     <span className="relative z-10 flex items-center space-x-2">
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="18" 
-                        height="18" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
                         strokeLinejoin="round"
                         className="transition-transform duration-300 group-hover:translate-x-1"
                       >
@@ -110,11 +110,10 @@ export default function Navbar() {
             ) : (
               <div className="w-20 h-8 bg-gray-200 rounded animate-pulse"></div>
             )}
-
           </div>
 
           {/* Mobile Menu Button */}
-          <button
+          {/* <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none transition-colors"
             aria-label="Toggle menu"
@@ -128,16 +127,26 @@ export default function Navbar() {
               viewBox="0 0 24 24"
             >
               {isOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               )}
             </motion.svg>
-          </button>
+          </button> */}
         </div>
 
         {/* Mobile Menu */}
-        <AnimatePresence>
+        {/* <AnimatePresence>
           {isOpen && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -187,20 +196,16 @@ export default function Navbar() {
               </div>
             </motion.div>
           )}
-        </AnimatePresence>
+        </AnimatePresence> */}
       </div>
     </nav>
-  );
+  )
 }
 
 // ✅ Premium Animated Sign Up Button (Desktop)
 function AnimatedSignUpButton() {
   return (
-    <motion.div
-      whileHover="hover"
-      whileTap="tap"
-      className="relative"
-    >
+    <motion.div whileHover="hover" whileTap="tap" className="relative">
       <Link
         href="/auth/signup"
         className="px-6 py-2.5 text-white font-semibold rounded-full shadow-lg relative overflow-hidden z-10"
@@ -226,34 +231,34 @@ function AnimatedSignUpButton() {
         className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white to-transparent opacity-40"
         style={{ backgroundSize: '60% 100%', transform: 'skewX(-20deg)' }}
         variants={{
-          hover: { 
+          hover: {
             x: '100%',
-            transition: { duration: 1, repeat: Infinity, repeatType: 'loop' }
+            transition: { duration: 1, repeat: Infinity, repeatType: 'loop' },
           },
         }}
       ></motion.div>
 
       <style jsx>{`
         @keyframes gradientShift {
-          0% { background-position: 0%; }
-          100% { background-position: 200%; }
+          0% {
+            background-position: 0%;
+          }
+          100% {
+            background-position: 200%;
+          }
         }
-        [style*="background: linear-gradient"] {
+        [style*='background: linear-gradient'] {
           animation: gradientShift 3s ease-in-out infinite alternate;
         }
       `}</style>
     </motion.div>
-  );
+  )
 }
 
 // ✅ Premium Animated Sign Up Button (Mobile)
 function AnimatedSignUpButtonMobile() {
   return (
-    <motion.div
-      whileHover="hover"
-      whileTap="tap"
-      className="relative"
-    >
+    <motion.div whileHover="hover" whileTap="tap" className="relative">
       <Link
         href="/auth/signup"
         className="block w-full text-center py-2.5 text-white font-semibold rounded-lg shadow relative overflow-hidden"
@@ -279,22 +284,26 @@ function AnimatedSignUpButtonMobile() {
         className="absolute inset-0 rounded-lg bg-gradient-to-r from-transparent via-white to-transparent opacity-40"
         style={{ backgroundSize: '60% 100%', transform: 'skewX(-20deg)' }}
         variants={{
-          hover: { 
+          hover: {
             x: '100%',
-            transition: { duration: 1, repeat: Infinity, repeatType: 'loop' }
+            transition: { duration: 1, repeat: Infinity, repeatType: 'loop' },
           },
         }}
       ></motion.div>
 
       <style jsx>{`
         @keyframes gradientShift {
-          0% { background-position: 0%; }
-          100% { background-position: 200%; }
+          0% {
+            background-position: 0%;
+          }
+          100% {
+            background-position: 200%;
+          }
         }
-        [style*="background: linear-gradient"] {
+        [style*='background: linear-gradient'] {
           animation: gradientShift 3s ease-in-out infinite alternate;
         }
       `}</style>
     </motion.div>
-  );
+  )
 }

@@ -524,15 +524,14 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                   </h3>
                 </div>
 
-                {/* ✅ Polished Subtitle */}
+                {/* ✅ Polished Subtitle
                 <p className="text-base sm:text-lg text-gray-700 mb-3 font-medium max-w-md mx-auto leading-relaxed">
-                  You&#39;ve earned <span className="font-bold text-emerald-600">points</span> added
-                  to your wallet!
-                </p>
+                  you&#39;ve earned points added to your wallet Your Points Added to Wallet{' '}
+                </p> */}
 
                 {/* ✅ Highlighted Reward Badge */}
-                <div className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 text-white px-5 py-3 rounded-full font-bold text-lg sm:text-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <div className="inline-flex items-center gap-3 rounded-xl bg-white border border-gray-200 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-300">
+                  <svg className="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                     <path
                       fillRule="evenodd"
@@ -540,7 +539,10 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                       clipRule="evenodd"
                     />
                   </svg>
-                  Your Points Added to Wallet{' '}
+
+                  <p className="text-gray-700 text-sm sm:text-base font-medium leading-relaxed">
+                    🎉 You&#39;ve earned points! They&#39;ve been added to your wallet.
+                  </p>
                 </div>
 
                 {/* ✅ Optional Micro-Interaction: Floating sparkles on hover */}

@@ -23,9 +23,8 @@ export default function ClientInteractivePart({ user: serverUser }: { user: User
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    // Simulate client-side loading
     setTimeout(() => {
-      setUser(serverUser) // replace with API call if needed
+      setUser(serverUser)
     }, 1000)
   }, [serverUser])
 
@@ -40,15 +39,16 @@ export default function ClientInteractivePart({ user: serverUser }: { user: User
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      {' '}
-      {/* Sidebar Desktop */}
+      {/* Sidebar Desktop — unchanged */}
       <div className="hidden lg:block">
         <Sidebar />
       </div>
-      {/* Sidebar Mobile */}
+
+      {/* Sidebar Mobile Overlay */}
       {sidebarOpen && (
-        <>
-          <div className="fixed top-0 left-0 z-50 h-full w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out lg:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
+          <div className="relative h-full w-64 bg-white shadow-xl">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-bold text-gray-800">Menu</h2>
               <button
@@ -60,22 +60,23 @@ export default function ClientInteractivePart({ user: serverUser }: { user: User
             </div>
             <Sidebar />
           </div>
-        </>
+        </div>
       )}
+
       {/* Main Content */}
       <div className="flex-1 w-full">
-        {/* Mobile Header */}
-        <div className="flex items-center justify-between lg:hidden px-4 py-3 border-b bg-white shadow-sm">
-          <h1 className="text-lg font-bold text-gray-900">Sidebar</h1>
+        {/* Mobile Toggle Button Only — NO NAVBAR */}
+        <div className="lg:hidden px-4 py-3 flex justify-between items-center">
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-md text-gray-600 hover:text-gray-900"
           >
             <Menu className="w-6 h-6" />
           </button>
+          <div className="w-6"></div>
         </div>
 
-        {/* Content */}
+        {/* Page Content — unchanged */}
         <div className="p-4 sm:p-6 lg:ml-64 transition-all duration-300">
           <DashboardHeader user={user} activeTab="overview" />
           <div className="mt-8 space-y-8">
