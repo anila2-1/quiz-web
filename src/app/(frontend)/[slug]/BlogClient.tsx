@@ -227,9 +227,28 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
             {/* Quiz Header */}
             <div className="flex justify-center items-center mb-6 sm:mb-8">
               {state.completed ? (
-                <span className="px-4 sm:px-5 py-2 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full text-xs sm:text-sm font-bold shadow-md flex items-center gap-2">
-                  ✅ Completed
-                </span>
+                <div className="group relative">
+                  {/* Main Badge */}
+                  <div className="px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-600 text-white rounded-full text-sm sm:text-base font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2 sm:gap-3 backdrop-blur-sm border border-white/10">
+                    <svg
+                      className="w-5 h-5 sm:w-6 sm:h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2.5"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    <span>Quiz Completed</span>
+                  </div>
+
+                  {/* Subtle floating halo effect */}
+                  <div className="absolute inset-0 rounded-full border border-green-400/30 animate-ping opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+                </div>
               ) : (
                 <button
                   onClick={() =>
@@ -238,9 +257,45 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                       [quiz.id]: { ...prev![quiz.id], showQuiz: !prev![quiz.id]?.showQuiz },
                     }))
                   }
-                  className="px-5 sm:px-7 py-2.5 sm:py-3 text-sm sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg sm:rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                  className="group relative px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 sm:gap-3 overflow-hidden"
                 >
-                  {state.showQuiz ? 'Hide Quiz' : 'Start Quiz'}
+                  {/* Animated gradient background shimmer */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-shine"></div>
+
+                  {/* Icon */}
+                  <svg
+                    className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:rotate-12"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d={state.showQuiz ? 'M6 18L18 6M6 6l12 12' : 'M13 10V3L4 14h7v7l9-11h-7z'}
+                    />
+                  </svg>
+
+                  {/* Text */}
+                  <span className="relative z-10">
+                    {state.showQuiz ? 'Hide Quiz' : 'Start Quiz'}
+                  </span>
+
+                  {/* Shine Animation Style */}
+                  <style jsx>{`
+                    @keyframes shine {
+                      0% {
+                        transform: translateX(-100%);
+                      }
+                      100% {
+                        transform: translateX(200%);
+                      }
+                    }
+                    .animate-shine {
+                      animation: shine 1.8s ease-in-out infinite;
+                    }
+                  `}</style>
                 </button>
               )}
             </div>
