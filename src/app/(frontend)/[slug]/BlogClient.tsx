@@ -104,7 +104,9 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
             />
           </svg>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Content not found</h3>
-          <p className="text-gray-500 mb-4">The blog post you're looking for doesn't exist.</p>
+          <p className="text-gray-500 mb-4">
+            The blog post you&#39;re looking for doesn&#39;t exist.
+          </p>
           <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-500 font-medium">
             Return to Dashboard
           </Link>
