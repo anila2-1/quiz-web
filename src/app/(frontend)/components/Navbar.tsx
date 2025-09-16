@@ -50,10 +50,10 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8 h-full">
-            {(['Home', 'Blogs'] as const).map((item) => (
+            {(['Home'] as const).map((item) => (
               <motion.div key={item} whileHover={{ y: -2 }}>
                 <Link
-                  href={item === 'Home' ? '/' : '/blog'}
+                  href={item === 'Home' ? '/' : ''}
                   className="text-gray-700 hover:text-indigo-600 font-medium relative group"
                 >
                   {item}

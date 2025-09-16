@@ -39,8 +39,15 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
   const { user, refreshUser } = useAuth()
   const [post] = useState<Blog | null>(initialBlog || null)
   const [quizStates, setQuizStates] = useState<Record<string, QuizState>>({})
-
+  const [isLoading, setIsLoading] = useState(!initialBlog)
   // Initialize quiz states
+
+  useEffect(() => {
+    if (!initialBlog) {
+      setIsLoading(true)
+    }
+  }, [initialBlog])
+
   useEffect(() => {
     if (post?.quizzes?.length) {
       const initial = post.quizzes.reduce(
@@ -62,8 +69,49 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
         {} as Record<string, QuizState>,
       )
       setQuizStates(initial)
+      setIsLoading(false)
     }
   }, [post?.quizzes, user])
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-lg font-semibold text-gray-700 animate-pulse text-center px-4">
+          Loading your content...
+        </p>
+      </div>
+    )
+  }
+
+  // Error state - if no post after loading
+  if (!post) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="text-center">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400 mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Content not found</h3>
+          <p className="text-gray-500 mb-4">The blog post you're looking for doesn't exist.</p>
+          <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-500 font-medium">
+            Return to Dashboard
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   const handleAnswerChange = (quizId: string, index: number, value: string) => {
     setQuizStates((prev) => ({
@@ -179,19 +227,16 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
     })
   }
 
-  if (!post) {
-    return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        {/* Spinner */}
-        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-
-        {/* Text */}
-        <p className="text-lg font-semibold text-gray-700 animate-pulse text-center px-4">
-          Loading your content...
-        </p>
-      </div>
-    )
-  }
+  // if (!post || (post && Object.keys(post).length === 0)) {
+  //   return (
+  //     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  //       <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+  //       <p className="text-lg font-semibold text-gray-700 animate-pulse text-center px-4">
+  //         Loading your content...
+  //       </p>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="max-w-5xl mx-auto py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
@@ -523,25 +568,16 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                     Quiz Completed!
                   </h3>
                 </div>
-
-                {/* ✅ Polished Subtitle
-                <p className="text-base sm:text-lg text-gray-700 mb-3 font-medium max-w-md mx-auto leading-relaxed">
-                  you&#39;ve earned points added to your wallet Your Points Added to Wallet{' '}
-                </p> */}
-
                 {/* ✅ Highlighted Reward Badge */}
                 <div className="inline-flex items-center gap-3 rounded-xl bg-white border border-gray-200 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-300">
-                  <svg className="w-6 h-6 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.655.434 1.503.707 2.37.707.867 0 1.715-.273 2.37-.707C13.398 9.765 14 8.99 14 8c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 5.092V5z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                  <svg
+                    className="w-6 h-6 text-indigo-600"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  ></svg>
 
                   <p className="text-gray-700 text-sm sm:text-base font-medium leading-relaxed">
-                    🎉 You&#39;ve earned points! They&#39;ve been added to your wallet.
+                    🎉 You&#39;ve earned points! Theyve been added to your wallet.
                   </p>
                 </div>
 
