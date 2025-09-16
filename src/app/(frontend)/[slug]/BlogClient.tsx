@@ -174,11 +174,9 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
     if (isSubmitting) return // prevent multiple clicks
     setIsSubmitting(true)
 
-    // Simulate delay (3 sec)
-    setTimeout(() => {
-      handleSubmitQuiz(quizId)
-      setIsSubmitting(false) // optional reset after submission
-    }, 3000)
+    handleSubmitQuiz(quizId).finally(() => {
+      setIsSubmitting(false)
+    })
   }
 
   if (!post) {
@@ -360,13 +358,65 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                     <button
                       onClick={() => handleDelayedSubmit(quiz.id)}
                       disabled={!state.answers[state.currentQuestionIndex] || isSubmitting}
-                      className={`px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base 
-        bg-gradient-to-r from-green-600 to-emerald-600 text-white 
-        rounded-lg sm:rounded-xl 
-        transition-all duration-300 font-medium
-        ${isSubmitting ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-xl transform hover:scale-105'}`}
+                      className={`
+    group relative
+    px-6 sm:px-8 py-3 sm:py-3.5
+    text-sm sm:text-base font-medium
+    bg-gradient-to-r from-green-600 to-emerald-600
+    text-white
+    rounded-xl sm:rounded-2xl
+    shadow-lg hover:shadow-xl
+    transition-all duration-300
+    flex items-center justify-center
+    gap-2 sm:gap-3
+    ${isSubmitting ? 'opacity-90 cursor-not-allowed scale-100' : 'hover:scale-105 active:scale-95'}
+  `}
                     >
-                      {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
+                      {isSubmitting ? (
+                        <>
+                          <div className="flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6">
+                            <svg
+                              className="animate-spin text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth="2.5"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="9"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                          </div>
+                          <span>Submitting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Submit Quiz</span>
+                          <svg
+                            className="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:translate-x-0.5 transition-transform duration-200"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M14 5l7 7m0 0l-7 7m7-7H3"
+                            />
+                          </svg>
+                        </>
+                      )}
                     </button>
                   )}
                 </div>
@@ -374,28 +424,85 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
             )}
             {/* In the result section of your BlogClient component: */}
             {state.completed && (
-              <div className="mt-6 sm:mt-8 p-6 sm:p-8 bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl sm:rounded-3xl shadow-md sm:shadow-lg text-center animate-fade-in">
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
-                  <svg
-                    className="w-10 h-10 sm:w-12 sm:h-12 text-green-600 animate-bounce"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
+              <div className="mt-6 sm:mt-8 p-6 sm:p-8 bg-gradient-to-br from-emerald-50 via-white to-teal-50 border border-emerald-200/70 rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl text-center animate-fade-in backdrop-blur-sm relative overflow-hidden group">
+                {/* Subtle animated background pattern */}
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/20 to-teal-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+
+                {/* Floating confetti dots (optional visual flair) */}
+                <div className="absolute top-0 right-0 w-20 h-20">
+                  <div
+                    className="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full animate-bounce"
+                    style={{ animationDelay: '0s' }}
+                  ></div>
+                  <div
+                    className="absolute top-6 right-6 w-1.5 h-1.5 bg-pink-400 rounded-full animate-bounce"
+                    style={{ animationDelay: '0.5s' }}
+                  ></div>
+                  <div
+                    className="absolute top-4 right-10 w-1 h-1 bg-blue-400 rounded-full animate-bounce"
+                    style={{ animationDelay: '1s' }}
+                  ></div>
+                </div>
+
+                {/* Main Content */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-6">
+                  {/* ✅ Elegant Animated Checkmark */}
+                  <div className="relative">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-emerald-500/30 transition-shadow duration-300">
+                      <svg
+                        className="w-8 h-8 sm:w-9 sm:h-9 text-white drop-shadow-sm"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2.5"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    {/* ✅ Subtle pulse ring on success */}
+                    <div className="absolute inset-0 rounded-full border-2 border-emerald-400/50 animate-ping opacity-75"></div>
+                  </div>
+
+                  {/* ✅ Modern Headline */}
+                  <h3 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-700 bg-clip-text text-transparent leading-tight">
+                    Quiz Completed!
+                  </h3>
+                </div>
+
+                {/* ✅ Polished Subtitle */}
+                <p className="text-base sm:text-lg text-gray-700 mb-3 font-medium max-w-md mx-auto leading-relaxed">
+                  You've earned <span className="font-bold text-emerald-600">points</span> added to
+                  your wallet!
+                </p>
+
+                {/* ✅ Highlighted Reward Badge */}
+                <div className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 text-white px-5 py-3 rounded-full font-bold text-lg sm:text-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
                     <path
                       fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.655.434 1.503.707 2.37.707.867 0 1.715-.273 2.37-.707C13.398 9.765 14 8.99 14 8c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 5.092V5z"
                       clipRule="evenodd"
                     />
                   </svg>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-green-700">Quiz Completed!</h3>
+                  Your Points Added to Wallet{' '}
                 </div>
-                <p className="text-lg sm:text-xl text-gray-800 mb-2">
-                  <strong>Congratulations!</strong>
-                </p>
-                {/* <p className="text-lg sm:text-xl text-gray-800 mb-2">You got Points!</p> */}
-                <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  points added to wallet!
-                </p>
+
+                {/* ✅ Optional Micro-Interaction: Floating sparkles on hover */}
+                <style jsx>{`
+                  @keyframes float {
+                    0%,
+                    100% {
+                      transform: translateY(0px);
+                    }
+                    50% {
+                      transform: translateY(-8px);
+                    }
+                  }
+                  .animate-float {
+                    animation: float 3s ease-in-out infinite;
+                  }
+                `}</style>
               </div>
             )}
           </div>
