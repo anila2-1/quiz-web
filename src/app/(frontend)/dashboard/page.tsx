@@ -1,22 +1,19 @@
-
 // src/app/(frontend)/dashboard/page.tsx
-import ClientInteractivePart from './ClientInteractivePart';
+import ClientInteractivePart from './ClientInteractivePart'
 
-import { getServerSideMember } from '@/lib/getServerSideUser.server';
-import { redirect } from 'next/navigation';
-
+import { getServerSideMember } from '@/lib/getServerSideUser.server'
+import { redirect } from 'next/navigation'
 
 export default async function DashboardPage() {
-  const member = await getServerSideMember();
+  const member = await getServerSideMember()
 
   if (!member) {
-    redirect('/auth/login');
+    redirect('/auth/login')
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-100">
-  <ClientInteractivePart user={member} />
-</div>
-
-  );
+      <ClientInteractivePart user={member} />
+    </div>
+  )
 }

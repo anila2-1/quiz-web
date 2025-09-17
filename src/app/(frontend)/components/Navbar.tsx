@@ -4,11 +4,13 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { usePathname } from 'next/navigation' // ← Add this
 
 export default function Navbar() {
-  const [member, setMember] = useState<any>()
+  const [member, setMember] = useState<any>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
+  const pathname = usePathname() // ← Track URL changes
 
   useEffect(() => {
     const fetchMember = async () => {
@@ -24,7 +26,7 @@ export default function Navbar() {
     }
 
     fetchMember()
-  }, [])
+  }, [pathname]) // ← Re-run when URL changes
 
   const handleLogout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' })

@@ -1,9 +1,22 @@
 // src/app/(frontend)/components/WalletCard.tsx
-import { motion } from 'framer-motion'
+'use client' // ← Add this
+
+import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from './../_providers/Auth'
+import { useEffect, useState } from 'react'
 
 export default function WalletCard() {
   const { user } = useAuth()
+  const [isLoading, setIsLoading] = useState(true)
+  const [walletBalance, setWalletBalance] = useState<number | null>(null)
+
+  useEffect(() => {
+    // Wait for user to be available
+    if (user !== undefined) {
+      setIsLoading(false)
+      setWalletBalance(user?.wallet || 0)
+    }
+  }, [user])
 
   return (
     <motion.div
@@ -18,23 +31,46 @@ export default function WalletCard() {
         <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
           💰 Wallet Balance
         </h3>
-        <div className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-5">
-          ₹{user?.wallet?.toFixed(2) || ''}
-        </div>
+
+        <AnimatePresence mode="wait">
+          {isLoading ? (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="h-12 bg-gray-200 rounded-lg animate-pulse mb-5"
+            ></motion.div>
+          ) : (
+            <motion.div
+              key="balance"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-5"
+            >
+              ₹{walletBalance?.toFixed(2)}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => (window.location.href = '/dashboard/withdrawals')}
           className="relative w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+          disabled={isLoading}
         >
-          Withdraw Funds
+          {isLoading ? 'Loading...' : 'Withdraw Funds'}
         </motion.button>
       </div>
 
-      <motion.div
-        className="pointer-events-none absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform group-hover:animate-shine"
-        style={{ height: '100%', width: '50%' }}
-      ></motion.div>
+      {!isLoading && (
+        <motion.div
+          className="pointer-events-none absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform group-hover:animate-shine"
+          style={{ height: '100%', width: '50%' }}
+        ></motion.div>
+      )}
 
       <style jsx>{`
         @keyframes shine {
