@@ -4,12 +4,14 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import LoadingButton from '../../components/LoadingButton'
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     const memberId = document.cookie.split('; ').find((row) => row.startsWith('member_id='))
@@ -19,13 +21,14 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setIsLoading(true)
 
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
       headers: { 'Content-Type': 'application/json' },
     })
-
+    setIsLoading(false)
     if (res.ok) {
       router.push('/dashboard')
     } else {
@@ -119,12 +122,14 @@ export default function LoginPage() {
         </div>
 
         {/* Submit Button */}
-        <button
+        <LoadingButton
           type="submit"
-          className="group w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] 
-                     transition-all duration-300 overflow-hidden relative"
+          isLoading={isLoading}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="group w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative"
         >
-          {/* Shine Effect */}
+          {/* Shine Effect — keep it! */}
           <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform group-hover:animate-shine"></span>
           <span className="relative z-10 flex items-center justify-center space-x-2">
             <svg
@@ -144,7 +149,7 @@ export default function LoginPage() {
             </svg>
             <span>Log In</span>
           </span>
-        </button>
+        </LoadingButton>
 
         <p className="text-center text-gray-500 text-sm mt-6">
           Don’t have an account?{' '}

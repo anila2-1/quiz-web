@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import Footer from './components/Footer'
+import LoadingLink from './components/LoadingLink'
 
 export default function HomePage() {
   const [member, setMember] = useState<any>(null)
@@ -144,58 +145,112 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="max-w-4xl mx-auto"
+            className="max-w-4xl mx-auto text-center"
           >
             <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Earn Points by Learning &{' '}
-              <span className="relative inline-block">
-                Taking Quizzes
-                <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transform scale-x-0 origin-left animate-grow"></span>
+              Learn, Quiz & Earn Real Rewards
+              <span className="block mt-4 text-lg text-gray-600 font-normal">
+                Master new skills, test your knowledge, and get rewarded.
               </span>
             </h2>
+
             <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-              Read blogs, test your knowledge, and earn rewards. Refer friends and earn extra{' '}
-              <span className="font-bold text-indigo-600">100 points</span> per signup!
+              Refer friends and get{' '}
+              <span className="font-bold text-indigo-600">100 bonus points</span> per signup!
             </p>
 
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-r from-blue-300 to-purple-300 rounded-full opacity-20 animate-pulse"></div>
-            <div
-              className="absolute -bottom-40 -left-40 w-86 h-86 
-     bg-gradient-to-l from-pink-300 to-indigo-300 
-     rounded-full opacity-20 animate-bounce-slow"
-            ></div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+            {/* Hero CTA Buttons — Only Signup/Login or Dashboard */}
+            <div className="flex flex-col sm:flex-row justify-center gap-6">
               {!member ? (
                 <>
-                  <motion.button
+                  <LoadingLink
+                    href="/auth/signup"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-10 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl shadow-2xl hover:shadow-3xl transform transition-all duration-200 text-lg"
+                    className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200 text-base"
                   >
-                    <Link href="/auth/signup">Join Now</Link>
-                  </motion.button>
-                  <motion.button
+                    Join Now — It’s Free
+                  </LoadingLink>
+                  <LoadingLink
+                    href="/auth/login"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="px-10 py-4 bg-white text-indigo-600 font-bold rounded-2xl shadow-xl hover:shadow-2xl border-2 border-indigo-200 transform transition-all duration-200 text-lg"
+                    theme="light" // ← Force light theme for white button
+                    className="px-8 py-4 bg-white text-indigo-600 font-semibold rounded-xl shadow-lg hover:shadow-xl border border-indigo-200 transform transition-all duration-200 text-base"
                   >
-                    <Link href="/auth/login">Login</Link>
-                  </motion.button>
+                    Login
+                  </LoadingLink>
                 </>
               ) : (
-                <motion.button
+                <LoadingLink
+                  href="/dashboard"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-10 py-4 bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold rounded-2xl shadow-2xl hover:shadow-3xl transform transition-all duration-200 text-lg"
+                  className="px-8 py-4 bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform transition-all duration-200 text-base"
                 >
-                  <Link href="/dashboard">Go to Dashboard</Link>
-                </motion.button>
+                  Go to Dashboard
+                </LoadingLink>
               )}
             </div>
           </motion.div>
         </AnimatePresence>
+
+        {/* Blog Section — Fully Responsive */}
+        <div className="my-16 md:my-24 max-w-5xl mx-auto px-2 sm:px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
+            className="relative bg-white/70 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 border border-gray-200/40 shadow-xl md:shadow-2xl hover:shadow-2xl md:hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-1 md:hover:-translate-y-2 overflow-hidden group"
+          >
+            {/* Subtle corner decoration — hidden on mobile */}
+            <div className="hidden md:block absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-gradient-to-br from-teal-400/10 to-cyan-400/10 rounded-bl-full -translate-y-8 md:-translate-y-12 translate-x-8 md:translate-x-12 group-hover:translate-x-6 md:group-hover:translate-x-8 group-hover:-translate-y-6 md:group-hover:-translate-y-8 transition-transform duration-500"></div>
+            <div className="hidden md:block absolute bottom-0 left-0 w-24 md:w-32 h-24 md:h-32 bg-gradient-to-tr from-purple-400/10 to-indigo-400/10 rounded-tr-full translate-y-8 md:translate-y-12 -translate-x-8 md:-translate-x-12 group-hover:-translate-x-6 md:group-hover:-translate-x-8 group-hover:translate-y-6 md:group-hover:translate-y-8 transition-transform duration-500"></div>
+
+            {/* Content */}
+            <div className="relative z-10 text-center">
+              <motion.div
+                initial={{ scale: 0.95 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.8, type: 'spring', stiffness: 300 }}
+                className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 bg-gradient-to-r from-teal-500/20 to-cyan-500/20 px-3 sm:px-5 py-2 sm:py-3 rounded-full border border-teal-200/50"
+              >
+                <span className="text-xl sm:text-2xl">📖</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-700 tracking-wide uppercase">
+                  New Knowledge Awaits
+                </span>
+              </motion.div>
+
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4 leading-tight px-2">
+                Ready to Learn Something{' '}
+                <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
+                  New?
+                </span>
+              </h3>
+
+              <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-10 max-w-3xl mx-auto leading-relaxed px-2">
+                Learn from experts. Quiz with confidence. Earn as you grow.
+              </p>
+
+              <LoadingLink
+                href="/blog"
+                whileHover={{ scale: 1.03, boxShadow: '0 20px 40px -10px rgba(32, 211, 200, 0.3)' }}
+                whileTap={{ scale: 0.97 }}
+                className="px-6 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-teal-500 via-cyan-500 to-teal-500 text-white font-bold rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl hover:shadow-xl sm:hover:shadow-2xl transform transition-all duration-300 text-base sm:text-lg relative overflow-hidden mx-auto block"
+              >
+                <span className="relative z-10 flex items-center justify-center gap-1 sm:gap-2">
+                  Explore Blogs Now
+                  <span className="text-base sm:text-lg">→</span>
+                </span>
+                <span className="absolute inset-0 bg-gradient-to-r from-teal-600 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              </LoadingLink>
+
+              {/* Floating particles — only on desktop */}
+              <div className="hidden lg:block absolute -top-2 -left-2 w-1.5 h-1.5 bg-teal-400 rounded-full animate-ping"></div>
+              <div className="hidden lg:block absolute -bottom-4 -right-4 w-2 h-2 bg-cyan-400 rounded-full animate-pulse delay-1000"></div>
+            </div>
+          </motion.div>
+        </div>
 
         {/* Stats Cards */}
         <motion.div
@@ -291,5 +346,12 @@ export default function HomePage() {
     25% { transform: translate(20px, 20px); }
     50% { transform: translate(-10px, -10px); }
     75% { transform: translate(-20px, 20px); }
+  }
+    @keyframes glow {
+    0%, 100% { box-shadow: 0 5px 15px rgba(32, 211, 200, 0.2); }
+    50% { box-shadow: 0 5px 30px rgba(32, 211, 200, 0.4); }
+  }
+  .button-glow:hover {
+    animation: glow 1.5s infinite;
   }
 `}</style>

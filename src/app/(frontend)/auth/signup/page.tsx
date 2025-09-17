@@ -4,6 +4,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import LoadingButton from '../../components/LoadingButton'
 
 export default function SignupPage() {
   const [name, setName] = useState<string>('')
@@ -13,16 +14,19 @@ export default function SignupPage() {
   const [referredBy, setReferredBy] = useState<string>('') // ✅ renamed
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
+    setIsLoading(true)
 
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       body: JSON.stringify({ name, email, username, password, referredBy }), // ✅ renamed
       headers: { 'Content-Type': 'application/json' },
     })
+    setIsLoading(false)
 
     if (res.ok) {
       router.push('/dashboard')
@@ -201,10 +205,12 @@ export default function SignupPage() {
         </div>
 
         {/* Submit Button */}
-        <button
+        <LoadingButton
           type="submit"
-          className="group w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] 
-                     transition-all duration-300 overflow-hidden relative"
+          isLoading={isLoading}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="group w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative"
         >
           <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform group-hover:animate-shine"></span>
           <span className="relative z-10 flex items-center justify-center space-x-2">
@@ -223,7 +229,7 @@ export default function SignupPage() {
             </svg>
             <span>Sign Up</span>
           </span>
-        </button>
+        </LoadingButton>
 
         <p className="text-center text-gray-500 text-sm mt-6">
           Already have an account?{' '}

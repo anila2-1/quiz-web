@@ -1,8 +1,7 @@
 // src/app/(frontend)/dashboard/profile/page.tsx
 import { getServerSideMember } from '@/lib/getServerSideUser.server'
 import { redirect } from 'next/navigation'
-import Sidebar from '@/components/Sidebar'
-import ProfileForm from '@/components/ProfileForm'
+
 import ProfileWrapper from './ProfileWrapper'
 
 export default async function ProfilePage() {

@@ -187,7 +187,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
 
         {/* Text */}
         <p className="text-lg font-semibold text-gray-700 animate-pulse text-center px-4">
-          Loading your content...
+          Loading...
         </p>
       </div>
     )
@@ -577,7 +577,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
       {/* ✅ Back to Dashboard */}
       <div className="mt-8 sm:mt-10 pt-4 sm:pt-6 border-t border-gray-100">
         <Link
-          href="/dashboard"
+          href="/blog"
           className="group inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg sm:rounded-2xl bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-white border border-gray-200 
                hover:shadow-md sm:hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 text-gray-700 font-medium text-sm sm:text-base
                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -601,7 +601,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
           </span>
 
           <span className="font-semibold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent group-hover:from-indigo-600 group-hover:to-purple-600 transition-all duration-300">
-            Back to Dashboard
+            Back to Blog
           </span>
         </Link>
       </div>

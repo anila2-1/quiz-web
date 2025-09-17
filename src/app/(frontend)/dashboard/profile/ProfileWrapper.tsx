@@ -21,9 +21,7 @@ export default function ProfileWrapper({ member }: { member: any }) {
         <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
 
         {/* Text */}
-        <p className="text-lg font-semibold text-gray-700 animate-pulse text-center">
-          Loading your content...
-        </p>
+        <p className="text-lg font-semibold text-gray-700 animate-pulse text-center">Loading...</p>
       </div>
     )
   }

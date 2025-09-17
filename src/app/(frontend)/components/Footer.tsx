@@ -148,8 +148,8 @@ const Footer = () => {
         <button
           onClick={scrollToTop}
           className="fixed bottom-6 right-6 p-3 rounded-full 
-                     bg-white border border-gray-200 
-                     text-indigo-600 shadow-lg hover:shadow-xl 
+                     bg-indigo-600 border border-gray-200 
+                     text-white shadow-lg hover:shadow-xl 
                      hover:scale-110 active:scale-100 
                      transition-all duration-300 ease-in-out 
                      z-50"
