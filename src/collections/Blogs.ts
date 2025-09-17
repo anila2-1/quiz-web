@@ -55,17 +55,12 @@ const Blogs: CollectionConfig = {
       required: true,
     },
     {
-      name: 'category',
-      type: 'select',
-      label: 'Category',
-      options: [
-        { label: 'Technology', value: 'technology' },
-        { label: 'Finance', value: 'finance' },
-        { label: 'Health', value: 'health' },
-        { label: 'Education', value: 'education' },
-        { label: 'Lifestyle', value: 'lifestyle' },
-      ],
-      defaultValue: 'education',
+      name: 'categories',
+      type: 'relationship',
+      relationTo: 'categories',
+      label: 'Categories',
+      required: true,
+      hasMany: false,
     },
     {
       name: 'status',

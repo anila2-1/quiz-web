@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import LoadingButton from '../../components/LoadingButton'
+import { motion } from 'framer-motion'
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>('')
@@ -23,17 +23,24 @@ export default function LoginPage() {
     setError(null)
     setIsLoading(true)
 
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-      headers: { 'Content-Type': 'application/json' },
-    })
-    setIsLoading(false)
-    if (res.ok) {
-      router.push('/dashboard')
-    } else {
-      const json = await res.json()
-      setError(json.error || 'Login failed')
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+        headers: { 'Content-Type': 'application/json' },
+      })
+
+      if (res.ok) {
+        // Redirect to dashboard
+        router.push('/dashboard')
+      } else {
+        const json = await res.json()
+        setError(json.error || 'Login failed')
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -122,34 +129,66 @@ export default function LoginPage() {
         </div>
 
         {/* Submit Button */}
-        <LoadingButton
+        <motion.button
           type="submit"
-          isLoading={isLoading}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="group w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative"
+          disabled={isLoading}
+          whileHover={isLoading ? {} : { scale: 1.02 }}
+          whileTap={isLoading ? {} : { scale: 0.98 }}
+          className={`group w-full py-3 px-6 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative
+            ${isLoading ? 'cursor-not-allowed opacity-90' : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'}`}
         >
           {/* Shine Effect — keep it! */}
-          <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform group-hover:animate-shine"></span>
+          {!isLoading && (
+            <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform group-hover:animate-shine"></span>
+          )}
+
           <span className="relative z-10 flex items-center justify-center space-x-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-              <polyline points="10 17 15 12 10 7"></polyline>
-              <line x1="15" y1="12" x2="3" y2="12"></line>
-            </svg>
-            <span>Log In</span>
+            {isLoading ? (
+              <>
+                <svg
+                  className="animate-spin w-5 h-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <span>Logging in...</span>
+              </>
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                <span>Log In</span>
+              </>
+            )}
           </span>
-        </LoadingButton>
+        </motion.button>
 
         <p className="text-center text-gray-500 text-sm mt-6">
           Don’t have an account?{' '}

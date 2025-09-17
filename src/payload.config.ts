@@ -20,6 +20,7 @@ import Quizzes from './collections/Quizzes'
 import Withdrawals from './collections/Withdrawals'
 import Members from './collections/Members'
 import Pages from './collections/Pages'
+import { Categories } from './collections/Categories'
 
 import SiteSettings from './globals/sitesettings'
 
@@ -33,7 +34,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Pages, Blogs, Members, Quizzes, Withdrawals],
+  collections: [Users, Media, Pages, Blogs, Members, Quizzes, Withdrawals, Categories],
   globals: [SiteSettings],
   editor: lexicalEditor(),
 

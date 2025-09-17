@@ -79,6 +79,7 @@ export interface Config {
     members: Member;
     quizzes: Quiz;
     withdrawals: Withdrawal;
+    categories: Category;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -92,6 +93,7 @@ export interface Config {
     members: MembersSelect<false> | MembersSelect<true>;
     quizzes: QuizzesSelect<false> | QuizzesSelect<true>;
     withdrawals: WithdrawalsSelect<false> | WithdrawalsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -368,7 +370,7 @@ export interface Blog {
     };
     [k: string]: unknown;
   };
-  category?: ('technology' | 'finance' | 'health' | 'education' | 'lifestyle') | null;
+  categories: string | Category;
   status?: ('draft' | 'published') | null;
   /**
    * Is blog se related quizzes
@@ -388,6 +390,17 @@ export interface Blog {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  title: string;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -520,6 +533,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'withdrawals';
         value: string | Withdrawal;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: string | Category;
       } | null);
   globalSlug?: string | null;
   user:
@@ -674,7 +691,7 @@ export interface BlogsSelect<T extends boolean = true> {
   excerpt?: T;
   image?: T;
   content?: T;
-  category?: T;
+  categories?: T;
   status?: T;
   quizzes?: T;
   seo?:
@@ -766,6 +783,16 @@ export interface WithdrawalsSelect<T extends boolean = true> {
   amount?: T;
   paymentInfo?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }
