@@ -532,7 +532,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                   ></svg>
 
                   <p className="text-gray-700 text-sm sm:text-base font-medium leading-relaxed">
-                    🎉 You&#39;ve earned points! Theyve been added to your wallet.
+                    🎉 You&#39;ve earned points! They&#39;ve been added to your wallet.
                   </p>
                 </div>
 
