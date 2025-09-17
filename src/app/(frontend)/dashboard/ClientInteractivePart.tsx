@@ -1,3 +1,4 @@
+// src/app/(frontend)/dashboard/ClientInteractivePart.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -7,6 +8,7 @@ import DashboardHeader from './../../../components/DashboardHeader'
 import WalletCard from './../../../components/WalletCard'
 import ReferralStats from './../../../components/ReferralStats'
 import QuizStats from '../../../components/QuizStats'
+import { useSidebar } from '../SidebarContext'
 
 interface User {
   id: string
@@ -18,9 +20,13 @@ interface User {
   referralsCount?: number | null
 }
 
-export default function ClientInteractivePart({ user: serverUser }: { user: User | null }) {
+interface ClientInteractivePartProps {
+  user: User | null
+}
+
+export default function ClientInteractivePart({ user: serverUser }: ClientInteractivePartProps) {
+  const { sidebarOpen, setSidebarOpen } = useSidebar()
   const [user, setUser] = useState<User | null>(null)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     setTimeout(() => {
@@ -65,17 +71,6 @@ export default function ClientInteractivePart({ user: serverUser }: { user: User
 
       {/* Main Content */}
       <div className="flex-1 w-full">
-        {/* Mobile Toggle Button Only — NO NAVBAR */}
-        <div className="lg:hidden px-4 py-3 flex justify-between items-center">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-md text-gray-600 hover:text-gray-900"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          <div className="w-6"></div>
-        </div>
-
         {/* Page Content — unchanged */}
         <div className="p-4 sm:p-6 lg:ml-64 transition-all duration-300">
           <DashboardHeader user={user} activeTab="overview" />

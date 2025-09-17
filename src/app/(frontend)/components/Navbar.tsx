@@ -3,14 +3,19 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { usePathname } from 'next/navigation' // ← Add this
+import { motion } from 'framer-motion'
+import { Menu } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { useSidebar } from '../SidebarContext'
 
 export default function Navbar() {
+  const { sidebarOpen, setSidebarOpen } = useSidebar()
   const [member, setMember] = useState<any>(null)
-  const [isOpen, setIsOpen] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
-  const pathname = usePathname() // ← Track URL changes
+  const pathname = usePathname()
+
+  // Check if current route is dashboard — for mobile toggle
+  const shouldShowToggle = ['/dashboard'].includes(pathname)
 
   useEffect(() => {
     const fetchMember = async () => {
@@ -33,6 +38,10 @@ export default function Navbar() {
     window.location.href = '/'
   }
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
+
   return (
     <nav
       className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-200/60 shadow-lg transition-all duration-300"
@@ -50,32 +59,46 @@ export default function Navbar() {
             </Link>
           </motion.div>
 
+          {/* Mobile Toggle Button — Only on Dashboard */}
+          {shouldShowToggle && (
+            <button
+              onClick={toggleSidebar}
+              className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 focus:outline-none"
+              aria-label="Toggle Sidebar"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+          )}
+
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8 h-full">
-            {(['Home'] as const).map((item) => (
-              <motion.div key={item} whileHover={{ y: -2 }}>
+            {/* Home Button */}
+            <motion.div whileHover={{ y: -2 }}>
+              <Link
+                href="/"
+                className="text-gray-700 hover:text-indigo-600 font-medium relative group"
+              >
+                Home
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-pink-500 group-hover:w-full transition-all duration-300"></span>
+              </Link>
+            </motion.div>
+
+            {/* Dashboard Button — Only if logged in */}
+            {isLoaded && member && (
+              <motion.div whileHover={{ y: -2 }}>
                 <Link
-                  href={item === 'Home' ? '/' : ''}
+                  href="/dashboard"
                   className="text-gray-700 hover:text-indigo-600 font-medium relative group"
                 >
-                  {item}
+                  Dashboard
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-pink-500 group-hover:w-full transition-all duration-300"></span>
                 </Link>
               </motion.div>
-            ))}
+            )}
 
             {isLoaded ? (
               member ? (
                 <>
-                  <motion.div whileHover={{ y: -2 }}>
-                    <Link
-                      href="/dashboard"
-                      className="text-gray-700 hover:text-indigo-600 font-medium relative group"
-                    >
-                      Dashboard
-                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-pink-500 group-hover:w-full transition-all duration-300"></span>
-                    </Link>
-                  </motion.div>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -113,92 +136,7 @@ export default function Navbar() {
               <div className="w-20 h-8 bg-gray-200 rounded animate-pulse"></div>
             )}
           </div>
-
-          {/* Mobile Menu Button */}
-          {/* <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none transition-colors"
-            aria-label="Toggle menu"
-          >
-            <motion.svg
-              animate={{ rotate: isOpen ? 90 : 0 }}
-              transition={{ duration: 0.3 }}
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {isOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </motion.svg>
-          </button> */}
         </div>
-
-        {/* Mobile Menu */}
-        {/* <AnimatePresence>
-          {isOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="md:hidden bg-white border-t border-gray-200 shadow-xl rounded-b-2xl overflow-hidden"
-            >
-              <div className="px-4 pt-2 pb-4 space-y-1">
-                {(['Home', 'Blogs'] as const).map((item) => (
-                  <Link
-                    key={item}
-                    href={item === 'Home' ? '/' : '/blog'}
-                    className="block relative after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r from-indigo-500 to-pink-500 after:transition-all after:duration-300 hover:after:w-full px-4 py-3 text-gray-700 hover:bg-indigo-50 rounded transition"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item}
-                  </Link>
-                ))}
-                {isLoaded ? (
-                  member ? (
-                    <>
-                      <Link
-                        href="/dashboard"
-                        className="block px-4 py-3 text-gray-700 hover:bg-indigo-50 rounded transition"
-                        onClick={() => setIsOpen(false)}
-                      >
-                        Dashboard
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 rounded transition"
-                      >
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                    <div className="px-4 py-2 space-y-2">
-                      <AnimatedSignUpButtonMobile />
-                    </div>
-                  )
-                ) : (
-                  <div className="px-4 py-2">
-                    <div className="w-full h-10 bg-gray-200 rounded-lg animate-pulse"></div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence> */}
       </div>
     </nav>
   )
@@ -231,59 +169,6 @@ function AnimatedSignUpButton() {
 
       <motion.div
         className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white to-transparent opacity-40"
-        style={{ backgroundSize: '60% 100%', transform: 'skewX(-20deg)' }}
-        variants={{
-          hover: {
-            x: '100%',
-            transition: { duration: 1, repeat: Infinity, repeatType: 'loop' },
-          },
-        }}
-      ></motion.div>
-
-      <style jsx>{`
-        @keyframes gradientShift {
-          0% {
-            background-position: 0%;
-          }
-          100% {
-            background-position: 200%;
-          }
-        }
-        [style*='background: linear-gradient'] {
-          animation: gradientShift 3s ease-in-out infinite alternate;
-        }
-      `}</style>
-    </motion.div>
-  )
-}
-
-// ✅ Premium Animated Sign Up Button (Mobile)
-function AnimatedSignUpButtonMobile() {
-  return (
-    <motion.div whileHover="hover" whileTap="tap" className="relative">
-      <Link
-        href="/auth/signup"
-        className="block w-full text-center py-2.5 text-white font-semibold rounded-lg shadow relative overflow-hidden"
-        style={{
-          background: 'linear-gradient(90deg, #4F46E5, #7C3AED, #EC4899, #4F46E5)',
-          backgroundSize: '300% 100%',
-          backgroundPosition: '0%',
-        }}
-      >
-        <span className="relative z-10">Sign Up</span>
-      </Link>
-
-      <motion.div
-        className="absolute inset-0 rounded-lg opacity-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 blur-sm"
-        style={{ border: '2px solid transparent', backgroundClip: 'padding-box' }}
-        variants={{
-          hover: { opacity: 1 },
-        }}
-        transition={{ duration: 0.4 }}
-      ></motion.div>
-
-      <motion.div
-        className="absolute inset-0 rounded-lg bg-gradient-to-r from-transparent via-white to-transparent opacity-40"
         style={{ backgroundSize: '60% 100%', transform: 'skewX(-20deg)' }}
         variants={{
           hover: {
