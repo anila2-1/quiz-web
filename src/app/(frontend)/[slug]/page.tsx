@@ -3,13 +3,13 @@ import { Metadata } from 'next'
 import { getBlogBySlug } from '../../../lib/getBlogBySlug'
 import { BlogClient } from './BlogClient'
 
-// ✅ Correct type: params is always a Promise<{ slug: string }>
-type Props = {
-  params: Promise<{ slug: string }>
+interface Props {
+  params: { slug: string }
+  searchParams?: { [key: string]: string | string[] | undefined }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
+  const { slug } = params
   const blog = await getBlogBySlug(slug)
 
   if (!blog) return { title: 'Blog Not Found' }
@@ -57,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPage({ params }: Props) {
-  const { slug } = await params
+  const { slug } = params
   const blog = await getBlogBySlug(slug)
 
   if (!blog) {
