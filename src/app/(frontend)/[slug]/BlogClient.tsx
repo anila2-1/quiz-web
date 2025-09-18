@@ -542,7 +542,7 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
                 </div>
                 <div className="inline-flex items-center gap-3 rounded-xl bg-white border border-gray-200 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-300">
                   <p className="text-gray-700 text-sm sm:text-base font-medium leading-relaxed">
-                    🎉 You've earned points! They've been added to your wallet.
+                    🎉 You&lsquo;ve earned points! They&lsquo;ve been added to your wallet.
                   </p>
                 </div>
                 <style jsx>{`
