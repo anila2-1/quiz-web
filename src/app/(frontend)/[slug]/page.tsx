@@ -1,15 +1,16 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { getBlogBySlug } from '../../../lib/getBlogBySlug'
-import { BlogClient } from './BlogClient'
+import { BlogClient } from './BlogClient' // ← Client component
+import Footer from '../components/Footer'
 
-interface Props {
-  params: { slug: string }
-  searchParams?: { [key: string]: string | string[] | undefined }
+type Props = {
+  params: Promise<{ slug: string }>
 }
 
+// ✅ SEO: Dynamic Metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = params
+  const { slug } = await params
   const blog = await getBlogBySlug(slug)
 
   if (!blog) return { title: 'Blog Not Found' }
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `${process.env.NEXT_PUBLIC_SERVER_URL}${blog.image.url}`
     : `${process.env.NEXT_PUBLIC_SERVER_URL}/api/og?title=${encodeURIComponent(blog.title)}`
 
-  const canonicalUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/${blog.slug}`
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/blog/${blog.slug}`
 
   return {
     title: blog.seo?.title || blog.title,
@@ -57,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BlogPage({ params }: Props) {
-  const { slug } = params
+  const { slug } = await params
   const blog = await getBlogBySlug(slug)
 
   if (!blog) {
