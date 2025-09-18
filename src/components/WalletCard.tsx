@@ -1,22 +1,15 @@
 // src/app/(frontend)/components/WalletCard.tsx
-'use client' // ← Add this
+'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from './../_providers/Auth'
-import { useEffect, useState } from 'react'
 
 export default function WalletCard() {
   const { user } = useAuth()
-  const [isLoading, setIsLoading] = useState(true)
-  const [walletBalance, setWalletBalance] = useState<number | null>(null)
 
-  useEffect(() => {
-    // Wait for user to be available
-    if (user !== undefined) {
-      setIsLoading(false)
-      setWalletBalance(user?.wallet || 0)
-    }
-  }, [user])
+  // ✅ Show loading only while auth is initializing (user === undefined)
+  const isLoading = user === undefined
+  const walletBalance = user?.wallet || 0
 
   return (
     <motion.div
@@ -49,7 +42,7 @@ export default function WalletCard() {
               transition={{ duration: 0.3 }}
               className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-5"
             >
-              ₹{walletBalance?.toFixed(2)}
+              ₹{walletBalance.toFixed(2)}
             </motion.div>
           )}
         </AnimatePresence>
