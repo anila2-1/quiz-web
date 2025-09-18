@@ -3,8 +3,9 @@ import { Metadata } from 'next'
 import { getBlogBySlug } from '../../../lib/getBlogBySlug'
 import { BlogClient } from './BlogClient'
 
+// ✅ Correct type: params is always a Promise<{ slug: string }>
 type Props = {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
