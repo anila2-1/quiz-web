@@ -31,7 +31,7 @@ export default function BlogGrid({ posts }: { posts: any[] }) {
                   </div>
                 )}
                 {post.category && (
-                  <div className="mb-3">
+                  <div className="mb-3 p-6 pt-4">
                     <span
                       className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800"
                       style={{

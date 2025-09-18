@@ -32,8 +32,11 @@ export default async function CategoriesPage() {
 
   return (
     <div className="container mx-auto px-4 py-16">
-      <h1 className="text-4xl font-bold text-gray-900 mb-8">Categories</h1>
-
+      <div className="relative px-4 py-8 sm:py-10 md:py-12 text-center">
+        <h1 className="text-4xl p-2.5 sm:text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight">
+          Categories
+        </h1>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((category: any) => (
           <Link
