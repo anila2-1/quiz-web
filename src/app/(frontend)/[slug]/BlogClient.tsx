@@ -24,6 +24,12 @@ interface Blog {
   content: any[]
   image?: { url: string }
   quizzes?: Quiz[]
+  category?: {
+    id: string
+    title: string
+    color?: string
+    slug: string
+  }
 }
 
 interface QuizState {
@@ -35,9 +41,15 @@ interface QuizState {
   completed: boolean
 }
 
-export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
+interface BlogClientProps {
+  initialBlog?: Blog
+  initialCategory?: any
+}
+
+export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
   const { user, refreshUser } = useAuth()
   const [post] = useState<Blog | null>(initialBlog || null)
+  const [category] = useState<any>(initialCategory || null)
   const [quizStates, setQuizStates] = useState<Record<string, QuizState>>({})
 
   // Initialize quiz states
@@ -123,7 +135,6 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
     }, 150)
   }
 
-  // In your BlogClient component, update the handleSubmitQuiz function:
   const handleSubmitQuiz = async (quizId: string) => {
     if (!user) {
       window.location.href = '/auth/login'
@@ -167,13 +178,12 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
       console.error('Failed to submit quiz:', err)
     }
   }
-  // inside your component:
+
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleDelayedSubmit = (quizId: string) => {
-    if (isSubmitting) return // prevent multiple clicks
+    if (isSubmitting) return
     setIsSubmitting(true)
-
     handleSubmitQuiz(quizId).finally(() => {
       setIsSubmitting(false)
     })
@@ -182,10 +192,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
   if (!post || Object.keys(post).length === 0) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        {/* Spinner */}
         <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-
-        {/* Text */}
         <p className="text-lg font-semibold text-gray-700 animate-pulse text-center px-4">
           Loading...
         </p>
@@ -208,6 +215,32 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
         {post!.title}
       </h1>
 
+      {/* ✅ Category Tag - Beautiful & Clickable */}
+      {category && (
+        <div className="flex justify-center mb-8">
+          <Link
+            href={`/categories/${category.slug}`}
+            className="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-100 to-purple-100 hover:from-indigo-200 hover:to-purple-200 border border-indigo-200/50 hover:border-indigo-300/70 transition-all duration-300 shadow-sm hover:shadow-md"
+          >
+            <span
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: category.color || '#4F46E5' }}
+            ></span>
+            <span className="text-sm font-medium text-gray-700 group-hover:text-indigo-800 transition-colors">
+              {category.title}
+            </span>
+            <svg
+              className="w-4 h-4 text-gray-500 group-hover:text-indigo-600 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      )}
+
       {/* Quizzes */}
       {post!.quizzes?.map((quiz) => {
         const state = quizStates![quiz.id] || {
@@ -228,7 +261,6 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
             <div className="flex justify-center items-center mb-6 sm:mb-8">
               {state.completed ? (
                 <div className="group relative">
-                  {/* Main Badge */}
                   <div className="px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-600 text-white rounded-full text-sm sm:text-base font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2 sm:gap-3 backdrop-blur-sm border border-white/10">
                     <svg
                       className="w-5 h-5 sm:w-6 sm:h-6"
@@ -245,8 +277,6 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                     </svg>
                     <span>Quiz Completed</span>
                   </div>
-
-                  {/* Subtle floating halo effect */}
                   <div className="absolute inset-0 rounded-full border border-green-400/30 animate-ping opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
                 </div>
               ) : (
@@ -259,10 +289,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                   }
                   className="group relative px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-semibold rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 sm:gap-3 overflow-hidden"
                 >
-                  {/* Animated gradient background shimmer */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-shine"></div>
-
-                  {/* Icon */}
                   <svg
                     className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:rotate-12"
                     fill="none"
@@ -276,13 +303,9 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                       d={state.showQuiz ? 'M6 18L18 6M6 6l12 12' : 'M13 10V3L4 14h7v7l9-11h-7z'}
                     />
                   </svg>
-
-                  {/* Text */}
                   <span className="relative z-10">
                     {state.showQuiz ? 'Hide Quiz' : 'Start Quiz'}
                   </span>
-
-                  {/* Shine Animation Style */}
                   <style jsx>{`
                     @keyframes shine {
                       0% {
@@ -299,6 +322,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                 </button>
               )}
             </div>
+
             {/* Quiz Flow */}
             {state.showQuiz && !state.completed && (
               <div className="mt-4 sm:mt-6">
@@ -307,7 +331,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                   <div className="flex space-x-2 sm:space-x-3">
                     {(Array.isArray(quiz.questions) ? quiz.questions : []).map((_, idx) => (
                       <div
-                        key={`${quiz.id}-dot-${idx}`} // Add unique key here
+                        key={`${quiz.id}-dot-${idx}`}
                         className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-all duration-300 ${
                           idx < state.answers.filter((a) => a !== null).length
                             ? 'bg-gradient-to-r from-green-500 to-emerald-600 scale-110 shadow-md'
@@ -319,6 +343,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                     ))}
                   </div>
                 </div>
+
                 {/* Question Card */}
                 <div
                   className={`relative overflow-hidden rounded-xl sm:rounded-2xl bg-white shadow-lg sm:shadow-2xl min-h-64 sm:min-h-80 transition-all duration-300 ${
@@ -414,18 +439,18 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                       onClick={() => handleDelayedSubmit(quiz.id)}
                       disabled={!state.answers[state.currentQuestionIndex] || isSubmitting}
                       className={`
-    group relative
-    px-6 sm:px-8 py-3 sm:py-3.5
-    text-sm sm:text-base font-medium
-    bg-gradient-to-r from-green-600 to-emerald-600
-    text-white
-    rounded-xl sm:rounded-2xl
-    shadow-lg hover:shadow-xl
-    transition-all duration-300
-    flex items-center justify-center
-    gap-2 sm:gap-3
-    ${isSubmitting ? 'opacity-90 cursor-not-allowed scale-100' : 'hover:scale-105 active:scale-95'}
-  `}
+                        group relative
+                        px-6 sm:px-8 py-3 sm:py-3.5
+                        text-sm sm:text-base font-medium
+                        bg-gradient-to-r from-green-600 to-emerald-600
+                        text-white
+                        rounded-xl sm:rounded-2xl
+                        shadow-lg hover:shadow-xl
+                        transition-all duration-300
+                        flex items-center justify-center
+                        gap-2 sm:gap-3
+                        ${isSubmitting ? 'opacity-90 cursor-not-allowed scale-100' : 'hover:scale-105 active:scale-95'}
+                      `}
                     >
                       {isSubmitting ? (
                         <>
@@ -477,13 +502,11 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                 </div>
               </div>
             )}
-            {/* In the result section of your BlogClient component: */}
+
+            {/* Result */}
             {state.completed && (
               <div className="mt-6 sm:mt-8 p-6 sm:p-8 bg-gradient-to-br from-emerald-50 via-white to-teal-50 border border-emerald-200/70 rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl text-center animate-fade-in backdrop-blur-sm relative overflow-hidden group">
-                {/* Subtle animated background pattern */}
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/20 to-teal-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
-
-                {/* Floating confetti dots (optional visual flair) */}
                 <div className="absolute top-0 right-0 w-20 h-20">
                   <div
                     className="absolute top-2 right-2 w-2 h-2 bg-yellow-400 rounded-full animate-bounce"
@@ -498,10 +521,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                     style={{ animationDelay: '1s' }}
                   ></div>
                 </div>
-
-                {/* Main Content */}
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-6">
-                  {/* ✅ Elegant Animated Checkmark */}
                   <div className="relative">
                     <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-emerald-500/30 transition-shadow duration-300">
                       <svg
@@ -514,29 +534,17 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
-                    {/* ✅ Subtle pulse ring on success */}
                     <div className="absolute inset-0 rounded-full border-2 border-emerald-400/50 animate-ping opacity-75"></div>
                   </div>
-
-                  {/* ✅ Modern Headline */}
                   <h3 className="text-2xl sm:text-3xl font-extrabold bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-700 bg-clip-text text-transparent leading-tight">
                     Quiz Completed!
                   </h3>
                 </div>
-                {/* ✅ Highlighted Reward Badge */}
                 <div className="inline-flex items-center gap-3 rounded-xl bg-white border border-gray-200 px-4 py-3 shadow-sm hover:shadow-md transition-all duration-300">
-                  <svg
-                    className="w-6 h-6 text-indigo-600"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  ></svg>
-
                   <p className="text-gray-700 text-sm sm:text-base font-medium leading-relaxed">
-                    🎉 You&#39;ve earned points! They&#39;ve been added to your wallet.
+                    🎉 You've earned points! They've been added to your wallet.
                   </p>
                 </div>
-
-                {/* ✅ Optional Micro-Interaction: Floating sparkles on hover */}
                 <style jsx>{`
                   @keyframes float {
                     0%,
@@ -574,7 +582,7 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
         <RichText content={post!.content} />
       </article>
 
-      {/* ✅ Back to Dashboard */}
+      {/* Back to Blog */}
       <div className="mt-8 sm:mt-10 pt-4 sm:pt-6 border-t border-gray-100">
         <Link
           href="/blog"
@@ -582,7 +590,6 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
                hover:shadow-md sm:hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 text-gray-700 font-medium text-sm sm:text-base
                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
-          {/* Arrow */}
           <span className="relative flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-200 group-hover:bg-indigo-50 transition-all duration-300">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -599,7 +606,6 @@ export function BlogClient({ initialBlog }: { initialBlog?: Blog }) {
               />
             </svg>
           </span>
-
           <span className="font-semibold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent group-hover:from-indigo-600 group-hover:to-purple-600 transition-all duration-300">
             Back to Blog
           </span>

@@ -30,6 +30,21 @@ export default function BlogGrid({ posts }: { posts: any[] }) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                   </div>
                 )}
+                {post.category && (
+                  <div className="mb-3">
+                    <span
+                      className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800"
+                      style={{
+                        backgroundColor: post.category.color
+                          ? `${post.category.color}20`
+                          : '#e0e7ff',
+                        color: post.category.color || '#4F46E5',
+                      }}
+                    >
+                      {post.category.title}
+                    </span>
+                  </div>
+                )}
                 <div className="p-6">
                   <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
                     {post.title}

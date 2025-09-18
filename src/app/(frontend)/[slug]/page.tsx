@@ -1,14 +1,12 @@
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import { getBlogBySlug } from '../../../lib/getBlogBySlug'
-import { BlogClient } from './BlogClient' // ← Client component
-import Footer from '../components/Footer'
+import { BlogClient } from './BlogClient'
 
 type Props = {
-  params: Promise<{ slug: string }>
+  params: Promise<{ slug: string }> | { slug: string }
 }
 
-// ✅ SEO: Dynamic Metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const blog = await getBlogBySlug(slug)
@@ -19,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `${process.env.NEXT_PUBLIC_SERVER_URL}${blog.image.url}`
     : `${process.env.NEXT_PUBLIC_SERVER_URL}/api/og?title=${encodeURIComponent(blog.title)}`
 
-  const canonicalUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/blog/${blog.slug}`
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SERVER_URL}/${blog.slug}`
 
   return {
     title: blog.seo?.title || blog.title,
@@ -57,7 +55,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-// ✅ Server Component: Fetch data and pass to client
 export default async function BlogPage({ params }: Props) {
   const { slug } = await params
   const blog = await getBlogBySlug(slug)
@@ -66,10 +63,25 @@ export default async function BlogPage({ params }: Props) {
     notFound()
   }
 
+  // ✅ Fetch category to pass to client
+  let category = null
+  if (blog.category?.id) {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/categories/${blog.category.id}?depth=1`,
+        { next: { revalidate: 60 } },
+      )
+      if (res.ok) {
+        category = await res.json()
+      }
+    } catch (error) {
+      console.error('Error fetching category:', error)
+    }
+  }
+
   return (
     <div>
-      <BlogClient initialBlog={blog} />
-      <Footer />
+      <BlogClient initialBlog={blog} initialCategory={category} />
     </div>
   )
 }

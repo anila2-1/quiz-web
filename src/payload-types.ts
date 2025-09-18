@@ -370,7 +370,7 @@ export interface Blog {
     };
     [k: string]: unknown;
   };
-  categories: string | Category;
+  category: string | Category;
   status?: ('draft' | 'published') | null;
   /**
    * Is blog se related quizzes
@@ -691,7 +691,7 @@ export interface BlogsSelect<T extends boolean = true> {
   excerpt?: T;
   image?: T;
   content?: T;
-  categories?: T;
+  category?: T;
   status?: T;
   quizzes?: T;
   seo?:
