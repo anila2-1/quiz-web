@@ -20,13 +20,6 @@ export default function Sidebar() {
     { key: 'profile', label: 'Profile', icon: '👤', href: '/dashboard/profile' },
   ]
 
-  // Brand Header
-  const BrandHeader = () => (
-    <div className="p-6">
-      <h2 className="text-xl font-bold text-indigo-700">Dashboard</h2>
-    </div>
-  )
-
   const MenuItemComponent = ({ item }: { item: MenuItem }) => (
     <li key={item.key}>
       <Link
@@ -65,7 +58,6 @@ export default function Sidebar() {
 
   return (
     <div className="fixed h-full w-64 bg-white/95 backdrop-blur-lg shadow-xl border-r border-gray-200 transition-transform duration-300 z-40">
-      <BrandHeader />
       <Navigation />
     </div>
   )

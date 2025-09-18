@@ -1,3 +1,4 @@
+// src/app/(frontend)/blog/[slug]/BlogClient.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -51,6 +52,8 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
   const [post] = useState<Blog | null>(initialBlog || null)
   const [category] = useState<any>(initialCategory || null)
   const [quizStates, setQuizStates] = useState<Record<string, QuizState>>({})
+  const [relatedBlogs, setRelatedBlogs] = useState<any[]>([])
+  const [loadingRelated, setLoadingRelated] = useState(true)
 
   // Initialize quiz states
   useEffect(() => {
@@ -76,6 +79,33 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
       setQuizStates(initial)
     }
   }, [post?.quizzes, user])
+
+  // Fetch related blogs by category
+  useEffect(() => {
+    const fetchRelatedBlogs = async (categoryId: string, currentBlogId: string) => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/blogs?where[category][equals][id]=${categoryId}&limit=6&depth=1`,
+          { cache: 'no-store' },
+        )
+        if (!res.ok) throw new Error('Failed to fetch related blogs')
+        const data = await res.json()
+        // Filter out current blog
+        return data.docs.filter((blog: any) => blog.id !== currentBlogId)
+      } catch (error) {
+        console.error('Error fetching related blogs:', error)
+        return []
+      }
+    }
+
+    if (category?.id && post?.id) {
+      setLoadingRelated(true)
+      fetchRelatedBlogs(category.id, post.id).then((blogs) => {
+        setRelatedBlogs(blogs)
+        setLoadingRelated(false)
+      })
+    }
+  }, [category?.id, post?.id])
 
   const handleAnswerChange = (quizId: string, index: number, value: string) => {
     setQuizStates((prev) => ({
@@ -215,7 +245,7 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
         {post!.title}
       </h1>
 
-      {/* ✅ Category Tag - Beautiful & Clickable */}
+      {/* Category Tag */}
       {category && (
         <div className="flex justify-center mb-8">
           <Link
@@ -581,6 +611,87 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
         )}
         <RichText content={post!.content} />
       </article>
+
+      {/* ✅ RELATED POSTS SECTION */}
+      {category && (
+        <div className="mt-16 pt-8 border-t border-gray-200">
+          {loadingRelated ? (
+            <>
+              <h2 className="text-2xl font-bold text-center mb-8">Related Posts</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-white border border-gray-200 rounded-2xl p-5 animate-pulse"
+                  >
+                    <div className="h-48 bg-gray-200 rounded-xl mb-4"></div>
+                    <div className="h-5 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : relatedBlogs.length > 0 ? (
+            <>
+              <h2
+                className="text-2xl sm:text-3xl font-bold text-center mb-8 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
+                style={{ WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+              >
+                Related Posts in “{category.title}”
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {relatedBlogs.map((blog) => (
+                  <Link
+                    key={blog.id}
+                    href={`/blog/${blog.slug}`}
+                    className="group block overflow-hidden rounded-2xl bg-white border border-gray-200 hover:shadow-xl hover:border-indigo-300 transition-all duration-300 transform hover:-translate-y-1"
+                  >
+                    {blog.image && (
+                      <div className="relative h-48 overflow-hidden">
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_SERVER_URL}${blog.image.url}`}
+                          alt={blog.title}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </div>
+                    )}
+                    <div className="p-5">
+                      <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-indigo-700 line-clamp-2">
+                        {blog.title}
+                      </h3>
+                      {blog.excerpt && (
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{blog.excerpt}</p>
+                      )}
+                      <div className="flex items-center text-indigo-600 font-medium text-sm">
+                        Read More
+                        <svg
+                          className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-10">
+              <p className="text-gray-500">No related posts in this category yet.</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Back to Blog */}
       <div className="mt-8 sm:mt-10 pt-4 sm:pt-6 border-t border-gray-100">
