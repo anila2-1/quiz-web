@@ -84,6 +84,7 @@ export default async function BlogPage({ params }: Props) {
   return (
     <div>
       <BlogClient initialBlog={blog} initialCategory={category} />
+      <Footer />
     </div>
   )
 }
