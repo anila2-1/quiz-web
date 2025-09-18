@@ -4,7 +4,7 @@ import { getBlogBySlug } from '../../../lib/getBlogBySlug'
 import { BlogClient } from './BlogClient'
 
 type Props = {
-  params: Promise<{ slug: string }> | { slug: string }
+  params: { slug: string }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
