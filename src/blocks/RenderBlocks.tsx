@@ -17,7 +17,7 @@ const blockComponents = {
 }
 
 export const RenderBlocks: React.FC<{
-  blocks: Page['layout'][0][]
+  blocks: Page['layout']
 }> = (props) => {
   const { blocks } = props
 
@@ -35,7 +35,7 @@ export const RenderBlocks: React.FC<{
             if (Block) {
               return (
                 <div className="my-16" key={index}>
-                  <Block {...block} disableInnerContainer />
+                  <Block {...(block as any)} disableInnerContainer />
                 </div>
               )
             }
