@@ -1,4 +1,3 @@
-// src/app/(frontend)/blog/BlogGrid.tsx
 'use client'
 
 import Link from 'next/link'
@@ -11,53 +10,57 @@ export default function BlogGrid({ posts }: { posts: any[] }) {
         <AnimatePresence>
           {posts.length > 0 ? (
             posts.map((post, index) => (
-              <motion.div
+              <Link
                 key={post.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -30 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -10 }}
-                className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/60 overflow-hidden transition-all duration-300 hover:shadow-2xl"
+                href={`/${post.slug}`}
+                className="block h-full" // Makes link fill entire card
               >
-                {post.image && (
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image.url}`}
-                      alt={post.title?.toString() || 'Blog Image'}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -30 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  whileHover={{ y: -10 }}
+                  className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200/60 overflow-hidden transition-all duration-300 hover:shadow-2xl h-full flex flex-col"
+                >
+                  {post.image && (
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image.url}`}
+                        alt={post.title?.toString() || 'Blog Image'}
+                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    </div>
+                  )}
+                  <div className="flex-grow p-6 flex flex-col">
+                    {post.category && (
+                      <div className="mb-3">
+                        <span
+                          className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800"
+                          style={{
+                            backgroundColor: post.category.color
+                              ? `${post.category.color}20`
+                              : '#e0e7ff',
+                            color: post.category.color || '#4F46E5',
+                          }}
+                        >
+                          {post.category.title}
+                        </span>
+                      </div>
+                    )}
+                    <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+                      {post.title}
+                    </h2>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
+                    <div className="mt-auto">
+                      <span className="inline-block px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow hover:shadow-md transition-all duration-300 transform hover:scale-105 cursor-pointer">
+                        Read More →
+                      </span>
+                    </div>
                   </div>
-                )}
-                {post.category && (
-                  <div className="mb-3 p-6 pt-4">
-                    <span
-                      className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800"
-                      style={{
-                        backgroundColor: post.category.color
-                          ? `${post.category.color}20`
-                          : '#e0e7ff',
-                        color: post.category.color || '#4F46E5',
-                      }}
-                    >
-                      {post.category.title}
-                    </span>
-                  </div>
-                )}
-                <div className="p-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
-                    {post.title}
-                  </h2>
-                  <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
-                  <Link
-                    href={`/${post.slug}`}
-                    className="inline-block px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow hover:shadow-md transition-all duration-300 transform hover:scale-105"
-                  >
-                    Read More →
-                  </Link>
-                </div>
-              </motion.div>
+                </motion.div>
+              </Link>
             ))
           ) : (
             <motion.div

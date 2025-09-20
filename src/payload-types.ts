@@ -344,7 +344,7 @@ export interface Image {
 export interface Blog {
   id: string;
   /**
-   * Blog post ka title
+   * Title of Blog post
    */
   title: string;
   slug?: string | null;
@@ -374,7 +374,7 @@ export interface Blog {
   category: string | Category;
   status?: ('draft' | 'published') | null;
   /**
-   * Is blog se related quizzes
+   * blog related quizzes
    */
   quizzes?: (string | Quiz)[] | null;
   seo?: {

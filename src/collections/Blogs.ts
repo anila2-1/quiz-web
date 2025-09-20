@@ -30,7 +30,7 @@ const Blogs: CollectionConfig = {
       required: true,
       label: 'Title',
       admin: {
-        description: 'Blog post ka title',
+        description: 'Title of Blog post ',
       },
     },
     slugField,
@@ -85,7 +85,7 @@ const Blogs: CollectionConfig = {
       relationTo: 'quizzes',
       hasMany: true,
       admin: {
-        description: 'Is blog se related quizzes',
+        description: 'blog related quizzes',
       },
     },
     {
