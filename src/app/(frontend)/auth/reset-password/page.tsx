@@ -1,8 +1,8 @@
 // src/app/auth/reset-password/page.tsx
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 export default function ResetPassword() {
@@ -13,6 +13,8 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false)
 
   const router = useRouter()
+
+  // ✅ Wrap useSearchParams in Suspense
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
 
