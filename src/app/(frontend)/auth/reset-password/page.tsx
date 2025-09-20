@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('')
@@ -114,9 +115,9 @@ export default function ResetPassword() {
         </form>
 
         <div className="mt-6 text-center">
-          <a href="/auth/login" className="text-blue-600 hover:underline">
+          <Link href="/auth/login" className="text-blue-600 hover:underline">
             Back to Login
-          </a>
+          </Link>
         </div>
       </div>
     </div>
