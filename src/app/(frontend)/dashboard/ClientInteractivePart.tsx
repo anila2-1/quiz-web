@@ -2,7 +2,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Menu } from 'lucide-react'
 import Sidebar from './../../../components/Sidebar'
 import DashboardHeader from './../../../components/DashboardHeader'
 import WalletCard from './../../../components/WalletCard'

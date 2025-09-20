@@ -2,6 +2,7 @@
 import { CollectionConfig } from 'payload'
 import { slugField } from '../fields/slugField'
 import { isAdmin } from '../access/isAdmin'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
 
 const Blogs: CollectionConfig = {
   slug: 'blogs',
@@ -53,6 +54,13 @@ const Blogs: CollectionConfig = {
       type: 'richText',
       label: 'Content',
       required: true,
+      admin: {
+        description:
+          'The main content of your blog post. Supports rich formatting, lists, images, etc.',
+      },
+      editor: lexicalEditor({
+        features: ({ defaultFeatures }) => defaultFeatures,
+      }),
     },
     {
       name: 'category',

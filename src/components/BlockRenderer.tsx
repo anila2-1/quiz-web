@@ -1,5 +1,5 @@
 import React from 'react'
-import RichText from '../components/RichText'
+import RichText from './../components/RichText'
 import Image from 'next/image'
 
 export const getBlockContent = (block: {
@@ -59,7 +59,7 @@ export const getBlockContent = (block: {
     case 'richText':
       return (
         <div key={block.id} className="py-12 px-4 max-w-4xl mx-auto">
-          <RichText content={block.content} />
+          <RichText content={block.content} data={block.content} />
         </div>
       )
 

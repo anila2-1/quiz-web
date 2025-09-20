@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../../_providers/Auth'
 import Link from 'next/link'
-import { RichText } from '../../../components/RichText'
+import RichText from '@/components/RichText'
 
 interface Question {
   id: string
@@ -609,7 +609,10 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
             className="w-full h-56 sm:h-72 object-cover rounded-xl sm:rounded-2xl shadow-md sm:shadow-xl mb-6 sm:mb-8 transform hover:scale-[1.02] transition duration-700 animate-blog-image"
           />
         )}
-        <RichText content={post!.content} />
+        <RichText
+          content={Array.isArray(post!.content) ? post!.content.join('') : post!.content}
+          data={post!.content as any}
+        />
       </article>
 
       {/* ✅ RELATED POSTS SECTION */}

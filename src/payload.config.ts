@@ -3,13 +3,16 @@ import { mongooseAdapter } from '@payloadcms/db-mongodb' // database-adapter-imp
 import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 
-import Hero from './blocks/Hero'
-import RichTextBlock from './blocks/RichTextBlock'
-import ImageBlock from './blocks/ImageBlock'
+import { Banner } from './blocks/Banner/config'
+import { CallToAction } from './blocks/CallToAction/config'
+import { Archive } from './blocks/ArchiveBlock/config'
+import { Content } from './blocks/Content/config'
+import { FormBlock } from './blocks/Form/config'
+import { MediaBlock } from './blocks/MediaBlock/config'
 import path from 'path'
 import { buildConfig } from 'payload'
-// import { seoPlugin } from '@payloadcms/plugin-seo';
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
@@ -38,7 +41,7 @@ export default buildConfig({
   globals: [SiteSettings],
   editor: lexicalEditor(),
 
-  blocks: [Hero, RichTextBlock, ImageBlock],
+  blocks: [Banner, CallToAction, Archive, Content, FormBlock, MediaBlock],
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
@@ -51,6 +54,11 @@ export default buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
+    formBuilderPlugin({
+      fields: {
+        payment: false,
+      },
+    }),
     // storage-adapter-placeholder
     vercelBlobStorage({
       cacheControlMaxAge: 60 * 60 * 24 * 365, // 1 year

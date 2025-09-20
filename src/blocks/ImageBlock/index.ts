@@ -1,12 +1,8 @@
-// src/blocks/ImageBlock.ts
-import { Block } from 'payload'
+import type { Block } from 'payload'
 
-const ImageBlock: Block = {
+export const ImageBlock: Block = {
   slug: 'image',
-  labels: {
-    singular: 'Image',
-    plural: 'Images',
-  },
+  interfaceName: 'Image',
   fields: [
     {
       name: 'image',
@@ -17,8 +13,6 @@ const ImageBlock: Block = {
     {
       name: 'caption',
       type: 'text',
-      // 🔴 Remove `localized: true` unless you have localization enabled
-      // localized: true, // ❌ Remove this unless you use i18n
     },
     {
       name: 'size',
@@ -27,7 +21,7 @@ const ImageBlock: Block = {
         { label: 'Small', value: 'small' },
         { label: 'Medium', value: 'medium' },
         { label: 'Large', value: 'large' },
-        { label: 'Full Width', value: 'full' },
+        { label: 'Full', value: 'full' },
       ],
       defaultValue: 'medium',
     },
@@ -42,6 +36,6 @@ const ImageBlock: Block = {
       defaultValue: 'center',
     },
   ],
-};
+}
 
-export default ImageBlock;
+export default ImageBlock
