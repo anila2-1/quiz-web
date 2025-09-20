@@ -773,6 +773,7 @@ export interface Member {
   id: string;
   username: string;
   name?: string | null;
+  resetPasswordExpires?: number | null;
   wallet?: number | null;
   totalPoints?: number | null;
   referralCode?: string | null;
@@ -1076,6 +1077,7 @@ export interface BlogsSelect<T extends boolean = true> {
 export interface MembersSelect<T extends boolean = true> {
   username?: T;
   name?: T;
+  resetPasswordExpires?: T;
   wallet?: T;
   totalPoints?: T;
   referralCode?: T;

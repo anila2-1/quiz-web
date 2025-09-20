@@ -20,33 +20,50 @@ export default function QuizStats() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchQuizStats = async () => {
-      setLoading(true)
-      setError(null)
+  // ✅ FETCH STATS FUNCTION
+  const fetchQuizStats = async () => {
+    setLoading(true)
+    setError(null)
 
-      try {
-        const res = await fetch('/api/quiz-stats')
+    try {
+      const res = await fetch('/api/quiz-stats', {
+        method: 'GET',
+        headers: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+        },
+      })
 
-        if (!res.ok) {
-          const errorData = await res.json()
-          throw new Error(errorData.error || 'Failed to load quiz stats')
-        }
-
-        const data = await res.json()
-        setStats(data)
-      } catch (err: any) {
-        console.error('Error fetching quiz stats:', err)
-        setError(err.message)
-      } finally {
-        setLoading(false)
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'Failed to load quiz stats')
       }
-    }
 
+      const data = await res.json()
+      setStats(data)
+    } catch (err: any) {
+      console.error('Error fetching quiz stats:', err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ✅ FETCH ON MOUNT
+  useEffect(() => {
     fetchQuizStats()
   }, [])
 
-  if (loading) {
+  // ✅ POLL EVERY 30 SECONDS FOR UPDATES
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchQuizStats()
+    }, 30000) // 30 seconds
+
+    return () => clearInterval(interval) // Cleanup on unmount
+  }, [])
+
+  if (loading && !stats) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -78,7 +95,7 @@ export default function QuizStats() {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 p-5 transition-all duration-300 hover:shadow-2xl hover:scale-101 relative overflow-hidden"
+      className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 p-5 transition-all duration-300 hover:shadow-2xl hover:scale-101 relative overflow-hidden group"
     >
       {/* Background Gradient Blob */}
       <div className="pointer-events-none absolute -top-16 -right-16 w-32 h-30 bg-gradient-to-br from-yellow-100 to-pink-100 rounded-full blur-3xl opacity-70"></div>
@@ -95,7 +112,8 @@ export default function QuizStats() {
 
         {stats?.latestQuiz && (
           <div className="text-xs text-gray-500">
-            <strong>Latest:</strong> — {new Date(stats.latestQuiz.date).toLocaleDateString()}
+            <strong>Latest:</strong> {stats.latestQuiz.title} —{' '}
+            {new Date(stats.latestQuiz.date).toLocaleDateString()}
           </div>
         )}
       </div>

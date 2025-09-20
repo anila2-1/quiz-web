@@ -15,6 +15,7 @@ import { CodeBlock, CodeBlockProps } from '@/blocks/Code/Component'
 import { BannerBlock } from '@/blocks/Banner/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import MediaBlock from './../../blocks/MediaBlock/Component'
+
 // Define missing types locally since blocks are not registered in payload config
 type BannerBlockProps = {
   style: 'info' | 'warning' | 'error' | 'success'
@@ -154,35 +155,28 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
     const children = nodesToJSX({ nodes: node.children })
     const tag = (node as any).tag
 
+    // Common styles for ALL headings
+    const baseStyles = 'border-b border-indigo-200 pb-1 mb-4 mt-6 font-bold'
+
     switch (tag) {
       case 'h1':
         return (
-          <h1 className="text-4xl sm:text-5xl font-extrabold mb-6 mt-10 text-gray-900 leading-tight">
+          <h1 className={`${baseStyles} text-4xl sm:text-5xl text-indigo-700 leading-tight`}>
             {children}
           </h1>
         )
       case 'h2':
-        return (
-          <h2 className="text-3xl sm:text-4xl font-bold mb-5 mt-8 text-gray-900 border-b border-gray-200 pb-2">
-            {children}
-          </h2>
-        )
+        return <h2 className={`${baseStyles} text-3xl sm:text-4xl text-indigo-600`}>{children}</h2>
       case 'h3':
-        return (
-          <h3 className="text-2xl sm:text-3xl font-semibold mb-4 mt-6 text-gray-800">{children}</h3>
-        )
+        return <h3 className={`${baseStyles} text-2xl sm:text-3xl text-indigo-500`}>{children}</h3>
       case 'h4':
-        return <h4 className="text-xl font-semibold mb-3 mt-5 text-gray-800">{children}</h4>
+        return <h4 className={`${baseStyles} text-xl text-indigo-600`}>{children}</h4>
       case 'h5':
-        return <h5 className="text-lg font-medium mb-2 mt-4 text-gray-700">{children}</h5>
+        return <h5 className={`${baseStyles} text-lg text-indigo-700`}>{children}</h5>
       case 'h6':
-        return <h6 className="text-base font-medium mb-2 mt-3 text-gray-700">{children}</h6>
+        return <h6 className={`${baseStyles} text-base text-indigo-800`}>{children}</h6>
       default:
-        return (
-          <h2 className="text-3xl font-bold mb-5 mt-8 text-gray-900 border-b border-gray-200 pb-2">
-            {children}
-          </h2>
-        )
+        return <h2 className={`${baseStyles} text-3xl text-indigo-600`}>{children}</h2>
     }
   },
 
@@ -237,7 +231,6 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
       <BannerBlock className="col-start-2 mb-6" {...node.fields} />
     ),
     mediaBlock: ({ node }: { node: SerializedBlockNode<any> }) => {
-      // Extract media resource and caption
       const resource = node.fields?.resource
       const caption = node.fields?.caption
 
@@ -286,8 +279,7 @@ export default function RichText(props: Props) {
         {
           container: enableGutter,
           'max-w-none': !enableGutter,
-          'mx-auto prose prose-lg md:prose-xl dark:prose-invert prose-headings:font-bold prose-p:leading-relaxed prose-ul:space-y-2 prose-ol:space-y-2':
-            enableProse,
+          'mx-auto': enableProse, // Removed prose classes to avoid conflicts
         },
         className,
       )}

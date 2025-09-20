@@ -5,13 +5,16 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { useAuth } from './../../../../_providers/Auth' // ← Import useAuth
 
 export default function LoginPage() {
-  const [email, setEmail] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+
+  const { refreshUser } = useAuth() // ← Get refreshUser from context
 
   useEffect(() => {
     const memberId = document.cookie.split('; ').find((row) => row.startsWith('member_id='))
@@ -31,6 +34,9 @@ export default function LoginPage() {
       })
 
       if (res.ok) {
+        // ✅ IMPORTANT: Refresh user context after login
+        await refreshUser() // ← This will fetch latest user data
+
         // Redirect to dashboard
         router.push('/dashboard')
       } else {
@@ -46,11 +52,10 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex items-center justify-center min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-hidden px-4">
-      {/* Soft Background Blobs - FULL SCREEN */}
+      {/* Soft Background Blobs */}
       <div className="absolute top-0 left-0 w-[40rem] h-[40rem] bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full opacity-50 blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 right-0 w-[40rem] h-[40rem] bg-gradient-to-l from-pink-100 to-indigo-100 rounded-full opacity-50 blur-3xl translate-x-1/3 translate-y-1/3"></div>
 
-      {/* Form */}
       <form
         onSubmit={handleSubmit}
         className="relative z-10 bg-white/90 backdrop-blur-lg p-10 rounded-3xl shadow-xl w-full max-w-md border border-gray-100 transition-all duration-300 hover:shadow-2xl"
@@ -137,11 +142,9 @@ export default function LoginPage() {
           className={`group w-full py-3 px-6 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative
             ${isLoading ? 'cursor-not-allowed opacity-90' : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white'}`}
         >
-          {/* Shine Effect — keep it! */}
           {!isLoading && (
             <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform group-hover:animate-shine"></span>
           )}
-
           <span className="relative z-10 flex items-center justify-center space-x-2">
             {isLoading ? (
               <>
@@ -189,9 +192,13 @@ export default function LoginPage() {
             )}
           </span>
         </motion.button>
-
+        <div className="mt-6 text-center">
+          <a href="/auth/forgot-password" className="text-blue-600 hover:underline text-sm">
+            Forgot your password?
+          </a>
+        </div>
         <p className="text-center text-gray-500 text-sm mt-6">
-          Don’t have an account?{' '}
+          Don&lsquo;t have an account?{' '}
           <Link
             href="/auth/signup"
             className="font-medium text-indigo-600 hover:text-indigo-700 transition"
@@ -201,7 +208,6 @@ export default function LoginPage() {
         </p>
       </form>
 
-      {/* Animations */}
       <style>{`
         @keyframes shine {
           0% { transform: translateX(-100%); }

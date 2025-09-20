@@ -296,3 +296,63 @@
   position: absolute;
   left: 0;
 }
+/* Ensure consistent spacing and font */
+.prose {
+  font-family: 'Inter', sans-serif;
+  color: #1f2937;
+  line-height: 1.6;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  color: #4f46e5;
+  font-weight: 700;
+}
+
+.prose ul,
+.prose ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose a {
+  color: #4f46e5;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.prose p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+/* Ensure consistent heading spacing and border */
+.payload-richtext h1,
+.payload-richtext h2,
+.payload-richtext h3,
+.payload-richtext h4,
+.payload-richtext h5,
+.payload-richtext h6 {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e0e7ff;
+}
+
+.payload-richtext p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.payload-richtext ul,
+.payload-richtext ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}

@@ -26,7 +26,20 @@ const Members: CollectionConfig = {
       required: true,
       unique: true,
     },
-
+    {
+      name: 'resetPasswordToken',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
+      name: 'resetPasswordExpires',
+      type: 'number', // timestamp
+      admin: {
+        readOnly: true,
+      },
+    },
     {
       name: 'wallet',
       type: 'number',

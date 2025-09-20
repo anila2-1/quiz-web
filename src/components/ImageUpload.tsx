@@ -45,7 +45,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <div
       {...getRootProps()}
-      className={`relative cursor-pointer ${className} aspect-[${aspectRatio}]`}
+      className={`relative cursor-pointer ${className}`}
+      style={{ aspectRatio }}
     >
       <input {...getInputProps()} />
       <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">

@@ -603,11 +603,13 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
                    transition-all duration-500 hover:shadow-xl sm:hover:shadow-2xl"
       >
         {post!.image && (
-          <img
-            src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post!.image.url}`}
-            alt={post!.title}
-            className="w-full h-56 sm:h-72 object-cover rounded-xl sm:rounded-2xl shadow-md sm:shadow-xl mb-6 sm:mb-8 transform hover:scale-[1.02] transition duration-700 animate-blog-image"
-          />
+          <div className="w-ful aspect-video mb-8 overflow-hidden rounded-xl sm:rounded-2xl shadow-md sm:shadow-xl">
+            <img
+              src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post!.image.url}`}
+              alt={post!.title}
+              className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700"
+            />
+          </div>
         )}
         <RichText
           content={Array.isArray(post!.content) ? post!.content.join('') : post!.content}
