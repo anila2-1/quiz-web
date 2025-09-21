@@ -3,7 +3,8 @@
 
 export const dynamic = 'force-dynamic' // ❗️ Prevents static generation
 
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
