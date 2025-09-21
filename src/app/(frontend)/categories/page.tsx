@@ -57,6 +57,7 @@ export default async function CategoriesPage() {
                     alt={category.title}
                     width={800} // Example: 800px wide
                     height={600} // Example: 600px tall
+                    unoptimized
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>

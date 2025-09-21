@@ -132,6 +132,7 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
             <Image
               src={src}
               alt={alt}
+              unoptimized
               className="w-full h-auto object-cover max-h-[600px] transition-opacity duration-300 group-hover:opacity-95"
               style={{
                 maxWidth: `${width}px`,

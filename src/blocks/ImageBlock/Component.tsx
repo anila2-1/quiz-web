@@ -15,6 +15,7 @@ export const ImageBlockComponent: React.FC<any> = ({ image, caption, size, align
           alt={image.alt || ''}
           width={800} // Example: 800px wide
           height={600} // Example: 600px tall
+          unoptimized
           className={`${sizeClass} mx-auto`}
         />
       )}

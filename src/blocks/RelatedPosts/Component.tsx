@@ -34,6 +34,7 @@ export const RelatedPosts: React.FC<RelatedPostsProps> = (props) => {
                   alt={doc.title || 'Blog Image'}
                   width={800} // Example: 800px wide
                   height={600} // Example: 600px tall
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
               </div>

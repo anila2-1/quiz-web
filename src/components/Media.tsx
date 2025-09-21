@@ -47,6 +47,7 @@ export const Media: React.FC<MediaProps> = ({
               alt={resource?.alt || ''}
               width={800} // Example: 800px wide
               height={600} // Example: 600px tall
+              unoptimized
               className={cn(
                 'w-full h-full object-contain',
                 'transition-all duration-300 hover:scale-[1.02]',

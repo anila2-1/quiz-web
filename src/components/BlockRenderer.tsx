@@ -72,6 +72,7 @@ export const getBlockContent = (block: {
           <Image
             src={`${process.env.NEXT_PUBLIC_SERVER_URL}/media/${block.image.filename}`}
             alt="Content Image"
+            unoptimized
             className={`${block.size === 'small' ? 'w-1/4' : block.size === 'medium' ? 'w-1/2' : block.size === 'large' ? 'w-3/4' : 'w-full'} rounded-lg`}
           />
         </div>

@@ -19,6 +19,7 @@ export const CollectionArchive: React.FC<{ posts: Blog[] }> = ({ posts }) => {
                     alt={post.title || 'Blog Image'}
                     width={800} // Example: 800px wide
                     height={600} // Example: 600px tall
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 </div>
