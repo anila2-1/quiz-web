@@ -1,16 +1,15 @@
 // src/app/(frontend)/blog/page.tsx
+
 import { Metadata } from 'next'
 import BlogGrid from './BlogGrid'
 import Footer from '../components/Footer'
 import Link from 'next/link'
 
-//  ADD THIS INSTEAD
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Learn & Earn Blog | Discover Articles & Earn Rewards',
     description:
       'Explore insightful articles, tips, and guides to boost your knowledge and earn rewards through quizzes.',
-    // Optional: Open Graph / Twitter
     openGraph: {
       title: 'Learn & Earn Blog | QuizEarn',
       description: 'Boost your knowledge and earn rewards through quizzes.',
@@ -22,7 +21,6 @@ export async function generateMetadata(): Promise<Metadata> {
       title: 'Learn & Earn Blog | QuizEarn',
       description: 'Boost your knowledge and earn rewards through quizzes.',
     },
-    // This prevents merging with parent metadata
     alternates: {
       canonical: '/blog',
     },
@@ -31,10 +29,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 async function fetchBlogs(page: number = 1, limit: number = 6) {
   try {
+    // ✅ Enable caching — Vercel CDN will cache this for 1 hour
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/api/blogs?where[status][equals]=published&sort=-createdAt&page=${page}&limit=${limit}`,
       {
-        cache: 'no-store',
+        next: { revalidate: 3600 }, // ISR: Revalidate every hour
+        // ❌ REMOVE: cache: 'no-store'
       },
     )
     if (!res.ok) throw new Error('Failed to fetch blogs')
@@ -111,6 +111,7 @@ export default async function BlogList({
         )}
       </div>
 
+      {/* ✅ Lazy-load Footer */}
       <Footer />
     </div>
   )

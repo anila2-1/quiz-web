@@ -4,7 +4,12 @@ import React, { ReactNode } from 'react'
 import ClientWrapper from './ClientWrapper'
 
 import './globals.css'
-
+import { Poppins } from 'next/font/google'
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '600'],
+  variable: '--font-poppins',
+})
 // Fetch site settings from Payload CMS
 async function getSiteSettings() {
   try {
@@ -66,7 +71,7 @@ export default async function FrontendLayout({ children }: { children: ReactNode
         {seoImage && <meta name="twitter:image" content={seoImage} />}
         <link rel="canonical" href={process.env.NEXT_PUBLIC_SERVER_URL} />
       </head>
-      <body>
+      <body className={`${poppins.variable} font-sans`}>
         <AuthProvider>
           <ClientWrapper>{children}</ClientWrapper>
         </AuthProvider>
