@@ -110,9 +110,6 @@ importers:
       react-icons:
         specifier: ^5.5.0
         version: 5.5.0(react@19.1.1)
-      resend:
-        specifier: ^6.1.0
-        version: 6.1.0
       sharp:
         specifier: 0.34.2
         version: 0.34.2
@@ -4695,15 +4692,6 @@ packages:
   require-from-string@2.0.2:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
-
-  resend@6.1.0:
-    resolution: {integrity: sha512-H0cJI2pcLk5/dGwyvZUHu+O7X/q6arvc40EWm+pRPuy+PSWojH5utZtmDBUZ2L0+gVwYZiWs6y2lw6GQA1z1rg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@react-email/render': ^1.1.0
-    peerDependenciesMeta:
-      '@react-email/render':
-        optional: true
 
   resolve-dir@1.0.1:
     resolution: {integrity: sha512-R7uiTjECzvOsWSfdM0QKFNBVFcK27aHOUwdvK53BcW8zqnGdYp0Fbj82cy54+2A4P2tFM22J5kRfe1R+lM/1yg==}
@@ -11073,8 +11061,6 @@ snapshots:
       set-function-name: 2.0.2
 
   require-from-string@2.0.2: {}
-
-  resend@6.1.0: {}
 
   resolve-dir@1.0.1:
     dependencies:
