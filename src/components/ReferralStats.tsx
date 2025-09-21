@@ -5,7 +5,7 @@ export default function ReferralStats({ count, code }: { count: number; code: st
   // Har referral par kitne points milte hain?
   const pointsPerReferral = 10
   const totalReferralPoints = count * pointsPerReferral
-  const referralLink = `https://quiz-learn-web.vercel.app/referral/${code}` // Fixed spacing issue
+  const referralLink = `https://quiz-learn-web.vercel.app/referral/${code}` //  Remove space
 
   // Copy function
   const handleCopy = () => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Member } from './../payload-types'
 
@@ -8,9 +8,26 @@ export default function ProfileForm({ member }: { member: Member }) {
   const [name, setName] = useState<string>(member.name || '')
   const [username] = useState<string>(member.username || '')
   const [walletAddress, setWalletAddress] = useState<string>(member.walletAddress || '')
+  const [isLoading, setIsLoading] = useState(true)
   const [loading, setLoading] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
 
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+
+  // Validate wallet address format
+  const validateWalletAddress = (value: string) => {
+    const upiRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    const cryptoRegex = /^([0-9a-fA-F]{40}|[0-9a-fA-F]{64})$/
+
+    if (!value.trim()) return 'Wallet address is required'
+    if (upiRegex.test(value)) return ''
+    if (cryptoRegex.test(value)) return ''
+    return 'Invalid UPI or crypto wallet address'
+  }
+
+  {
+    errors.walletAddress && <p className="text-red-500 text-sm mt-1">{errors.walletAddress}</p>
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -39,6 +56,23 @@ export default function ProfileForm({ member }: { member: Member }) {
     }
   }
 
+  useEffect(() => {
+    // Simulate API fetch
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 200) // ← Only 200ms if needed
+  }, [])
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+        <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
+        <div className="h-10 bg-gray-200 rounded animate-pulse w-1/2"></div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 md:px-8">
       <motion.form
@@ -62,7 +96,6 @@ export default function ProfileForm({ member }: { member: Member }) {
             {message}
           </motion.div>
         )}
-
         {/* Fields */}
         <div className="space-y-6">
           <div>
@@ -103,10 +136,37 @@ export default function ProfileForm({ member }: { member: Member }) {
             <input
               type="text"
               value={walletAddress}
-              onChange={(e) => setWalletAddress(e.target.value)}
-              placeholder="your@upi or wallet address"
-              className="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              onChange={(e) => {
+                const value = e.target.value
+                setWalletAddress(value)
+                const error = validateWalletAddress(value)
+                setErrors({ ...errors, walletAddress: error })
+              }}
+              className={`w-full bg-gray-50 border ${
+                errors.walletAddress ? 'border-red-500' : 'border-gray-300'
+              } rounded-xl px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500`}
             />
+            {/* ✅ Show error OR success icon */}
+            {errors.walletAddress ? (
+              <p className="text-red-500 text-sm mt-1">{errors.walletAddress}</p>
+            ) : walletAddress.trim() ? (
+              <div className="flex items-center mt-1">
+                <svg
+                  className="w-5 h-5 text-green-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                <span className="text-green-500 text-sm ml-1">Valid address</span>
+              </div>
+            ) : null}
           </div>
         </div>
 

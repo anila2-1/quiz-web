@@ -1,31 +1,11 @@
 // src/app/(frontend)/dashboard/profile/ProfileWrapper.tsx
 'use client'
 
-import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
 import ProfileForm from '@/components/ProfileForm'
 import Link from 'next/link'
 
 export default function ProfileWrapper({ member }: { member: any }) {
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000)
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (loading) {
-    return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4">
-        {/* Spinner */}
-        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-
-        {/* Text */}
-        <p className="text-lg font-semibold text-gray-700 animate-pulse text-center">Loading...</p>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar (hidden on small screens, visible on md+) */}
@@ -37,7 +17,6 @@ export default function ProfileWrapper({ member }: { member: any }) {
       <div className="flex-1 p-4 sm:p-6 md:ml-64 flex justify-center">
         <div className="w-full max-w-2xl bg-white rounded-2xl shadow-sm p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 drop-shadow-sm flex items-center gap-3 mb-8">
-            {/* Icon */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-500"
@@ -56,7 +35,6 @@ export default function ProfileWrapper({ member }: { member: any }) {
           </h1>
 
           <ProfileForm member={member} />
-          {/* ✅ Back to Dashboard — PROFESSIONAL UPGRADE */}
           <div className="mt-10 pt-6 border-t border-gray-100">
             <Link
               href="/dashboard"
@@ -64,7 +42,6 @@ export default function ProfileWrapper({ member }: { member: any }) {
                hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 text-gray-700 font-medium text-sm sm:text-base
                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
-              {/* Animated Arrow */}
               <span className="relative flex items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200 group-hover:bg-indigo-50 transition-all duration-300">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

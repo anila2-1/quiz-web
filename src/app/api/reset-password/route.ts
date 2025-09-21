@@ -1,8 +1,8 @@
 // src/app/api/reset-password/route.ts
+
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import bcrypt from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,15 +29,12 @@ export async function POST(req: NextRequest) {
 
     const member = members[0]
 
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 10)
-
-    // Update password and clear reset fields
+    // ✅ PASS PLAIN TEXT PASSWORD — Payload will hash it automatically
     await payload.update({
       collection: 'members',
       id: member.id,
       data: {
-        password: hashedPassword,
+        password: password, // ← ✅ JUST PLAIN TEXT — NO HASHING
         resetPasswordToken: null,
         resetPasswordExpires: null,
       },

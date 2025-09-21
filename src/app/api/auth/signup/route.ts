@@ -1,83 +1,101 @@
 // src/app/api/auth/signup/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from 'payload' // ✅ Use getPayload instead of getPayloadHMR
+import { getPayloadHMR } from '@payloadcms/next/utilities'
 import config from '@payload-config'
+import crypto from 'crypto'
 import { cookies } from 'next/headers'
 
 export async function POST(req: NextRequest) {
-  const { name, email, username, password, referredBy } = await req.json()
+  try {
+    const { name, email, username, password, referredBy } = await req.json() // ✅ Add referredBy
 
-  if (!name || !email || !username || !password) {
-    return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
-  }
+    if (!name || !email || !username || !password) {
+      return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
+    }
 
-  const payload = await getPayload({ config })
+    const payload = await getPayloadHMR({ config })
 
-  // Check if email or username already exists
-  const existing = await payload.find({
-    collection: 'members',
-    where: {
-      or: [{ email: { equals: email } }, { username: { equals: username } }],
-    },
-    limit: 1,
-  })
-
-  if (existing.docs.length > 0) {
-    return NextResponse.json({ error: 'Email or username already taken' }, { status: 409 })
-  }
-
-  // Check if referredBy code exists
-  const referrer = await payload.find({
-    collection: 'members',
-    where: { referralCode: { equals: referredBy } },
-    limit: 1,
-  })
-
-  let referrerMember = null
-  if (referredBy && referrer.docs.length > 0) {
-    referrerMember = referrer.docs[0]
-  }
-
-  // Create new member with password
-  const member = await payload.create({
-    collection: 'members',
-    data: {
-      name,
-      email,
-      username,
-      password,
-      wallet: 0,
-      totalPoints: 0,
-      referredBy: referrerMember?.id || null, // ✅ Pass ID, not code
-      referralCode: `REF${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
-      referralsCount: 0,
-      completedBlogs: [],
-    },
-  })
-
-  // ✅ Add 100 points to referrer
-  if (referrerMember) {
-    await payload.update({
+    // Check if email or username already exists
+    const existing = await payload.find({
       collection: 'members',
-      id: referrerMember.id,
-      data: {
-        wallet: (referrerMember.wallet || 0) + 100,
-        totalPoints: (referrerMember.totalPoints || 0) + 100,
-        referralsCount: (referrerMember.referralsCount || 0) + 1,
+      where: {
+        or: [{ email: { equals: email } }, { username: { equals: username } }],
       },
     })
+
+    if (existing.docs.length > 0) {
+      return NextResponse.json({ error: 'Email or username already exists' }, { status: 409 })
+    }
+
+    // ✅ Generate referral code for new user
+    const newReferralCode = 'REF' + crypto.randomBytes(4).toString('hex').toUpperCase()
+
+    // ✅ Create new user
+    const newUser = await payload.create({
+      collection: 'members',
+      data: {
+        name,
+        email,
+        username,
+        password,
+        wallet: 0,
+        totalPoints: 0,
+        referralCode: newReferralCode,
+        referralsCount: 0,
+      },
+    })
+
+    // ✅ If referredBy is provided, update referrer
+    if (referredBy) {
+      const referrer = await payload.find({
+        collection: 'members',
+        where: {
+          referralCode: { equals: referredBy },
+        },
+      })
+
+      if (referrer.docs.length > 0) {
+        const referrerUser = referrer.docs[0]
+        const pointsPerReferral = 100 // ✅ 100 points per referral
+
+        // ✅ Update referrer's wallet and referralsCount
+        await payload.update({
+          collection: 'members',
+          id: referrerUser.id,
+          data: {
+            wallet: (referrerUser.wallet || 0) + pointsPerReferral,
+            totalPoints: (referrerUser.totalPoints || 0) + pointsPerReferral,
+            referralsCount: (referrerUser.referralsCount || 0) + 1,
+          },
+        })
+      }
+    }
+
+    // ✅ Set cookie
+    const cookieStore = await cookies()
+    cookieStore.set('member_id', newUser.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60,
+      path: '/',
+    })
+
+    return NextResponse.json({
+      success: true,
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        username: newUser.username,
+        wallet: newUser.wallet || 0,
+        totalPoints: newUser.totalPoints || 0,
+        referralCode: newUser.referralCode,
+        referralsCount: newUser.referralsCount || 0,
+      },
+    })
+  } catch (error) {
+    console.error('Signup error:', error)
+    return NextResponse.json({ error: 'Signup failed' }, { status: 500 })
   }
-
-  // Set session cookie
-  ;(await cookies()).set('member_id', member.id, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 24 * 7,
-    path: '/',
-  })
-
-  return NextResponse.json({
-    success: true,
-    user: { id: member.id, name, email, username },
-  })
 }
