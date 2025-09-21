@@ -10,6 +10,7 @@ import {
   LinkJSXConverter,
   RichText as ConvertRichText,
 } from '@payloadcms/richtext-lexical/react'
+import Image from 'next/image'
 
 import { CodeBlock, CodeBlockProps } from '@/blocks/Code/Component'
 import { BannerBlock } from '@/blocks/Banner/Component'
@@ -128,7 +129,7 @@ const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) 
       <div className={containerClass}>
         <figure className="group max-w-4xl mx-auto">
           <div className="relative overflow-hidden rounded-2xl bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-[1.02]">
-            <img
+            <Image
               src={src}
               alt={alt}
               className="w-full h-auto object-cover max-h-[600px] transition-opacity duration-300 group-hover:opacity-95"

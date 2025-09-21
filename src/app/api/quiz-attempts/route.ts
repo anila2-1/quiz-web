@@ -6,7 +6,7 @@ import { cookies } from 'next/headers'
 
 export async function POST(req: NextRequest) {
   try {
-    const { quizId, answers, userId, blogId } = await req.json()
+    const { quizId, answers, blogId } = await req.json()
     const memberId = (await cookies()).get('member_id')?.value
 
     if (!memberId) {

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Blog } from '@/payload-types'
+import Image from 'next/image'
 
 export const CollectionArchive: React.FC<{ posts: Blog[] }> = ({ posts }) => {
   return (
@@ -13,9 +14,11 @@ export const CollectionArchive: React.FC<{ posts: Blog[] }> = ({ posts }) => {
             >
               {post.image && typeof post.image === 'object' && (
                 <div className="relative h-48 overflow-hidden">
-                  <img
+                  <Image
                     src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image.url}`}
                     alt={post.title || 'Blog Image'}
+                    width={800} // Example: 800px wide
+                    height={600} // Example: 600px tall
                     className="w-full h-full object-cover"
                   />
                 </div>

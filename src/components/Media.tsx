@@ -1,6 +1,7 @@
 import React from 'react'
 import { cn } from '@/utilities/ui'
 import { ImageUpload } from './ImageUpload'
+import Image from 'next/image'
 
 interface MediaProps {
   className?: string
@@ -41,9 +42,11 @@ export const Media: React.FC<MediaProps> = ({
       {mediaSrc ? (
         <div className="w-full">
           <div className="aspect-[16/9] relative bg-gray-100">
-            <img
+            <Image
               src={mediaSrc}
               alt={resource?.alt || ''}
+              width={800} // Example: 800px wide
+              height={600} // Example: 600px tall
               className={cn(
                 'w-full h-full object-contain',
                 'transition-all duration-300 hover:scale-[1.02]',

@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import React from 'react'
 import RichText from '@/components/RichText'
+import Image from 'next/image'
 
 import type { Blog } from '@/payload-types'
 
@@ -28,9 +29,11 @@ export const RelatedPosts: React.FC<RelatedPostsProps> = (props) => {
           >
             {doc.image && typeof doc.image === 'object' && (
               <div className="relative h-48 overflow-hidden">
-                <img
+                <Image
                   src={`${process.env.NEXT_PUBLIC_SERVER_URL}${doc.image.url}`}
                   alt={doc.title || 'Blog Image'}
+                  width={800} // Example: 800px wide
+                  height={600} // Example: 600px tall
                   className="w-full h-full object-cover"
                 />
               </div>

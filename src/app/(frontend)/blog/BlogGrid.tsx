@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 
 export default function BlogGrid({ posts }: { posts: any[] }) {
   return (
@@ -25,9 +26,11 @@ export default function BlogGrid({ posts }: { posts: any[] }) {
                 >
                   {post.image && (
                     <div className="relative h-48 overflow-hidden">
-                      <img
+                      <Image
                         src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post.image.url}`}
                         alt={post.title?.toString() || 'Blog Image'}
+                        width={800} // Example: 800px wide
+                        height={600} // Example: 600px tall
                         className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>

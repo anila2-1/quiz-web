@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import React from 'react'
 
 export const HeroBlock: React.FC<any> = ({
@@ -10,7 +11,14 @@ export const HeroBlock: React.FC<any> = ({
 }) => {
   return (
     <div className={`hero ${theme === 'dark' ? 'dark' : ''}`}>
-      {backgroundImage && <img src={backgroundImage.url} alt="" />}
+      {backgroundImage && (
+        <Image
+          src={backgroundImage.url}
+          alt=""
+          width={800} // Example: 800px wide
+          height={600} // Example: 600px tall
+        />
+      )}
       <h1>{heading}</h1>
       {subheading && <p>{subheading}</p>}
       {ctaText && ctaLink && <a href={ctaLink}>{ctaText}</a>}

@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import React from 'react'
 
 export const ImageBlockComponent: React.FC<any> = ({ image, caption, size, alignment }) => {
@@ -8,7 +9,15 @@ export const ImageBlockComponent: React.FC<any> = ({ image, caption, size, align
 
   return (
     <div className={`image-block ${alignClass}`}>
-      {image && <img src={image.url} alt={image.alt || ''} className={`${sizeClass} mx-auto`} />}
+      {image && (
+        <Image
+          src={image.url}
+          alt={image.alt || ''}
+          width={800} // Example: 800px wide
+          height={600} // Example: 600px tall
+          className={`${sizeClass} mx-auto`}
+        />
+      )}
       {caption && <p className="caption">{caption}</p>}
     </div>
   )

@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Footer from './../../components/Footer'
+import Image from 'next/image'
 
 import Link from 'next/link'
 
@@ -79,9 +80,11 @@ export default async function CategoryPage({ params }: PageProps) {
         <div className="mb-12 text-center">
           {category.featuredImage && (
             <div className="relative mx-auto mb-8 h-64 w-full max-w-3xl overflow-hidden rounded-2xl">
-              <img
+              <Image
                 src={`${process.env.NEXT_PUBLIC_SERVER_URL}${category.featuredImage.url}`}
                 alt={category.title}
+                width={800} // Example: 800px wide
+                height={600} // Example: 600px tall
                 className="h-full w-full object-cover"
               />
             </div>
@@ -107,9 +110,11 @@ export default async function CategoryPage({ params }: PageProps) {
               {/* Blog Image */}
               {blog.image && (
                 <div className="relative h-48 w-full overflow-hidden">
-                  <img
+                  <Image
                     src={`${process.env.NEXT_PUBLIC_SERVER_URL}${blog.image.url}`}
                     alt={blog.title}
+                    width={800} // Example: 800px wide
+                    height={600} // Example: 600px tall
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 </div>

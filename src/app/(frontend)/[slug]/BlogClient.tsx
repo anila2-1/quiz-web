@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../../../_providers/Auth'
 import Link from 'next/link'
 import RichText from '@/components/RichText'
+import Image from 'next/image'
 
 interface Question {
   id: string
@@ -604,9 +605,11 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
       >
         {post!.image && (
           <div className="w-ful aspect-video mb-8 overflow-hidden rounded-xl sm:rounded-2xl shadow-md sm:shadow-xl">
-            <img
+            <Image
               src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post!.image.url}`}
               alt={post!.title}
+              width={800} // Example: 800px wide
+              height={600} // Example: 600px tall
               className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700"
             />
           </div>
@@ -649,14 +652,16 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
                 {relatedBlogs.map((blog) => (
                   <Link
                     key={blog.id}
-                    href={`/blog/${blog.slug}`}
+                    href={`/${blog.slug}`}
                     className="group block overflow-hidden rounded-2xl bg-white border border-gray-200 hover:shadow-xl hover:border-indigo-300 transition-all duration-300 transform hover:-translate-y-1"
                   >
                     {blog.image && (
                       <div className="relative h-48 overflow-hidden">
-                        <img
+                        <Image
                           src={`${process.env.NEXT_PUBLIC_SERVER_URL}${blog.image.url}`}
                           alt={blog.title}
+                          width={800} // Example: 800px wide
+                          height={600} // Example: 600px tall
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
