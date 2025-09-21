@@ -1,7 +1,9 @@
 // src/app/auth/reset-password/page.tsx
 'use client'
 
-import { useRouter } from 'next/navigation'
+export const dynamic = 'force-dynamic' // ❗️ Prevents static generation
+
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
@@ -14,11 +16,11 @@ export default function ResetPassword() {
 
   const router = useRouter()
 
-  // ✅ Safe usage: useSearchParams() is okay in client components
-  const searchParams = new URLSearchParams(window.location.search)
+  // ✅ Use useSearchParams() — safe for client components
+  const searchParams = useSearchParams()
   const token = searchParams.get('token')
 
-  // ⚠️ Optional: Add fallback logic if token is missing
+  // ⚠️ Check if token is valid
   useEffect(() => {
     if (!token) {
       setError('Invalid or missing reset token.')
