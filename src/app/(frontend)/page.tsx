@@ -2,9 +2,31 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Footer from './components/Footer'
-import LoadingLink from './components/LoadingLink'
+import dynamic from 'next/dynamic'
+
+// ✅ Code-split heavy components
+const Footer = dynamic(() => import('./components/Footer'), {
+  ssr: false,
+  loading: () => <div className="h-20 bg-gray-100 animate-pulse"></div>, // Skeleton
+})
+
+const LoadingLink = dynamic(() => import('./components/LoadingLink'), {
+  ssr: false,
+  loading: () => (
+    <button className="px-6 py-3 bg-gray-200 text-gray-500 rounded-lg animate-pulse cursor-wait">
+      Loading...
+    </button>
+  ),
+})
+
+// ✅ Code-split framer-motion components (optional but recommended)
+const MotionDiv = dynamic(() => import('framer-motion').then((mod) => mod.motion.div), {
+  ssr: false,
+})
+
+const AnimatePresence = dynamic(() => import('framer-motion').then((mod) => mod.AnimatePresence), {
+  ssr: false,
+})
 
 export default function HomePage() {
   const [member, setMember] = useState<any>(null)
@@ -74,7 +96,7 @@ export default function HomePage() {
       {/* Animated Ink Smoke Clouds */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Colorful Ink Cloud 1 */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: -100 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 2, delay: 0.5 }}
@@ -84,10 +106,10 @@ export default function HomePage() {
             transform: 'scale(1.2)',
             animation: 'float 20s ease-in-out infinite',
           }}
-        ></motion.div>
+        ></MotionDiv>
 
         {/* Colorful Ink Cloud 2 */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, x: 100 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 2, delay: 1.5 }}
@@ -97,10 +119,10 @@ export default function HomePage() {
             transform: 'scale(1.1)',
             animation: 'float 25s ease-in-out infinite reverse',
           }}
-        ></motion.div>
+        ></MotionDiv>
 
         {/* Colorful Ink Cloud 3 */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, rotate: -180 }}
           animate={{ opacity: 1, rotate: 0 }}
           transition={{ duration: 2, delay: 2.5 }}
@@ -110,7 +132,7 @@ export default function HomePage() {
             transform: 'translate(-50%, -50%) scale(1.3)',
             animation: 'float 30s ease-in-out infinite',
           }}
-        ></motion.div>
+        ></MotionDiv>
       </div>
 
       {/* Floating Animation Keyframes */}
@@ -131,16 +153,16 @@ export default function HomePage() {
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 text-center">
         {/* Logo & Brand */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className="mb-8"
-        ></motion.div>
+        ></MotionDiv>
 
         {/* Hero Content */}
         <AnimatePresence>
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -174,7 +196,7 @@ export default function HomePage() {
                     href="/auth/login"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    theme="light" // ← Force light theme for white button
+                    theme="light"
                     className="px-8 py-4 bg-white text-indigo-600 font-semibold rounded-xl shadow-lg hover:shadow-xl border border-indigo-200 transform transition-all duration-200 text-base"
                   >
                     Login
@@ -191,12 +213,12 @@ export default function HomePage() {
                 </LoadingLink>
               )}
             </div>
-          </motion.div>
+          </MotionDiv>
         </AnimatePresence>
 
         {/* Blog Section — Fully Responsive */}
         <div className="my-16 md:my-24 max-w-5xl mx-auto px-2 sm:px-4">
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
@@ -208,7 +230,7 @@ export default function HomePage() {
 
             {/* Content */}
             <div className="relative z-10 text-center">
-              <motion.div
+              <MotionDiv
                 initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.8, type: 'spring', stiffness: 300 }}
@@ -218,7 +240,7 @@ export default function HomePage() {
                 <span className="text-xs sm:text-sm font-medium text-gray-700 tracking-wide uppercase">
                   New Knowledge Awaits
                 </span>
-              </motion.div>
+              </MotionDiv>
 
               <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 mb-3 sm:mb-4 leading-tight px-2">
                 Ready to Learn Something{' '}
@@ -248,11 +270,11 @@ export default function HomePage() {
               <div className="hidden lg:block absolute -top-2 -left-2 w-1.5 h-1.5 bg-teal-400 rounded-full animate-ping"></div>
               <div className="hidden lg:block absolute -bottom-4 -right-4 w-2 h-2 bg-cyan-400 rounded-full animate-pulse delay-1000"></div>
             </div>
-          </motion.div>
+          </MotionDiv>
         </div>
 
         {/* Stats Cards */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -263,7 +285,7 @@ export default function HomePage() {
             { number: '50K+', label: 'Quizzes Taken', color: 'purple' },
             { number: '₹5L+', label: 'Rewards Distributed', color: 'pink' },
           ].map((stat, idx) => (
-            <motion.div
+            <MotionDiv
               key={idx}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -274,12 +296,12 @@ export default function HomePage() {
                 {stat.number}
               </h3>
               <p className="text-gray-600 font-medium">{stat.label}</p>
-            </motion.div>
+            </MotionDiv>
           ))}
-        </motion.div>
+        </MotionDiv>
 
         {/* Feature Highlights */}
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
@@ -307,7 +329,7 @@ export default function HomePage() {
               desc: 'Access quizzes and track earnings from any device, anytime.',
             },
           ].map((feature, idx) => (
-            <motion.div
+            <MotionDiv
               key={idx}
               initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -319,9 +341,9 @@ export default function HomePage() {
                 <h4 className="text-xl font-semibold text-gray-800">{feature.title}</h4>
                 <p className="text-gray-600 mt-1">{feature.desc}</p>
               </div>
-            </motion.div>
+            </MotionDiv>
           ))}
-        </motion.div>
+        </MotionDiv>
       </div>
 
       {/* Footer */}
