@@ -21,6 +21,7 @@ export default function AnimatedBlogCard({ post }: { post: any }) {
             alt={post.title?.toString() || 'Blog Image'}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            unoptimized
             className="object-cover transition-transform duration-500 hover:scale-110"
             priority={true}
           />
