@@ -30,6 +30,21 @@ export async function POST(req: NextRequest) {
     // ✅ Generate referral code for new user
     const newReferralCode = 'REF' + crypto.randomBytes(4).toString('hex').toUpperCase()
 
+    // ✅ If referredBy is provided, find referrer first
+    let referrerUser = null
+    if (referredBy) {
+      const referrer = await payload.find({
+        collection: 'members',
+        where: {
+          referralCode: { equals: referredBy },
+        },
+      })
+
+      if (referrer.docs.length > 0) {
+        referrerUser = referrer.docs[0]
+      }
+    }
+
     // ✅ Create new user
     const newUser = await payload.create({
       collection: 'members',
@@ -42,33 +57,24 @@ export async function POST(req: NextRequest) {
         totalPoints: 0,
         referralCode: newReferralCode,
         referralsCount: 0,
+        referredBy: referrerUser ? referrerUser.id : undefined,
       },
     })
 
-    // ✅ If referredBy is provided, update referrer
-    if (referredBy) {
-      const referrer = await payload.find({
+    // ✅ If referrer found, update referrer
+    if (referrerUser) {
+      const pointsPerReferral = 100 // ✅ 100 points per referral
+
+      // ✅ Update referrer's wallet and referralsCount
+      await payload.update({
         collection: 'members',
-        where: {
-          referralCode: { equals: referredBy },
+        id: referrerUser.id,
+        data: {
+          wallet: (referrerUser.wallet || 0) + pointsPerReferral,
+          totalPoints: (referrerUser.totalPoints || 0) + pointsPerReferral,
+          referralsCount: (referrerUser.referralsCount || 0) + 1,
         },
       })
-
-      if (referrer.docs.length > 0) {
-        const referrerUser = referrer.docs[0]
-        const pointsPerReferral = 100 // ✅ 100 points per referral
-
-        // ✅ Update referrer's wallet and referralsCount
-        await payload.update({
-          collection: 'members',
-          id: referrerUser.id,
-          data: {
-            wallet: (referrerUser.wallet || 0) + pointsPerReferral,
-            totalPoints: (referrerUser.totalPoints || 0) + pointsPerReferral,
-            referralsCount: (referrerUser.referralsCount || 0) + 1,
-          },
-        })
-      }
     }
 
     // ✅ Set cookie
