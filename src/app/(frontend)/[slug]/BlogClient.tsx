@@ -46,15 +46,20 @@ interface QuizState {
 interface BlogClientProps {
   initialBlog?: Blog
   initialCategory?: any
+  initialRelatedBlogs?: any[]
 }
 
-export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
+export function BlogClient({
+  initialBlog,
+  initialCategory,
+  initialRelatedBlogs = [],
+}: BlogClientProps) {
   const { user, refreshUser } = useAuth()
   const [post] = useState<Blog | null>(initialBlog || null)
   const [category] = useState<any>(initialCategory || null)
   const [quizStates, setQuizStates] = useState<Record<string, QuizState>>({})
-  const [relatedBlogs, setRelatedBlogs] = useState<any[]>([])
-  const [loadingRelated, setLoadingRelated] = useState(true)
+  const [relatedBlogs, setRelatedBlogs] = useState<any[]>(initialRelatedBlogs)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Initialize quiz states
   useEffect(() => {
@@ -80,33 +85,6 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
       setQuizStates(initial)
     }
   }, [post?.quizzes, user])
-
-  // Fetch related blogs by category
-  useEffect(() => {
-    const fetchRelatedBlogs = async (categoryId: string, currentBlogId: string) => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/blogs?where[category][equals][id]=${categoryId}&limit=6&depth=1`,
-          { cache: 'no-store' },
-        )
-        if (!res.ok) throw new Error('Failed to fetch related blogs')
-        const data = await res.json()
-        // Filter out current blog
-        return data.docs.filter((blog: any) => blog.id !== currentBlogId)
-      } catch (error) {
-        console.error('Error fetching related blogs:', error)
-        return []
-      }
-    }
-
-    if (category?.id && post?.id) {
-      setLoadingRelated(true)
-      fetchRelatedBlogs(category.id, post.id).then((blogs) => {
-        setRelatedBlogs(blogs)
-        setLoadingRelated(false)
-      })
-    }
-  }, [category?.id, post?.id])
 
   const handleAnswerChange = (quizId: string, index: number, value: string) => {
     setQuizStates((prev) => ({
@@ -210,8 +188,6 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
     }
   }
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
   const handleDelayedSubmit = (quizId: string) => {
     if (isSubmitting) return
     setIsSubmitting(true)
@@ -240,8 +216,7 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
              text-transparent bg-clip-text 
              bg-gradient-to-r from-blue-800 via-violet-800 to-fuchsia-800
              text-center leading-snug sm:leading-tight 
-             px-4 py-2 
-             animate-fade-in-up"
+             px-4 py-2"
       >
         {post!.title}
       </h1>
@@ -536,7 +511,7 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
 
             {/* Result */}
             {state.completed && (
-              <div className="mt-6 sm:mt-8 p-6 sm:p-8 bg-gradient-to-br from-emerald-50 via-white to-teal-50 border border-emerald-200/70 rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl text-center animate-fade-in backdrop-blur-sm relative overflow-hidden group">
+              <div className="mt-6 sm:mt-8 p-6 sm:p-8 bg-gradient-to-br from-emerald-50 via-white to-teal-50 border border-emerald-200/70 rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl text-center backdrop-blur-sm relative overflow-hidden group">
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/20 to-teal-100/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
                 <div className="absolute top-0 right-0 w-20 h-20">
                   <div
@@ -598,20 +573,20 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
 
       {/* Blog Content */}
       <article
-        className="relative prose prose-sm sm:prose-lg max-w-none mb-8 sm:mb-12 animate-blog-content
+        className="relative prose prose-sm sm:prose-lg max-w-none mb-8 sm:mb-12
                    bg-white/60 backdrop-blur-xl border border-gray-200 
                    rounded-2xl sm:rounded-3xl shadow-md sm:shadow-lg p-4 sm:p-6 md:p-8 leading-relaxed text-gray-800
                    transition-all duration-500 hover:shadow-xl sm:hover:shadow-2xl"
       >
         {post!.image && (
-          <div className="w-ful aspect-video mb-8 overflow-hidden rounded-xl sm:rounded-2xl shadow-md sm:shadow-xl">
+          <div className="w-full aspect-video mb-8 overflow-hidden rounded-xl sm:rounded-2xl shadow-md sm:shadow-xl">
             <Image
               src={`${process.env.NEXT_PUBLIC_SERVER_URL}${post!.image.url}`}
               alt={post!.title}
-              width={800} // Example: 800px wide
-              height={600} // Example: 600px tall
+              width={800}
+              height={600}
               unoptimized
-              className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-700"
+              className="w-full h-full object-cover"
             />
           </div>
         )}
@@ -621,27 +596,10 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
         />
       </article>
 
-      {/* ✅ RELATED POSTS SECTION */}
+      {/* RELATED POSTS SECTION */}
       {category && (
         <div className="mt-16 pt-8 border-t border-gray-200">
-          {loadingRelated ? (
-            <>
-              <h2 className="text-2xl font-bold text-center mb-8">Related Posts</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="bg-white border border-gray-200 rounded-2xl p-5 animate-pulse"
-                  >
-                    <div className="h-48 bg-gray-200 rounded-xl mb-4"></div>
-                    <div className="h-5 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : relatedBlogs.length > 0 ? (
+          {relatedBlogs.length > 0 ? (
             <>
               <h2
                 className="text-2xl sm:text-3xl font-bold text-center mb-8 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
@@ -661,8 +619,8 @@ export function BlogClient({ initialBlog, initialCategory }: BlogClientProps) {
                         <Image
                           src={`${process.env.NEXT_PUBLIC_SERVER_URL}${blog.image.url}`}
                           alt={blog.title}
-                          width={800} // Example: 800px wide
-                          height={600} // Example: 600px tall
+                          width={800}
+                          height={600}
                           unoptimized
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
