@@ -13,12 +13,11 @@ export default function SignupForm() {
   const [password, setPassword] = useState<string>('')
   const [showPassword, setShowPassword] = useState(false)
   const [referredBy, setReferredBy] = useState<string>('')
-  const [isLoading, setIsLoading] = useState<boolean>(false) // Add isLoading state
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  const searchParams = useSearchParams() // ✅ Now safe
+  const searchParams = useSearchParams()
 
-  // ✅ Extract 'ref' from URL on load
   useEffect(() => {
     const refCode = searchParams.get('ref')
     if (refCode) {
@@ -29,7 +28,7 @@ export default function SignupForm() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
-    setIsLoading(true) // Set loading to true on submission
+    setIsLoading(true)
 
     try {
       const res = await fetch('/api/auth/signup', {
@@ -47,24 +46,24 @@ export default function SignupForm() {
     } catch (err) {
       setError('An unexpected error occurred.')
     } finally {
-      setIsLoading(false) // Set loading to false after request completes
+      setIsLoading(false)
     }
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative z-10 m-10 bg-white/90 backdrop-blur-lg p-10 rounded-3xl shadow-xl w-full max-w-md border border-gray-100 transition-all duration-300 hover:shadow-2xl"
+      className="relative z-10 bg-white/90 backdrop-blur-lg p-6 sm:p-8 md:p-10 rounded-3xl shadow-xl w-full max-w-md border border-gray-100 transition-all duration-300 hover:shadow-2xl mx-auto"
     >
-      <h1 className="text-3xl font-extrabold text-center mb-2 bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent">
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-center mb-2 sm:mb-4 bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent">
         Create Account
       </h1>
-      <p className="text-center text-gray-500 text-sm mb-8">
+      <p className="text-center text-gray-500 text-sm mb-6 sm:mb-8">
         Join QuizEarn today and start earning
       </p>
 
       {error && (
-        <div className="mb-6 p-3 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-700 text-sm animate-fadeIn">
+        <div className="mb-4 sm:mb-6 p-3 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-700 text-sm animate-fadeIn">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -78,16 +77,17 @@ export default function SignupForm() {
       )}
 
       {/* Full Name */}
-      <div className="relative mb-5 group">
+      <div className="relative mb-4 sm:mb-5 group">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
+            className="sm:w-5 sm:h-5"
           >
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
@@ -99,22 +99,23 @@ export default function SignupForm() {
           onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
           placeholder="Full Name"
           required
-          className="w-full pl-12 pr-5 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-800 placeholder-gray-500 transition-all duration-300 
+          className="w-full pl-10 sm:pl-12 pr-4 sm:pr-5 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-800 placeholder-gray-500 text-sm sm:text-base transition-all duration-300 
                      focus:border-indigo-500 focus:bg-white focus:shadow-md focus:shadow-indigo-100"
         />
       </div>
 
       {/* Email */}
-      <div className="relative mb-5 group">
+      <div className="relative mb-4 sm:mb-5 group">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
+            className="sm:w-5 sm:h-5"
           >
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
             <polyline points="22,6 12,13 2,6" />
@@ -126,22 +127,23 @@ export default function SignupForm() {
           onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           placeholder="Email address"
           required
-          className="w-full pl-12 pr-5 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-800 placeholder-gray-500 transition-all duration-300 
+          className="w-full pl-10 sm:pl-12 pr-4 sm:pr-5 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-800 placeholder-gray-500 text-sm sm:text-base transition-all duration-300 
                      focus:border-indigo-500 focus:bg-white focus:shadow-md focus:shadow-indigo-100"
         />
       </div>
 
       {/* Username */}
-      <div className="relative mb-5 group">
+      <div className="relative mb-4 sm:mb-5 group">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
+            className="sm:w-5 sm:h-5"
           >
             <path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"></path>
             <path d="M12 13a8 8 0 0 1 8 8v2H4v-2a8 8 0 0 1 8-8z"></path>
@@ -153,22 +155,23 @@ export default function SignupForm() {
           onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
           placeholder="Username"
           required
-          className="w-full pl-12 pr-5 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-800 placeholder-gray-500 transition-all duration-300 
+          className="w-full pl-10 sm:pl-12 pr-4 sm:pr-5 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-800 placeholder-gray-500 text-sm sm:text-base transition-all duration-300 
                      focus:border-indigo-500 focus:bg-white focus:shadow-md focus:shadow-indigo-100"
         />
       </div>
 
       {/* Password */}
-      <div className="relative mb-5 group">
+      <div className="relative mb-4 sm:mb-5 group">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
+            className="sm:w-5 sm:h-5"
           >
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -180,11 +183,9 @@ export default function SignupForm() {
           onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
           placeholder="Password"
           required
-          className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-800 placeholder-gray-500 transition-all duration-300 
+          className="w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-800 placeholder-gray-500 text-sm sm:text-base transition-all duration-300 
                focus:border-indigo-500 focus:bg-white focus:shadow-md focus:shadow-indigo-100"
         />
-
-        {/* ✅ Show/Hide Toggle Button */}
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
@@ -194,12 +195,13 @@ export default function SignupForm() {
           {showPassword ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              className="sm:w-5 sm:h-5"
             >
               <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
               <line x1="1" y1="1" x2="23" y2="23" />
@@ -207,12 +209,13 @@ export default function SignupForm() {
           ) : (
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              className="sm:w-5 sm:h-5"
             >
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
               <circle cx="12" cy="12" r="3" />
@@ -223,16 +226,17 @@ export default function SignupForm() {
 
       {/* Referred By Field */}
       {referredBy && (
-        <div className="relative mb-6 group">
+        <div className="relative mb-4 sm:mb-6 group">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              className="sm:w-5 sm:h-5"
             >
               <path d="M17 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
               <path d="M17 17H7" />
@@ -244,7 +248,7 @@ export default function SignupForm() {
             type="text"
             value={referredBy}
             readOnly
-            className="w-full pl-12 pr-5 py-3 bg-gray-100 border border-gray-300 rounded-xl outline-none text-gray-800 cursor-not-allowed"
+            className="w-full pl-10 sm:pl-12 pr-4 sm:pr-5 py-2.5 sm:py-3 bg-gray-100 border border-gray-300 rounded-xl outline-none text-gray-800 cursor-not-allowed text-sm sm:text-base"
             placeholder="Referred by"
           />
         </div>
@@ -256,20 +260,21 @@ export default function SignupForm() {
         isLoading={isLoading}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="group w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative"
+        className="group w-full py-2.5 sm:py-3 px-4 sm:px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden relative text-sm sm:text-base"
       >
         <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform group-hover:animate-shine"></span>
-        <span className="relative z-10 flex items-center justify-center space-x-2">
+        <span className="relative z-10 flex items-center justify-center space-x-1 sm:space-x-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            className="sm:w-5 sm:h-5"
           >
             <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
           </svg>
@@ -277,7 +282,7 @@ export default function SignupForm() {
         </span>
       </LoadingButton>
 
-      <p className="text-center text-gray-500 text-sm mt-6">
+      <p className="text-center text-gray-500 text-xs sm:text-sm mt-4 sm:mt-6">
         Already have an account?{' '}
         <Link
           href="/auth/login"
