@@ -56,7 +56,6 @@ export async function POST(req: NextRequest) {
       id: memberId,
       data: {
         wallet: (member.wallet || 0) + pointsEarned,
-        totalPoints: (member.totalPoints || 0) + pointsEarned,
         completedBlogs: [
           ...(member.completedBlogs || []),
           {

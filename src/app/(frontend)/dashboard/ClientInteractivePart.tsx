@@ -14,7 +14,6 @@ interface User {
   name?: string | null
   email: string
   wallet?: number | null
-  totalPoints?: number | null
   referralCode?: string | null
   referralsCount?: number | null
 }

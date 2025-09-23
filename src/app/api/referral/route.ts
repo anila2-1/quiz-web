@@ -48,7 +48,6 @@ export async function GET() {
     limit: 100,
   })
 
-  const totalPointsEarned = member.totalPoints || 0
   const referralsCount = referredMembers.docs.length
   const referralCode = member.referralCode || 'N/A'
   const referralLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://quiz-learn-web.vercel.app'}/referral/${referralCode}`

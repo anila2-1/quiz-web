@@ -39,13 +39,12 @@ export const assignReferral: FieldHook = async ({ value, data, req, operation })
       id: referrer.id,
       data: {
         referralsCount: (referrer.referralsCount || 0) + 1,
-        totalPoints: (referrer.totalPoints || 0) + 100,
         wallet: (referrer.wallet || 0) + 100,
       },
     })
 
     payload.logger.info(
-      `Referral successful: User ${req.user?.id} used code ${referralCode}. Referrer ${referrer.id} earned 100 points.`
+      `Referral successful: User ${req.user?.id} used code ${referralCode}. Referrer ${referrer.id} earned 100 points.`,
     )
   } catch (error: any) {
     payload.logger.error('Error in referral assignment:', error)
