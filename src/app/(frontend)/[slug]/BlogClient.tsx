@@ -144,9 +144,28 @@ export function BlogClient({
     }, 150)
   }
 
+  // Add this right after your state declarations — BEFORE return
+  if (user === undefined) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-lg font-semibold text-gray-700 animate-pulse">
+          Checking login status...
+        </p>
+      </div>
+    )
+  }
+
+  // Update handleSubmitQuiz
   const handleSubmitQuiz = async (quizId: string) => {
-    if (!user) {
+    // ✅ Only redirect if user is null (logged out)
+    if (user === null) {
       window.location.href = '/auth/login'
+      return
+    }
+
+    // ✅ If still loading (user === undefined), do nothing
+    if (user === undefined) {
       return
     }
 
@@ -187,7 +206,6 @@ export function BlogClient({
       console.error('Failed to submit quiz:', err)
     }
   }
-
   const handleDelayedSubmit = (quizId: string) => {
     if (isSubmitting) return
     setIsSubmitting(true)
@@ -443,7 +461,11 @@ export function BlogClient({
                   ) : (
                     <button
                       onClick={() => handleDelayedSubmit(quiz.id)}
-                      disabled={!state.answers[state.currentQuestionIndex] || isSubmitting}
+                      disabled={
+                        !state.answers[state.currentQuestionIndex] ||
+                        isSubmitting ||
+                        user === undefined
+                      }
                       className={`
                         group relative
                         px-6 sm:px-8 py-3 sm:py-3.5

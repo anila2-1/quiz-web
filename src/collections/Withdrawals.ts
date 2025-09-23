@@ -31,7 +31,7 @@ const Withdrawals: CollectionConfig = {
       name: 'amount',
       type: 'number',
       required: true,
-      min: 0.5, // minimum $0.5 USDT
+      min: 0.5,
     },
     {
       name: 'paymentInfo',
@@ -53,36 +53,7 @@ const Withdrawals: CollectionConfig = {
     },
   ],
   hooks: {
-    beforeValidate: [
-      async ({ data, req, operation }) => {
-        if (!data) return data
-
-        // ✅ Only validate balance on CREATE — NOT on UPDATE
-        if (operation === 'create') {
-          const userId = data.user
-          if (typeof userId !== 'string') throw new Error('Invalid user ID')
-
-          const member = await req.payload.findByID({
-            collection: 'members',
-            id: userId,
-            depth: 0,
-          })
-
-          if (!member) throw new Error('User not found')
-
-          if ((member.usdtBalance || 0) < data.amount) {
-            throw new Error(
-              `Insufficient USDT balance. Available: $${(member.usdtBalance || 0).toFixed(4)}, Requested: $${data.amount}`,
-            )
-          }
-
-          return data
-        }
-
-        // ✅ On UPDATE (admin changing status) — SKIP balance check
-        return data
-      },
-    ],
+    // ✅ REMOVED beforeValidate — handled in API route
     afterChange: [
       async ({ doc, previousDoc, req }) => {
         // ✅ Only handle REJECTION — because deduction already happened on CREATE

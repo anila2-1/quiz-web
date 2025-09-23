@@ -102,7 +102,7 @@ export default function QuizStats() {
 
       {/* Card Content */}
       <div className="relative z-10">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">📝 Quiz Earnings</h3>
+        {/* <h3 className="text-lg font-semibold text-gray-800 mb-2">📝 Quiz Earnings</h3> */}
         <div className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-4">
           {stats?.totalQuizPoints || 0} Points
         </div>
@@ -112,8 +112,7 @@ export default function QuizStats() {
 
         {stats?.latestQuiz && (
           <div className="text-xs text-gray-500">
-            <strong>Latest:</strong> {stats.latestQuiz.title} —{' '}
-            {new Date(stats.latestQuiz.date).toLocaleDateString()}
+            <strong>Latest:</strong> {new Date(stats.latestQuiz.date).toLocaleDateString()}
           </div>
         )}
       </div>

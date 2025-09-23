@@ -356,3 +356,11 @@
   margin-bottom: 1rem;
   padding-left: 1.5rem;
 }
+
+/* Optional: Enhance card icons */
+.card-icon {
+  transition: transform 0.3s ease;
+}
+.card-icon:hover {
+  transform: scale(1.1);
+}

@@ -21,9 +21,9 @@ export default function WalletCard() {
       <div className="pointer-events-none absolute -top-16 -right-16 w-32 h-32 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full blur-3xl opacity-70"></div>
 
       <div className="relative z-10">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+        {/* <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
           💰 Wallet Balance
-        </h3>
+        </h3> */}
 
         <AnimatePresence mode="wait">
           {isLoading ? (
