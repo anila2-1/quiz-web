@@ -1,9 +1,10 @@
+// src/app/categories/[slug]/page.tsx
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Footer from './../../components/Footer'
 import Image from 'next/image'
-
 import Link from 'next/link'
+import AnimatedCategoryBlogCard from '../AnimatedCategoryBlogCard' // 👈 Import new client component
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -26,7 +27,6 @@ async function getCategory(slug: string) {
   }
 }
 
-// ✅ FIXED: Query by category.id inside relationship object
 async function getCategoryBlogs(categoryId: string) {
   try {
     const res = await fetch(
@@ -83,8 +83,8 @@ export default async function CategoryPage({ params }: PageProps) {
               <Image
                 src={`${process.env.NEXT_PUBLIC_SERVER_URL}${category.featuredImage.url}`}
                 alt={category.title}
-                width={800} // Example: 800px wide
-                height={600} // Example: 600px tall
+                width={800}
+                height={600}
                 className="h-full w-full object-cover"
               />
             </div>
@@ -102,68 +102,7 @@ export default async function CategoryPage({ params }: PageProps) {
         {/* Blogs Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {blogs.map((blog: any) => (
-            <Link
-              key={blog.id}
-              href={`/${blog.slug}`}
-              className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-md transition-all hover:shadow-lg"
-            >
-              {/* Blog Image */}
-              {blog.image && (
-                <div className="relative h-48 w-full overflow-hidden">
-                  <Image
-                    src={`${process.env.NEXT_PUBLIC_SERVER_URL}${blog.image.url}`}
-                    alt={blog.title}
-                    width={800} // Example: 800px wide
-                    height={600} // Example: 600px tall
-                    unoptimized
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-              )}
-
-              {/* Blog Content */}
-              <div className="p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-indigo-600">
-                  {blog.title}
-                </h2>
-
-                {blog.excerpt && <p className="text-gray-600 mb-4 line-clamp-2">{blog.excerpt}</p>}
-
-                {/* Category Tag */}
-                {blog.category && (
-                  <div className="mb-3">
-                    <span
-                      className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800"
-                      style={{
-                        backgroundColor: blog.category.color
-                          ? `${blog.category.color}20`
-                          : '#e0e7ff',
-                        color: blog.category.color || '#4F46E5',
-                      }}
-                    >
-                      {blog.category.title}
-                    </span>
-                  </div>
-                )}
-
-                <span className="inline-flex items-center text-sm font-medium text-indigo-600">
-                  Read More
-                  <svg
-                    className="ml-2 h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </Link>
+            <AnimatedCategoryBlogCard key={blog.id} post={blog} />
           ))}
         </div>
 
@@ -174,6 +113,7 @@ export default async function CategoryPage({ params }: PageProps) {
           </div>
         )}
       </div>
+
       {/* ✅ Footer — Outside container, full width */}
       <div className="mt-12 sm:mt-16 md:mt-20">
         <Footer />

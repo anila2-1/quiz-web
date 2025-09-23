@@ -6,6 +6,7 @@ import { useAuth } from '../../../_providers/Auth'
 import Link from 'next/link'
 import RichText from '@/components/RichText'
 import Image from 'next/image'
+import AnimatedBlogCard from './../categories/AnimatedCategoryBlogCard' // 👈 Add this
 
 interface Question {
   id: string
@@ -631,49 +632,7 @@ export function BlogClient({
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {relatedBlogs.map((blog) => (
-                  <Link
-                    key={blog.id}
-                    href={`/${blog.slug}`}
-                    className="group block overflow-hidden rounded-2xl bg-white border border-gray-200 hover:shadow-xl hover:border-indigo-300 transition-all duration-300 transform hover:-translate-y-1"
-                  >
-                    {blog.image && (
-                      <div className="relative h-48 overflow-hidden">
-                        <Image
-                          src={`${process.env.NEXT_PUBLIC_SERVER_URL}${blog.image.url}`}
-                          alt={blog.title}
-                          width={800}
-                          height={600}
-                          unoptimized
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      </div>
-                    )}
-                    <div className="p-5">
-                      <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-indigo-700 line-clamp-2">
-                        {blog.title}
-                      </h3>
-                      {blog.excerpt && (
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{blog.excerpt}</p>
-                      )}
-                      <div className="flex items-center text-indigo-600 font-medium text-sm">
-                        Read More
-                        <svg
-                          className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                  </Link>
+                  <AnimatedBlogCard key={blog.id} post={blog} />
                 ))}
               </div>
             </>
