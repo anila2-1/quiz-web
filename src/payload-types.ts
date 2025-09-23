@@ -766,6 +766,8 @@ export interface User {
   password?: string | null;
 }
 /**
+ * Username is case-insensitive and must be unique
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "members".
  */

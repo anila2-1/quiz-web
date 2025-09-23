@@ -7,6 +7,7 @@ const Members: CollectionConfig = {
     hidden: false,
     group: 'Members',
     useAsTitle: 'username',
+    description: 'Username is case-insensitive and must be unique',
   },
   fields: [
     {
@@ -14,6 +15,7 @@ const Members: CollectionConfig = {
       type: 'text',
       required: true,
       unique: true,
+      index: true,
     },
     {
       name: 'name',
@@ -123,6 +125,16 @@ const Members: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeValidate: [
+      ({ data }) => {
+        if (!data || typeof data.username !== 'string') return data
+        return {
+          ...data,
+          username: data.username.trim().toLowerCase(), // ✅ Normalize to lowercase
+        }
+      },
+    ],
+
     afterChange: [
       async ({ doc, req, operation }) => {
         if (operation === 'create' && !doc.referralCode) {

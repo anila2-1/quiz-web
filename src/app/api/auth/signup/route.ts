@@ -19,7 +19,11 @@ export async function POST(req: NextRequest) {
     const existing = await payload.find({
       collection: 'members',
       where: {
-        or: [{ email: { equals: email } }, { username: { equals: username } }],
+        or: [
+          { email: { equals: email } },
+          { username: { equals: username } },
+          { username: { equals: username.trim().toLowerCase() } },
+        ],
       },
     })
 

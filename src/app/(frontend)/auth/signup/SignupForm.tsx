@@ -16,7 +16,40 @@ export default function SignupForm() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+
   const searchParams = useSearchParams()
+  const [usernameError, setUsernameError] = useState<string | null>(null)
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false)
+
+  useEffect(() => {
+    if (!username) {
+      setUsernameError(null)
+      return
+    }
+
+    const timer = setTimeout(async () => {
+      setIsCheckingUsername(true)
+      try {
+        const res = await fetch('/api/check-username', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username }),
+        })
+        const data = await res.json()
+        if (!data.available) {
+          setUsernameError('Username already taken')
+        } else {
+          setUsernameError(null)
+        }
+      } catch (err) {
+        console.error('Username check failed')
+      } finally {
+        setIsCheckingUsername(false)
+      }
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [username])
 
   useEffect(() => {
     const refCode = searchParams.get('ref')
@@ -152,14 +185,34 @@ export default function SignupForm() {
         <input
           type="text"
           value={username}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)}
+          onChange={(e) => setUsername(e.target.value)}
           placeholder="Username"
           required
-          className="w-full pl-10 sm:pl-12 pr-4 sm:pr-5 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-800 placeholder-gray-500 text-sm sm:text-base transition-all duration-300 
-                     focus:border-indigo-500 focus:bg-white focus:shadow-md focus:shadow-indigo-100"
+          className={`w-full pl-10 sm:pl-12 pr-4 sm:pr-5 py-2.5 sm:py-3 bg-gray-50 border-2 border-gray-200 rounded-xl outline-none text-gray-800 placeholder-gray-500 text-sm sm:text-base transition-all duration-300 
+      focus:ring-2 focus:ring-indigo-200 ${
+        usernameError
+          ? 'border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-200'
+          : 'focus:border-indigo-500 focus:bg-white'
+      }`}
         />
+        {isCheckingUsername && (
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
       </div>
-
+      {usernameError && (
+        <p className="text-red-500 text-xs mb-2 flex items-center gap-1">
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+          {usernameError}
+        </p>
+      )}
       {/* Password */}
       <div className="relative mb-4 sm:mb-5 group">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
