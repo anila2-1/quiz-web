@@ -55,11 +55,10 @@ const Withdrawals: CollectionConfig = {
   hooks: {
     beforeValidate: [
       async ({ data, req, operation }) => {
-        if (!data) return data // Ensure data is defined
+        if (!data) return data
 
-        if (operation === 'create') return data
-
-        if (operation === 'update' && data.status === 'approved') {
+        // ✅ Only validate balance on CREATE — NOT on UPDATE
+        if (operation === 'create') {
           const userId = data.user
           if (typeof userId !== 'string') throw new Error('Invalid user ID')
 
@@ -71,48 +70,27 @@ const Withdrawals: CollectionConfig = {
 
           if (!member) throw new Error('User not found')
 
-          const totalUsdtAvailable = (member.usdtBalance || 0) + (member.wallet || 0) * 0.001
-          if (totalUsdtAvailable < data.amount) {
+          if ((member.usdtBalance || 0) < data.amount) {
             throw new Error(
-              `Insufficient balance. Available: $${totalUsdtAvailable.toFixed(4)} USDT, Requested: $${data.amount}`,
+              `Insufficient USDT balance. Available: $${(member.usdtBalance || 0).toFixed(4)}, Requested: $${data.amount}`,
             )
           }
+
+          return data
         }
 
+        // ✅ On UPDATE (admin changing status) — SKIP balance check
         return data
       },
     ],
     afterChange: [
       async ({ doc, previousDoc, req }) => {
-        if (doc.status === 'approved' && previousDoc?.status !== 'approved') {
-          try {
-            // Deduct from usdtBalance
-            await updateWallet({
-              userId: doc.user as string,
-              amount: -doc.amount, // negative = deduction from USDT
-              req,
-              type: 'usdt', // specify we're updating usdtBalance
-            })
-            req.payload.logger.info(
-              `✅ Approved withdrawal: $${doc.amount} USDT from user ${doc.user}`,
-            )
-          } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error)
-            req.payload.logger.error(`❌ Failed to deduct USDT: ${errorMessage}`)
-            await req.payload.update({
-              collection: 'withdrawals',
-              id: doc.id,
-              data: { status: 'pending' },
-            })
-            throw new Error('Failed to process withdrawal')
-          }
-        }
-
-        if (doc.status === 'rejected' && previousDoc?.status === 'approved') {
+        // ✅ Only handle REJECTION — because deduction already happened on CREATE
+        if (doc.status === 'rejected' && previousDoc?.status !== 'rejected') {
           try {
             await updateWallet({
               userId: doc.user as string,
-              amount: doc.amount, // refund USDT
+              amount: doc.amount, // REFUND
               req,
               type: 'usdt',
             })
@@ -120,8 +98,13 @@ const Withdrawals: CollectionConfig = {
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error)
             req.payload.logger.error(`❌ Failed to refund: ${errorMessage}`)
-            throw new Error('Failed to refund')
+            throw new Error('Failed to refund points')
           }
+        }
+
+        // ✅ If approved — do nothing (already deducted)
+        if (doc.status === 'approved' && previousDoc?.status !== 'approved') {
+          req.payload.logger.info(`✅ Approved withdrawal: $${doc.amount} USDT (already deducted)`)
         }
       },
     ],

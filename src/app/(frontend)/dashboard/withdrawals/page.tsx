@@ -173,6 +173,16 @@ export default function WithdrawalsPage() {
         if (res.ok) {
           const data = await res.json()
           setSuccess('Withdrawal request submitted successfully!')
+
+          // ✅ IMMEDIATELY UPDATE LOCAL BALANCE
+          setMember((prev) => {
+            if (!prev) return prev
+            return {
+              ...prev,
+              usdtBalance: (prev.usdtBalance || 0) - numAmount,
+            }
+          })
+
           setFormData({ amount: '', paymentInfo: '' })
 
           setWithdrawals((prev) => [
@@ -185,12 +195,6 @@ export default function WithdrawalsPage() {
             },
             ...prev,
           ])
-
-          const memberRes = await fetch('/api/get-member')
-          if (memberRes.ok) {
-            const memberData = await memberRes.json()
-            setMember(memberData.member)
-          }
         } else {
           const json = await res.json()
           throw new Error(json.error || 'Withdrawal request failed')
@@ -269,21 +273,41 @@ export default function WithdrawalsPage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200 hover:shadow-2xl transition-all duration-300 group">
               <div className="text-center">
                 <div className="text-3xl font-extrabold text-indigo-600 mb-2 group-hover:scale-110 transition-transform duration-300">
-                  {member.wallet.toLocaleString()}
+                  ${(member.usdtBalance || 0).toFixed(4)}
                 </div>
-                <div className="text-sm font-medium text-gray-600">Available Points</div>
+                <div className="text-sm font-medium text-gray-600">Available USDT</div>
               </div>
             </div>
+
+            <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200 hover:shadow-2xl transition-all duration-300 group">
+              <div className="text-center">
+                <div className="text-3xl font-extrabold text-yellow-600 mb-2 group-hover:scale-110 transition-transform duration-300">
+                  $
+                  {sortedWithdrawals
+                    .filter((w) => w.status === 'pending')
+                    .reduce((sum, w) => sum + w.amount, 0)
+                    .toFixed(4)}
+                </div>
+                <div className="text-sm font-medium text-gray-600">Pending Withdrawals</div>
+              </div>
+            </div>
+
             <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200 hover:shadow-2xl transition-all duration-300 group">
               <div className="text-center">
                 <div className="text-3xl font-extrabold text-green-600 mb-2 group-hover:scale-110 transition-transform duration-300">
-                  ${(member.usdtBalance || 0).toFixed(4)}
+                  $
+                  {(
+                    (member.usdtBalance || 0) +
+                    sortedWithdrawals
+                      .filter((w) => w.status === 'pending')
+                      .reduce((sum, w) => sum + w.amount, 0)
+                  ).toFixed(4)}
                 </div>
-                <div className="text-sm font-medium text-gray-600">USDT Balance</div>
+                <div className="text-sm font-medium text-gray-600">Total USDT</div>
               </div>
             </div>
           </div>

@@ -50,32 +50,31 @@ export async function POST(req: NextRequest) {
 
     if (!member) return NextResponse.json({ error: 'Member not found' }, { status: 404 })
 
-    // ✅ Now check BOTH wallet AND usdtBalance
-    const totalUsdtAvailable = (member.usdtBalance || 0) + (member.wallet || 0) * 0.001 // convert points to USDT
-    const minWithdrawalUsdt = 0.5 // 500 points = $0.5 USDT
-
-    if (amount < minWithdrawalUsdt) {
+    // ✅ Check balance
+    if ((member.usdtBalance || 0) < amount) {
       return NextResponse.json(
-        { error: `Minimum withdrawal is $${minWithdrawalUsdt} USDT` },
+        { error: `Insufficient USDT balance. Available: $${(member.usdtBalance || 0).toFixed(4)}` },
         { status: 400 },
       )
     }
 
-    if (amount > totalUsdtAvailable) {
-      return NextResponse.json(
-        { error: `Insufficient balance. Available: $${totalUsdtAvailable.toFixed(4)} USDT` },
-        { status: 400 },
-      )
-    }
+    // ✅ DEDUCT AMOUNT IMMEDIATELY
+    await payload.update({
+      collection: 'members',
+      id: memberId,
+      data: {
+        usdtBalance: (member.usdtBalance || 0) - amount,
+      },
+    })
 
-    // ✅ Create withdrawal request
+    // ✅ Create withdrawal request with status "pending"
     const withdrawal = await payload.create({
       collection: 'withdrawals',
       data: {
         user: memberId,
-        amount: amount, // in USDT
+        amount,
         paymentInfo,
-        status: 'pending',
+        status: 'pending', // Default status
       },
     })
 

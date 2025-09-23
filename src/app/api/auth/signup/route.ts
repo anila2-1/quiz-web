@@ -54,7 +54,6 @@ export async function POST(req: NextRequest) {
         username,
         password,
         wallet: 0,
-        totalPoints: 0,
         referralCode: newReferralCode,
         referralsCount: 0,
         referredBy: referrerUser ? referrerUser.id : undefined,
@@ -71,7 +70,6 @@ export async function POST(req: NextRequest) {
         id: referrerUser.id,
         data: {
           wallet: (referrerUser.wallet || 0) + pointsPerReferral,
-          totalPoints: (referrerUser.totalPoints || 0) + pointsPerReferral,
           referralsCount: (referrerUser.referralsCount || 0) + 1,
         },
       })
@@ -95,7 +93,6 @@ export async function POST(req: NextRequest) {
         email: newUser.email,
         username: newUser.username,
         wallet: newUser.wallet || 0,
-        totalPoints: newUser.totalPoints || 0,
         referralCode: newUser.referralCode,
         referralsCount: newUser.referralsCount || 0,
       },
