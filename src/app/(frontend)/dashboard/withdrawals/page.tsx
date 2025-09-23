@@ -6,14 +6,13 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
 
-const MIN_WITHDRAWAL = 500
-const POINTS_TO_USDT_RATE = 0.001
+const MIN_WITHDRAWAL_USDT = 0.5 // $0.5 USDT minimum
 
 interface Member {
   id: string
   email: string
   wallet: number
-  usdtBalance?: number // Optional: if you store it
+  usdtBalance?: number
 }
 
 interface Withdrawal {
@@ -41,10 +40,10 @@ export default function WithdrawalsPage() {
   const [converting, setConverting] = useState(false)
 
   const updateFormData = useCallback((field: keyof FormData, value: string) => {
-    setFormData((prev) => {
-      const current = prev || { amount: '', paymentInfo: '' }
-      return { ...current, [field]: value }
-    })
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }))
   }, [])
 
   const clearMessages = useCallback(() => {
@@ -76,21 +75,8 @@ export default function WithdrawalsPage() {
       setFetchingWithdrawals(true)
       try {
         const res = await fetch('/api/withdrawals')
-
-        if (!res.ok) {
-          const errorText = await res.text()
-          console.error('Server error:', errorText)
-          throw new Error('Failed to load withdrawal history')
-        }
-
-        const text = await res.text()
-        if (!text.trim()) {
-          console.warn('Empty response from server')
-          setWithdrawals([])
-          return
-        }
-
-        const data = JSON.parse(text)
+        if (!res.ok) throw new Error('Failed to load withdrawal history')
+        const data = await res.json()
         setWithdrawals(data.withdrawals || [])
       } catch (err: any) {
         console.error('Failed to fetch withdrawals:', err)
@@ -103,7 +89,7 @@ export default function WithdrawalsPage() {
     fetchWithdrawals()
   }, [member])
 
-  // ✅ Handle USDT Conversion — REAL API CALL
+  // ✅ Handle USDT Conversion
   const handleConvertToUsdt = useCallback(async () => {
     if (!member || member.wallet <= 0) return
 
@@ -114,9 +100,7 @@ export default function WithdrawalsPage() {
     try {
       const res = await fetch('/api/convert-points', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       })
 
       if (!res.ok) {
@@ -125,14 +109,10 @@ export default function WithdrawalsPage() {
       }
 
       const result = await res.json()
-
       setSuccess(
-        `✅ Successfully converted ${result.pointsConverted} points to $${result.usdtReceived.toFixed(
-          4,
-        )} USDT`,
+        `✅ Successfully converted ${result.pointsConverted} points to $${result.usdtReceived.toFixed(4)} USDT`,
       )
 
-      // ✅ Refetch member to get updated wallet
       const memberRes = await fetch('/api/get-member')
       if (memberRes.ok) {
         const memberData = await memberRes.json()
@@ -162,13 +142,15 @@ export default function WithdrawalsPage() {
         setLoading(false)
         return
       }
-      if (numAmount < MIN_WITHDRAWAL) {
-        setError(`Minimum withdrawal is ${MIN_WITHDRAWAL} points`)
+      if (numAmount < MIN_WITHDRAWAL_USDT) {
+        setError(`Minimum withdrawal is $${MIN_WITHDRAWAL_USDT} USDT`)
         setLoading(false)
         return
       }
-      if (numAmount > totalAvailable) {
-        setError(`Insufficient balance. Total available: ${totalAvailable.toFixed(0)} points`)
+      if (numAmount > (member.usdtBalance || 0)) {
+        setError(
+          `Insufficient USDT balance. Available: $${(member.usdtBalance || 0).toFixed(4)} USDT`,
+        )
         setLoading(false)
         return
       }
@@ -230,228 +212,288 @@ export default function WithdrawalsPage() {
 
   if (!member) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-lg font-semibold text-gray-700 animate-pulse">Loading...</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
+        <div className="hidden md:block">
+          <Sidebar />
+        </div>
+        <div className="flex-1 p-4 sm:p-6 md:ml-64 flex justify-center items-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-6 mx-auto"></div>
+            <p className="text-xl font-semibold text-gray-700 animate-pulse">Loading...</p>
+            <p className="text-sm text-gray-500 mt-2 animate-fade-in">
+              Almost there — just a moment please 😊
+            </p>
+          </div>
+        </div>
       </div>
     )
   }
 
-  // ✅ Calculate USDT Balance (if not stored in DB)
-  const usdtBalance = member.usdtBalance || 0
-  const totalAvailable = member.wallet + (member.usdtBalance || 0) * 1000
-
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-white to-blue-50 ">
+    <>
+      {/* Sidebar (hidden on small screens, visible on md+) */}
       <div className="hidden md:block">
         <Sidebar />
       </div>
-      <div className="max-w-3xl mx-auto py-10 px-6 sm:px-6 lg:px-8">
-        <div className="mt-3 mb-7 pt-6 border-t border-gray-100">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center mb-4 text-blue-600 hover:text-blue-800 font-medium text-sm sm:text-base"
-          >
-            <svg
-              className="w-4 h-4 sm:w-5 sm:h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+
+      {/* Main Content */}
+      <div className="flex-1 p-4 sm:p-6 md:ml-64">
+        <div className="max-w-4xl mx-auto">
+          {/* ✅ Back to Dashboard */}
+          <div className="mt-6 mb-7 pt-6 border-t border-gray-100">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center mb-4 text-blue-600 hover:text-blue-800 font-medium text-sm sm:text-base"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Back to Dashboard
-          </Link>
-        </div>
-        <h1 className="text-3xl top-4 font-bold text-gray-900 mb-6">Withdraw Earnings</h1>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-            {success}
-          </div>
-        )}
-
-        {/* ✅ Balance Overview Card */}
-        <div className="bg-blue-600 text-white shadow-xl rounded-2xl p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Balance Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <p className="text-sm opacity-90">Available Points</p>
-              <p className="text-3xl font-bold">{member.wallet}</p>
-            </div>
-            <div>
-              <p className="text-sm opacity-90">USDT Balance</p>
-              <p className="text-3xl font-bold">${usdtBalance.toFixed(4)} USDT</p>
-            </div>
-          </div>
-        </div>
-
-        {/* ✅ Convert Points to USDT — PROFESSIONAL */}
-        <div className="bg-white shadow-xl rounded-2xl p-6 mb-8 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Convert Points to USDT</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Rate: <span className="font-semibold">1 point = $0.001 USDT</span>
-          </p>
-
-          {member.wallet > 0 ? (
-            <button
-              onClick={handleConvertToUsdt}
-              disabled={converting}
-              className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 
-                text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-2xl active:scale-98 
-                transition-all duration-300 relative overflow-hidden group"
-            >
-              <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shine"></span>
-              <span className="relative flex items-center justify-center gap-2">
-                {converting ? (
-                  <>
-                    <svg
-                      className="animate-spin h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Converting Points...
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                      />
-                    </svg>
-                    Convert {member.wallet} Points to $
-                    {(member.wallet * POINTS_TO_USDT_RATE).toFixed(4)} USDT
-                  </>
-                )}
-              </span>
-            </button>
-          ) : (
-            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-              <p className="text-sm text-gray-600">
-                🎯 You have <span className="font-semibold">0 points</span> available for
-                conversion.
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Take quizzes or refer friends to earn more points!
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* ✅ Withdraw USDT Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white shadow-2xl rounded-3xl p-8 mb-10 border border-gray-100 hover:shadow-3xl transition-all duration-500 group"
-        >
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mb-4 group-hover:scale-110 transition-transform duration-300">
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 text-white"
+                className="w-4 h-4 sm:w-5 sm:h-5 mr-2"
                 fill="none"
-                viewBox="0 0 24 24"
                 stroke="currentColor"
+                viewBox="0 0 24 24"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-            </div>
-            <h2 className="text-2xl font-extrabold text-gray-900 mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text">
-              Request Withdrawal
-            </h2>
-            <p className="text-gray-500 text-sm">Transfer your earnings securely</p>
+              Back to Dashboard
+            </Link>
           </div>
 
-          <div className="space-y-6">
-            {/* Amount Field */}
-            <div className="relative group">
-              <label htmlFor="amount">
-                <span className="flex items-center gap-2">
-                  <svg
-                    className="w-4 h-4 text-indigo-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                    />
-                  </svg>
-                  Amount (USDT)
-                </span>
-              </label>
-              <div className="relative">
-                <input
-                  id="amount"
-                  type="number"
-                  step="0.0001"
-                  value={formData.amount}
-                  onChange={(e) => updateFormData('amount', e.target.value)}
-                  placeholder="Min: 0.5"
-                  required
-                  className="w-full px-5 py-4 text-lg font-medium bg-gray-50 border-2 border-gray-200 rounded-2xl outline-none text-gray-900 placeholder-gray-400 
-     focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50/30 transition-all duration-300 shadow-sm"
-                />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium"></div>
-              </div>
-              <p className="mt-1 text-xs text-gray-500">
-                Available:{' '}
-                <span className="font-semibold text-indigo-600">
-                  ${(member.usdtBalance || 0).toFixed(4)} USDT
-                </span>{' '}
-                • Min: $0.5
-              </p>
-            </div>
+          {/* Header */}
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-bold text-gray-900 mb-3">Withdraw Your Earnings</h1>
+            <p className="text-gray-600">Convert or withdraw your points as USDT anytime</p>
+          </div>
 
-            {/* Payment Info Field */}
-            <div className="relative group">
-              <label
-                htmlFor="paymentInfo"
-                className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200 hover:shadow-2xl transition-all duration-300 group">
+              <div className="text-center">
+                <div className="text-3xl font-extrabold text-indigo-600 mb-2 group-hover:scale-110 transition-transform duration-300">
+                  {member.wallet.toLocaleString()}
+                </div>
+                <div className="text-sm font-medium text-gray-600">Available Points</div>
+              </div>
+            </div>
+            <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200 hover:shadow-2xl transition-all duration-300 group">
+              <div className="text-center">
+                <div className="text-3xl font-extrabold text-green-600 mb-2 group-hover:scale-110 transition-transform duration-300">
+                  ${(member.usdtBalance || 0).toFixed(4)}
+                </div>
+                <div className="text-sm font-medium text-gray-600">USDT Balance</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Convert Points Section */}
+          <div className="bg-white shadow-2xl rounded-3xl p-8 mb-10 border border-gray-100 hover:shadow-3xl transition-all duration-500 group">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              Convert Points to USDT
+            </h2>
+            <p className="text-center text-gray-600 mb-6">
+              Rate: <span className="font-semibold">1 point = $0.001 USDT</span>
+            </p>
+
+            {member.wallet > 0 ? (
+              <button
+                onClick={handleConvertToUsdt}
+                disabled={converting}
+                className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 
+                  text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-2xl active:scale-98 
+                  transition-all duration-300 relative overflow-hidden group"
               >
+                <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shine"></span>
+                <span className="relative flex items-center justify-center gap-2">
+                  {converting ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Converting Points...
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                        />
+                      </svg>
+                      Convert {member.wallet.toLocaleString()} Points to $
+                      {(member.wallet * 0.001).toFixed(4)} USDT
+                    </>
+                  )}
+                </span>
+              </button>
+            ) : (
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
+                <p className="text-sm text-gray-600">
+                  🎯 You have <span className="font-semibold">0 points</span> available for
+                  conversion.
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Take quizzes or refer friends to earn more points!
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Withdraw Form */}
+          <div className="bg-white shadow-2xl rounded-3xl p-8 mb-10 border border-gray-100 hover:shadow-3xl transition-all duration-500 group">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              Request USDT Withdrawal
+            </h2>
+
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                {success}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <div className="space-y-6">
+                {/* Amount Field */}
+                <div>
+                  <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
+                    Amount (USDT)
+                  </label>
+                  <input
+                    id="amount"
+                    type="number"
+                    step="0.0001"
+                    value={formData.amount}
+                    onChange={(e) => updateFormData('amount', e.target.value)}
+                    placeholder={`Min: $${MIN_WITHDRAWAL_USDT}`}
+                    required
+                    className="w-full px-5 py-4 text-lg font-medium bg-gray-50 border-2 border-gray-200 rounded-2xl outline-none text-gray-900 placeholder-gray-400 
+                      focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50/30 transition-all duration-300 shadow-sm"
+                  />
+                  <p className="mt-2 text-xs text-gray-500">
+                    Available:{' '}
+                    <span className="font-semibold">
+                      ${(member.usdtBalance || 0).toFixed(4)} USDT
+                    </span>
+                  </p>
+                </div>
+
+                {/* Payment Info Field */}
+                <div>
+                  <label
+                    htmlFor="paymentInfo"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    USDT Wallet Address
+                  </label>
+                  <input
+                    id="paymentInfo"
+                    type="text"
+                    value={formData.paymentInfo}
+                    onChange={(e) => updateFormData('paymentInfo', e.target.value)}
+                    placeholder="Enter your USDT (TRC20/ERC20) wallet address"
+                    required
+                    className="w-full px-5 py-4 text-lg font-medium bg-gray-50 border-2 border-gray-200 rounded-2xl outline-none text-gray-900 placeholder-gray-400 
+                      focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50/30 transition-all duration-300 shadow-sm"
+                  />
+                  <p className="mt-2 text-xs text-gray-500">
+                    We’ll send USDT directly to this address. Double-check for accuracy.
+                  </p>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-4 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold text-lg rounded-2xl 
+                    shadow-lg hover:shadow-2xl active:scale-98 transition-all duration-300 relative overflow-hidden group"
+                >
+                  <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shine"></span>
+                  <span className="relative flex items-center justify-center gap-2">
+                    {loading ? (
+                      <>
+                        <svg
+                          className="animate-spin h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Processing Request...
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Request Withdrawal
+                      </>
+                    )}
+                  </span>
+                </button>
+              </div>
+            </form>
+
+            {/* Security Note */}
+            <div className="mt-8 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+              <div className="flex items-start gap-3">
                 <svg
-                  className="w-4 h-4 text-indigo-500"
+                  className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -460,197 +502,127 @@ export default function WithdrawalsPage() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                   />
                 </svg>
-                USDT Wallet Address
-              </label>
-              <input
-                id="paymentInfo"
-                type="text"
-                value={formData.paymentInfo}
-                onChange={(e) => updateFormData('paymentInfo', e.target.value)}
-                placeholder="Enter USDT wallet address"
-                required
-                className="w-full px-5 py-4 text-lg font-medium bg-gray-50 border-2 border-gray-200 rounded-2xl outline-none text-gray-900 placeholder-gray-400 
-                   focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50/30 transition-all duration-300 shadow-sm
-                   group-hover:border-gray-300"
-              />
-              <p className="mt-1 text-xs text-gray-500">We’ll send USDT to this address</p>
+                <p className="text-xs text-blue-800 leading-relaxed">
+                  <strong className="font-medium">Secure & Encrypted</strong> — Your payment
+                  information is protected with bank-grade encryption. Withdrawals are manually
+                  reviewed for your safety.
+                </p>
+              </div>
             </div>
+          </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 px-6 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white font-bold text-lg rounded-2xl 
-                 shadow-lg hover:shadow-2xl active:scale-98 transition-all duration-300 relative overflow-hidden group"
-            >
-              <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shine"></span>
-              <span className="relative flex items-center justify-center gap-2">
-                {loading ? (
-                  <>
-                    <svg
-                      className="animate-spin h-5 w-5 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Processing Request...
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    Request Withdrawal
-                  </>
-                )}
+          {/* Withdrawal History */}
+          <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">Withdrawal History</h2>
+              <span className="text-sm text-gray-500">
+                {sortedWithdrawals.length} {sortedWithdrawals.length === 1 ? 'request' : 'requests'}
               </span>
-            </button>
-          </div>
-
-          {/* Security Note */}
-          <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-            <div className="flex items-start gap-3">
-              <svg
-                className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
-              <p className="text-xs text-blue-800 leading-relaxed">
-                <strong className="font-medium">Secure & Encrypted</strong> — Your payment
-                information is protected with bank-grade encryption. Withdrawals are manually
-                reviewed for your safety.
-              </p>
             </div>
-          </div>
-        </form>
 
-        {/* Add Shine Animation */}
-        <style>{`
-  @keyframes shine {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(200%); }
-  }
-  .animate-shine {
-    animation: shine 1.8s ease-in-out infinite;
-  }
-`}</style>
-
-        {/* ✅ Past Withdrawals */}
-        <div className="bg-white shadow-xl rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Withdrawal History</h2>
-            <span className="text-sm text-gray-500">
-              {sortedWithdrawals.length} {sortedWithdrawals.length === 1 ? 'request' : 'requests'}
-            </span>
-          </div>
-
-          {fetchingWithdrawals ? (
-            <div className="flex flex-col items-center py-10">
-              <div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
-              <p className="mt-3 text-gray-500">Loading your history...</p>
-            </div>
-          ) : sortedWithdrawals.length > 0 ? (
-            <div className="space-y-5">
-              {sortedWithdrawals.map((req) => (
-                <div
-                  key={req.id}
-                  className="p-4 border border-gray-100 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200 group"
+            {fetchingWithdrawals ? (
+              <div className="flex flex-col items-center py-10">
+                <div className="w-8 h-8 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                <p className="mt-3 text-gray-500">Loading your history...</p>
+              </div>
+            ) : sortedWithdrawals.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full table-auto">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200">
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                        Amount (USDT)
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                        Status
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                        Wallet Address
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                        Date
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {sortedWithdrawals.map((req) => (
+                      <tr key={req.id} className="hover:bg-gray-50 transition-colors duration-200">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          ${req.amount.toFixed(4)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              req.status === 'approved'
+                                ? 'bg-green-100 text-green-800'
+                                : req.status === 'rejected'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                            }`}
+                          >
+                            {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                          </span>
+                        </td>
+                        <td
+                          className="px-6 py-4 text-sm text-gray-600 truncate max-w-xs"
+                          title={req.paymentInfo}
+                        >
+                          {req.paymentInfo}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          {new Date(req.createdAt).toLocaleString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <svg
+                  className="mx-auto h-16 w-16 text-gray-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        <span className="text-lg font-bold text-blue-600">{req.amount}</span> Points
-                      </p>
-                      <p className="text-sm text-gray-600 mt-1">
-                        <strong>Payment:</strong> {req.paymentInfo}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-col items-start sm:items-end gap-1">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          req.status === 'approved'
-                            ? 'bg-green-100 text-green-800'
-                            : req.status === 'rejected'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                      >
-                        {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
-                      </span>
-                      <p className="text-xs text-gray-500">
-                        {new Date(req.createdAt).toLocaleString(undefined, {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-10">
-              <svg
-                className="mx-auto h-12 w-12 text-gray-300"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No withdrawals yet</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Your withdrawal requests will appear here permanently.
-              </p>
-            </div>
-          )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <h3 className="mt-4 text-lg font-medium text-gray-900">No withdrawals yet</h3>
+                <p className="mt-2 text-gray-500">Your withdrawal requests will appear here.</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Shine Animation */}
+      <style>{`
+        @keyframes shine {
+          0% {
+            transform: translateX(-100%);
+          }
+          100% {
+            transform: translateX(200%);
+          }
+        }
+        .animate-shine {
+          animation: shine 1.8s ease-in-out infinite;
+        }
+      `}</style>
+    </>
   )
 }
