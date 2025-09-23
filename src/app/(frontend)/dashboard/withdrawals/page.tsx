@@ -1,3 +1,4 @@
+// src/app/(frontend)/dashboard/withdraw/page.tsx
 'use client'
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
@@ -6,11 +7,13 @@ import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
 
 const MIN_WITHDRAWAL = 500
+const POINTS_TO_USDT_RATE = 0.001
 
 interface Member {
   id: string
   email: string
   wallet: number
+  usdtBalance?: number // Optional: if you store it
 }
 
 interface Withdrawal {
@@ -35,6 +38,7 @@ export default function WithdrawalsPage() {
   const [fetchingWithdrawals, setFetchingWithdrawals] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [converting, setConverting] = useState(false)
 
   const updateFormData = useCallback((field: keyof FormData, value: string) => {
     setFormData((prev) => {
@@ -64,7 +68,7 @@ export default function WithdrawalsPage() {
     fetchMember()
   }, [router])
 
-  // ✅ Fetch past withdrawals — FIXED
+  // ✅ Fetch past withdrawals
   useEffect(() => {
     if (!member) return
 
@@ -99,6 +103,48 @@ export default function WithdrawalsPage() {
     fetchWithdrawals()
   }, [member])
 
+  // ✅ Handle USDT Conversion — REAL API CALL
+  const handleConvertToUsdt = useCallback(async () => {
+    if (!member || member.wallet <= 0) return
+
+    setConverting(true)
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const res = await fetch('/api/convert-points', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || 'Conversion failed')
+      }
+
+      const result = await res.json()
+
+      setSuccess(
+        `✅ Successfully converted ${result.pointsConverted} points to $${result.usdtReceived.toFixed(
+          4,
+        )} USDT`,
+      )
+
+      // ✅ Refetch member to get updated wallet
+      const memberRes = await fetch('/api/get-member')
+      if (memberRes.ok) {
+        const memberData = await memberRes.json()
+        setMember(memberData.member)
+      }
+    } catch (err: any) {
+      setError(err.message || 'Unexpected error occurred')
+    } finally {
+      setConverting(false)
+    }
+  }, [member])
+
   // ✅ Handle withdrawal request
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -121,8 +167,8 @@ export default function WithdrawalsPage() {
         setLoading(false)
         return
       }
-      if (numAmount > member.wallet) {
-        setError(`Insufficient wallet balance. You have ${member.wallet} points available.`)
+      if (numAmount > totalAvailable) {
+        setError(`Insufficient balance. Total available: ${totalAvailable.toFixed(0)} points`)
         setLoading(false)
         return
       }
@@ -147,7 +193,6 @@ export default function WithdrawalsPage() {
           setSuccess('Withdrawal request submitted successfully!')
           setFormData({ amount: '', paymentInfo: '' })
 
-          // ✅ Add new pending request to UI — NO WALLET DEDUCTION
           setWithdrawals((prev) => [
             {
               id: data.id || Date.now().toString(),
@@ -159,7 +204,6 @@ export default function WithdrawalsPage() {
             ...prev,
           ])
 
-          // ✅ Refetch member to ensure UI matches server (in case of race conditions)
           const memberRes = await fetch('/api/get-member')
           if (memberRes.ok) {
             const memberData = await memberRes.json()
@@ -177,6 +221,7 @@ export default function WithdrawalsPage() {
     },
     [member, formData, clearMessages],
   )
+
   const sortedWithdrawals = useMemo(() => {
     return [...withdrawals].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -186,21 +231,22 @@ export default function WithdrawalsPage() {
   if (!member) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        {/* Spinner */}
         <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-
-        {/* Text */}
         <p className="text-lg font-semibold text-gray-700 animate-pulse">Loading...</p>
       </div>
     )
   }
+
+  // ✅ Calculate USDT Balance (if not stored in DB)
+  const usdtBalance = member.usdtBalance || 0
+  const totalAvailable = member.wallet + (member.usdtBalance || 0) * 1000
+
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-slate-50 via-white to-blue-50 ">
       <div className="hidden md:block">
         <Sidebar />
       </div>
       <div className="max-w-3xl mx-auto py-10 px-6 sm:px-6 lg:px-8">
-        {/* ✅ Back to Dashboard — PROFESSIONAL UPGRADE */}
         <div className="mt-3 mb-7 pt-6 border-t border-gray-100">
           <Link
             href="/dashboard"
@@ -235,14 +281,98 @@ export default function WithdrawalsPage() {
           </div>
         )}
 
-        {/* ✅ Balance Card */}
-        <div className="bg-white shadow-xl rounded-2xl p-6 mb-8 border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Current Balance</h2>
-          <p className="text-2xl font-bold text-blue-600">{member.wallet} Points</p>
-          <p className="text-gray-600">Minimum withdrawal: {MIN_WITHDRAWAL} Points</p>
+        {/* ✅ Balance Overview Card */}
+        <div className="bg-blue-600 text-white shadow-xl rounded-2xl p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">Balance Overview</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p className="text-sm opacity-90">Available Points</p>
+              <p className="text-3xl font-bold">{member.wallet}</p>
+            </div>
+            <div>
+              <p className="text-sm opacity-90">USDT Balance</p>
+              <p className="text-3xl font-bold">${usdtBalance.toFixed(4)} USDT</p>
+            </div>
+          </div>
         </div>
 
-        {/* ✅ Withdrawal Form — PROFESSIONAL UPGRADE */}
+        {/* ✅ Convert Points to USDT — PROFESSIONAL */}
+        <div className="bg-white shadow-xl rounded-2xl p-6 mb-8 border border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Convert Points to USDT</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Rate: <span className="font-semibold">1 point = $0.001 USDT</span>
+          </p>
+
+          {member.wallet > 0 ? (
+            <button
+              onClick={handleConvertToUsdt}
+              disabled={converting}
+              className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 
+                text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-2xl active:scale-98 
+                transition-all duration-300 relative overflow-hidden group"
+            >
+              <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-shine"></span>
+              <span className="relative flex items-center justify-center gap-2">
+                {converting ? (
+                  <>
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Converting Points...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                      />
+                    </svg>
+                    Convert {member.wallet} Points to $
+                    {(member.wallet * POINTS_TO_USDT_RATE).toFixed(4)} USDT
+                  </>
+                )}
+              </span>
+            </button>
+          ) : (
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <p className="text-sm text-gray-600">
+                🎯 You have <span className="font-semibold">0 points</span> available for
+                conversion.
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Take quizzes or refer friends to earn more points!
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* ✅ Withdraw USDT Form */}
         <form
           onSubmit={handleSubmit}
           className="bg-white shadow-2xl rounded-3xl p-8 mb-10 border border-gray-100 hover:shadow-3xl transition-all duration-500 group"
@@ -260,7 +390,7 @@ export default function WithdrawalsPage() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
                 />
               </svg>
             </div>
@@ -273,47 +403,44 @@ export default function WithdrawalsPage() {
           <div className="space-y-6">
             {/* Amount Field */}
             <div className="relative group">
-              <label
-                htmlFor="amount"
-                className=" text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
-              >
-                <svg
-                  className="w-4 h-4 text-indigo-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                  />
-                </svg>
-                Amount (Points)
+              <label htmlFor="amount">
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4 text-indigo-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                    />
+                  </svg>
+                  Amount (USDT)
+                </span>
               </label>
               <div className="relative">
                 <input
                   id="amount"
                   type="number"
+                  step="0.0001"
                   value={formData.amount}
                   onChange={(e) => updateFormData('amount', e.target.value)}
-                  min={MIN_WITHDRAWAL}
-                  max={member.wallet}
+                  placeholder="Min: 0.5"
                   required
-                  placeholder={`Min: ${MIN_WITHDRAWAL}`}
                   className="w-full px-5 py-4 text-lg font-medium bg-gray-50 border-2 border-gray-200 rounded-2xl outline-none text-gray-900 placeholder-gray-400 
-                     focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50/30 transition-all duration-300 shadow-sm
-                     group-hover:border-gray-300"
+     focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50/30 transition-all duration-300 shadow-sm"
                 />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">
-                  PTS
-                </div>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium"></div>
               </div>
               <p className="mt-1 text-xs text-gray-500">
                 Available:{' '}
-                <span className="font-semibold text-indigo-600">{member.wallet} PTS</span> • Min:{' '}
-                {MIN_WITHDRAWAL} PTS
+                <span className="font-semibold text-indigo-600">
+                  ${(member.usdtBalance || 0).toFixed(4)} USDT
+                </span>{' '}
+                • Min: $0.5
               </p>
             </div>
 
@@ -336,20 +463,20 @@ export default function WithdrawalsPage() {
                     d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
                 </svg>
-                Payment Email or USDT Wallet
+                USDT Wallet Address
               </label>
               <input
                 id="paymentInfo"
                 type="text"
                 value={formData.paymentInfo}
                 onChange={(e) => updateFormData('paymentInfo', e.target.value)}
-                placeholder={member.email || 'Enter email or USDT address'}
+                placeholder="Enter USDT wallet address"
                 required
                 className="w-full px-5 py-4 text-lg font-medium bg-gray-50 border-2 border-gray-200 rounded-2xl outline-none text-gray-900 placeholder-gray-400 
                    focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-50/30 transition-all duration-300 shadow-sm
                    group-hover:border-gray-300"
               />
-              <p className="mt-1 text-xs text-gray-500">We’ll send payment to this address</p>
+              <p className="mt-1 text-xs text-gray-500">We’ll send USDT to this address</p>
             </div>
 
             {/* Submit Button */}
@@ -359,9 +486,7 @@ export default function WithdrawalsPage() {
               className="w-full py-4 px-6 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white font-bold text-lg rounded-2xl 
                  shadow-lg hover:shadow-2xl active:scale-98 transition-all duration-300 relative overflow-hidden group"
             >
-              {/* Shine Effect */}
               <span className="absolute inset-0 -left-full bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shine"></span>
-
               <span className="relative flex items-center justify-center gap-2">
                 {loading ? (
                   <>
@@ -446,7 +571,7 @@ export default function WithdrawalsPage() {
   }
 `}</style>
 
-        {/* ✅ Past Withdrawals — PROFESSIONAL UI */}
+        {/* ✅ Past Withdrawals */}
         <div className="bg-white shadow-xl rounded-2xl p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-gray-900">Withdrawal History</h2>

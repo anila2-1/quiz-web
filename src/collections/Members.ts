@@ -46,6 +46,11 @@ const Members: CollectionConfig = {
       defaultValue: 0,
     },
     {
+      name: 'usdtBalance',
+      type: 'number',
+      defaultValue: 0,
+    },
+    {
       name: 'totalPoints',
       type: 'number',
       defaultValue: 0,

@@ -49,30 +49,35 @@ export async function POST(req: NextRequest) {
     const member = await payload.findByID({ collection: 'members', id: memberId })
 
     if (!member) return NextResponse.json({ error: 'Member not found' }, { status: 404 })
-    if (amount < 500)
-      return NextResponse.json({ error: 'Minimum 500 points required' }, { status: 400 })
-    if (amount > (member.wallet ?? 0))
-      return NextResponse.json({ error: 'Insufficient balance' }, { status: 400 })
 
-    // ✅ Create withdrawal — WALLET IS NOT TOUCHED
+    // ✅ Now check BOTH wallet AND usdtBalance
+    const totalUsdtAvailable = (member.usdtBalance || 0) + (member.wallet || 0) * 0.001 // convert points to USDT
+    const minWithdrawalUsdt = 0.5 // 500 points = $0.5 USDT
+
+    if (amount < minWithdrawalUsdt) {
+      return NextResponse.json(
+        { error: `Minimum withdrawal is $${minWithdrawalUsdt} USDT` },
+        { status: 400 },
+      )
+    }
+
+    if (amount > totalUsdtAvailable) {
+      return NextResponse.json(
+        { error: `Insufficient balance. Available: $${totalUsdtAvailable.toFixed(4)} USDT` },
+        { status: 400 },
+      )
+    }
+
+    // ✅ Create withdrawal request
     const withdrawal = await payload.create({
       collection: 'withdrawals',
       data: {
         user: memberId,
-        amount,
+        amount: amount, // in USDT
         paymentInfo,
-        status: 'pending', // ⚠️ Points are NOT deducted yet
+        status: 'pending',
       },
     })
-
-    // ❌ DELETE THIS ENTIRE BLOCK — This is the BUG
-    // await payload.update({
-    //   collection: 'members',
-    //   id: memberId,
-    //    {
-    //     wallet: (member.wallet ?? 0) - amount,
-    //   },
-    // })
 
     return NextResponse.json({ success: true, id: withdrawal.id })
   } catch (error) {

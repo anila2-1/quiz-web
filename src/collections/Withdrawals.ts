@@ -31,7 +31,7 @@ const Withdrawals: CollectionConfig = {
       name: 'amount',
       type: 'number',
       required: true,
-      min: 500,
+      min: 0.5, // minimum $0.5 USDT
     },
     {
       name: 'paymentInfo',
@@ -55,16 +55,13 @@ const Withdrawals: CollectionConfig = {
   hooks: {
     beforeValidate: [
       async ({ data, req, operation }) => {
-        if (operation === 'create') {
-          return data
-        }
+        if (!data) return data // Ensure data is defined
 
-        // Validate only if trying to approve
-        if (operation === 'update' && data?.status === 'approved') {
+        if (operation === 'create') return data
+
+        if (operation === 'update' && data.status === 'approved') {
           const userId = data.user
-          if (typeof userId !== 'string') {
-            throw new Error('Invalid user ID')
-          }
+          if (typeof userId !== 'string') throw new Error('Invalid user ID')
 
           const member = await req.payload.findByID({
             collection: 'members',
@@ -74,9 +71,10 @@ const Withdrawals: CollectionConfig = {
 
           if (!member) throw new Error('User not found')
 
-          if ((member.wallet || 0) < data.amount) {
+          const totalUsdtAvailable = (member.usdtBalance || 0) + (member.wallet || 0) * 0.001
+          if (totalUsdtAvailable < data.amount) {
             throw new Error(
-              `Insufficient wallet balance. Current: ${member.wallet}, Requested: ${data.amount}`,
+              `Insufficient balance. Available: $${totalUsdtAvailable.toFixed(4)} USDT, Requested: $${data.amount}`,
             )
           }
         }
@@ -86,43 +84,43 @@ const Withdrawals: CollectionConfig = {
     ],
     afterChange: [
       async ({ doc, previousDoc, req }) => {
-        // ✅ Deduct ONLY when status changes to approved
         if (doc.status === 'approved' && previousDoc?.status !== 'approved') {
           try {
+            // Deduct from usdtBalance
             await updateWallet({
               userId: doc.user as string,
-              amount: -doc.amount, // negative = deduction
+              amount: -doc.amount, // negative = deduction from USDT
               req,
+              type: 'usdt', // specify we're updating usdtBalance
             })
             req.payload.logger.info(
-              `✅ Approved withdrawal: ${doc.amount} pts from user ${doc.user}`,
+              `✅ Approved withdrawal: $${doc.amount} USDT from user ${doc.user}`,
             )
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error)
-            req.payload.logger.error(`❌ Failed to deduct wallet on approval: ${errorMessage}`)
-            // Revert status if wallet update fails
+            req.payload.logger.error(`❌ Failed to deduct USDT: ${errorMessage}`)
             await req.payload.update({
               collection: 'withdrawals',
               id: doc.id,
               data: { status: 'pending' },
             })
-            throw new Error('Failed to process withdrawal. Insufficient balance or system error.')
+            throw new Error('Failed to process withdrawal')
           }
         }
 
-        // ✅ Refund if changed from approved → rejected
         if (doc.status === 'rejected' && previousDoc?.status === 'approved') {
           try {
             await updateWallet({
               userId: doc.user as string,
-              amount: doc.amount, // positive = refund
+              amount: doc.amount, // refund USDT
               req,
+              type: 'usdt',
             })
-            req.payload.logger.info(`↩️ Refunded ${doc.amount} pts to user ${doc.user}`)
+            req.payload.logger.info(`↩️ Refunded $${doc.amount} USDT to user ${doc.user}`)
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error)
             req.payload.logger.error(`❌ Failed to refund: ${errorMessage}`)
-            throw new Error('Failed to refund points')
+            throw new Error('Failed to refund')
           }
         }
       },
