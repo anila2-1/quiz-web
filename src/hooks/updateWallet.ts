@@ -3,7 +3,6 @@ import { PayloadRequest } from 'payload'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-// src/hooks/updateWallet.ts
 export const updateWallet = async ({
   userId,
   amount,
@@ -12,10 +11,10 @@ export const updateWallet = async ({
 }: {
   userId: string
   amount: number
-  req: any
+  req: PayloadRequest
   type?: 'points' | 'usdt'
 }) => {
-  const payload = req.payload
+  const payload = await getPayload({ config })
 
   // Fetch member with full data
   const member = await payload.findByID({
@@ -26,10 +25,9 @@ export const updateWallet = async ({
 
   if (!member) throw new Error('User not found')
 
-  let updatedData: Partial<any> = {}
+  const updatedData: Partial<{ wallet: number; usdtBalance: number }> = {}
 
   if (type === 'usdt') {
-    // Deduct from usdtBalance
     const newUsdtBalance = (member.usdtBalance || 0) + amount
     if (newUsdtBalance < 0) {
       throw new Error(
@@ -38,7 +36,6 @@ export const updateWallet = async ({
     }
     updatedData.usdtBalance = newUsdtBalance
   } else {
-    // Deduct from wallet (points)
     const newWallet = (member.wallet || 0) + amount
     if (newWallet < 0) {
       throw new Error(`Wallet cannot go negative. Current: ${member.wallet}, Change: ${amount}`)
