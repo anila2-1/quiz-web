@@ -35,7 +35,7 @@ const Members: CollectionConfig = {
     },
     {
       name: 'resetPasswordExpires',
-      type: 'number', // timestamp
+      type: 'number',
       admin: {
         readOnly: true,
       },
@@ -50,11 +50,11 @@ const Members: CollectionConfig = {
       type: 'number',
       defaultValue: 0,
     },
-    {
-      name: 'totalPoints',
-      type: 'number',
-      defaultValue: 0,
-    },
+    // {
+    //   name: 'totalPoints',
+    //   type: 'number',
+    //   defaultValue: 0,
+    // },
     {
       name: 'referralCode',
       type: 'text',

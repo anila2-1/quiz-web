@@ -776,7 +776,6 @@ export interface Member {
   resetPasswordExpires?: number | null;
   wallet?: number | null;
   usdtBalance?: number | null;
-  totalPoints?: number | null;
   referralCode?: string | null;
   referralsCount?: number | null;
   referredBy?: (string | null) | Member;
@@ -1081,7 +1080,6 @@ export interface MembersSelect<T extends boolean = true> {
   resetPasswordExpires?: T;
   wallet?: T;
   usdtBalance?: T;
-  totalPoints?: T;
   referralCode?: T;
   referralsCount?: T;
   referredBy?: T;
