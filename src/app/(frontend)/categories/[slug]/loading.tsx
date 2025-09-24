@@ -2,11 +2,11 @@ export default function CategoryLoading() {
   return (
     <div className="container mx-auto px-4 py-16">
       {/* Category Header Loading */}
-      <div className="mb-12 text-center">
+      {/* <div className="mb-12 text-center">
         <div className="relative mx-auto mb-8 h-64 w-full max-w-3xl overflow-hidden rounded-2xl bg-gray-200 animate-pulse"></div>
         <div className="h-10 w-64 mx-auto bg-gray-200 rounded animate-pulse mb-4"></div>
         <div className="h-6 w-96 mx-auto bg-gray-200 rounded animate-pulse"></div>
-      </div>
+      </div> */}
 
       {/* Blogs Grid Loading */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
