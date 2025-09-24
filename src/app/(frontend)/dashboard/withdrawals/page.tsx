@@ -39,6 +39,9 @@ export default function WithdrawalsPage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [converting, setConverting] = useState(false)
 
+  // ✅ Add dummy state to force re-render after conversion
+  const [refreshKey, setRefreshKey] = useState(0)
+
   const updateFormData = useCallback((field: keyof FormData, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -65,7 +68,7 @@ export default function WithdrawalsPage() {
       }
     }
     fetchMember()
-  }, [router])
+  }, [router, refreshKey]) // 👈 Add refreshKey here
 
   // ✅ Fetch past withdrawals
   useEffect(() => {
@@ -113,10 +116,12 @@ export default function WithdrawalsPage() {
         `✅ Successfully converted ${result.pointsConverted} points to $${result.usdtReceived.toFixed(4)} USDT`,
       )
 
+      // ✅ Refresh member data + force UI update
       const memberRes = await fetch('/api/get-member')
       if (memberRes.ok) {
         const memberData = await memberRes.json()
         setMember(memberData.member)
+        setRefreshKey((prev) => prev + 1) // 👈 Force re-render
       }
     } catch (err: any) {
       setError(err.message || 'Unexpected error occurred')
@@ -380,12 +385,19 @@ export default function WithdrawalsPage() {
             ) : (
               <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
                 <p className="text-sm text-gray-600">
-                  🎯 You have <span className="font-semibold">0 points</span> available for
-                  conversion.
+                  🎯 You have <span className="font-semibold">{member.wallet} points</span>{' '}
+                  available for conversion.
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
                   Take quizzes or refer friends to earn more points!
                 </p>
+              </div>
+            )}
+
+            {/* ✅ Show success message in this section too */}
+            {success && success.includes('converted') && (
+              <div className="mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+                {success}
               </div>
             )}
           </div>
@@ -401,7 +413,9 @@ export default function WithdrawalsPage() {
                 {error}
               </div>
             )}
-            {success && (
+
+            {/* ✅ Show success message only if it's NOT about conversion */}
+            {success && !success.includes('converted') && (
               <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
                 {success}
               </div>
