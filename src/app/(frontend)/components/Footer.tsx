@@ -79,14 +79,14 @@ const Footer = () => {
               <div className="flex space-x-4">
                 {[
                   {
-                    href: 'https://github.com/yourusername',
+                    href: 'https://github.com/anila2-1/quiz-learn-web',
                     icon: <FaGithub size={20} />,
                     bg: 'bg-gray-100 hover:bg-gray-200',
                     colors: 'from-gray-800 via-gray-900 to-black',
                     title: 'GitHub',
                   },
                   {
-                    href: 'https://twitter.com/quizearn',
+                    href: '#',
                     icon: <FaTwitter size={20} />,
                     bg: 'bg-sky-50 hover:bg-sky-100',
                     colors: 'from-sky-400 via-sky-500 to-blue-600',
@@ -94,7 +94,7 @@ const Footer = () => {
                     title: 'Twitter',
                   },
                   {
-                    href: 'https://linkedin.com/company/quizearn',
+                    href: '#',
                     icon: <FaLinkedin size={20} />,
                     bg: 'bg-blue-50 hover:bg-blue-100',
                     colors: 'from-blue-500 via-blue-600 to-blue-700',
@@ -102,7 +102,7 @@ const Footer = () => {
                     title: 'LinkedIn',
                   },
                   {
-                    href: 'https://facebook.com/quizearn',
+                    href: '#',
                     icon: <FaFacebook size={20} />,
                     bg: 'bg-blue-50 hover:bg-blue-100',
                     colors: 'from-blue-400 via-blue-600 to-blue-700',

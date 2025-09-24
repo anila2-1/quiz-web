@@ -8,7 +8,7 @@ export default function ProfileForm({ member }: { member: Member }) {
   const [name, setName] = useState<string>(member.name || '')
   const [username] = useState<string>(member.username || '')
   const [walletAddress, setWalletAddress] = useState<string>(member.walletAddress || '')
-  const [isLoading, setIsLoading] = useState(true)
+  // const [isLoading, setIsLoading] = useState(true)
   const [loading, setLoading] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
 
@@ -56,22 +56,12 @@ export default function ProfileForm({ member }: { member: Member }) {
     }
   }
 
-  useEffect(() => {
-    // Simulate API fetch
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 200) // ← Only 200ms if needed
-  }, [])
-
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
-        <div className="h-10 bg-gray-200 rounded animate-pulse"></div>
-        <div className="h-10 bg-gray-200 rounded animate-pulse w-1/2"></div>
-      </div>
-    )
-  }
+  // useEffect(() => {
+  //   // Simulate API fetch
+  //   setTimeout(() => {
+  //     setIsLoading(false)
+  //   }, 200) // ← Only 200ms if needed
+  // }, [])
 
   return (
     <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 md:px-8">

@@ -1,9 +1,6 @@
 // src/app/(frontend)/blog/page.tsx
-
 import { Metadata } from 'next'
-import BlogGrid from './BlogGrid'
-import Footer from '../components/Footer'
-import Link from 'next/link'
+import BlogListClient from './BlogListClient'
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -27,24 +24,6 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-async function fetchBlogs(page: number = 1, limit: number = 6) {
-  try {
-    // ✅ Enable caching — Vercel CDN will cache this for 1 hour
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/blogs?where[status][equals]=published&sort=-createdAt&page=${page}&limit=${limit}`,
-      {
-        next: { revalidate: 3600 }, // ISR: Revalidate every hour
-        // ❌ REMOVE: cache: 'no-store'
-      },
-    )
-    if (!res.ok) throw new Error('Failed to fetch blogs')
-    return res.json()
-  } catch (error) {
-    console.error('Fetch blogs error:', error)
-    return { docs: [], totalPages: 0, page: 1 }
-  }
-}
-
 export default async function BlogList({
   searchParams,
 }: {
@@ -52,8 +31,6 @@ export default async function BlogList({
 }) {
   const params = await searchParams
   const currentPage = parseInt(params?.page || '1', 10)
-  const limit = 6
-  const { docs: posts, totalPages } = await fetchBlogs(currentPage, limit)
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -67,52 +44,8 @@ export default async function BlogList({
         </p>
       </div>
 
-      {/* Blog Posts */}
-      <div className="px-4 sm:px-6 lg:px-8 pb-12">
-        <BlogGrid posts={posts} />
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center mt-10 gap-3">
-            {currentPage > 1 && (
-              <Link
-                href={`/blog?page=${currentPage - 1}`}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 transition"
-              >
-                ← Prev
-              </Link>
-            )}
-
-            <div className="flex gap-2">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <Link
-                  key={page}
-                  href={`/blog?page=${page}`}
-                  className={`px-4 py-2 rounded-lg transition ${
-                    page === currentPage
-                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
-                      : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-                  }`}
-                >
-                  {page}
-                </Link>
-              ))}
-            </div>
-
-            {currentPage < totalPages && (
-              <Link
-                href={`/blog?page=${currentPage + 1}`}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 transition"
-              >
-                Next →
-              </Link>
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* ✅ Lazy-load Footer */}
-      <Footer />
+      {/* Client-Side Blog List with Loading */}
+      <BlogListClient initialPage={currentPage} />
     </div>
   )
 }

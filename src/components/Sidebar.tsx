@@ -25,7 +25,7 @@ export default function Sidebar() {
     <li key={item.key}>
       <Link
         href={item.href}
-        className={`group w-full flex items-center space-x-3 px-6 py-3 text-left rounded-xl transition-all
+        className={`group w-full flex items-center mt-6 space-x-3 px-6 py-3 text-left rounded-xl transition-all
           ${
             pathname === item.href
               ? 'bg-indigo-50 text-indigo-700 border-r-4 border-indigo-600'
