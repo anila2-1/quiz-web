@@ -186,7 +186,7 @@ export default function ReferralPage() {
           </div>
 
           {/* Referral Link Section */}
-          <div className="bg-white shadow-2xl rounded-3xl p-8 mb-10 border border-gray-100 hover:shadow-3xl transition-all duration-500 group">
+          <div className="bg-white shadow-lg rounded-3xl p-8 mb-10 border border-gray-100 hover:shadow-3xl transition-all duration-500 group">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
               Your Referral Link
             </h2>
@@ -197,7 +197,7 @@ export default function ReferralPage() {
           </div>
 
           {/* Referrals Table */}
-          <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200">
+          <div className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">Your Referrals</h2>
               <span className="text-sm text-gray-500">

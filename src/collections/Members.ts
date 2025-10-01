@@ -52,11 +52,28 @@ const Members: CollectionConfig = {
       type: 'number',
       defaultValue: 0,
     },
-    // {
-    //   name: 'totalPoints',
-    //   type: 'number',
-    //   defaultValue: 0,
-    // },
+    {
+      name: 'emailVerified',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
+      name: 'verificationToken',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
+    {
+      name: 'verificationTokenExpiry',
+      type: 'date',
+      admin: {
+        readOnly: true,
+      },
+    },
     {
       name: 'referralCode',
       type: 'text',

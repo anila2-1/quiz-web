@@ -318,7 +318,7 @@ export default function WithdrawalsPage() {
           </div>
 
           {/* Convert Points Section */}
-          <div className="bg-white shadow-2xl rounded-3xl p-8 mb-10 border border-gray-100 hover:shadow-3xl transition-all duration-500 group">
+          <div className="bg-white shadow-lg rounded-3xl p-8 mb-10 border border-gray-100 hover:shadow-3xl transition-all duration-500 group">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
               Convert Points to USDT
             </h2>
@@ -403,7 +403,7 @@ export default function WithdrawalsPage() {
           </div>
 
           {/* Withdraw Form */}
-          <div className="bg-white shadow-2xl rounded-3xl p-8 mb-10 border border-gray-100 hover:shadow-3xl transition-all duration-500 group">
+          <div className="bg-white shadow-lg rounded-3xl p-8 mb-10 border border-gray-100 hover:shadow-3xl transition-all duration-500 group">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
               Request USDT Withdrawal
             </h2>

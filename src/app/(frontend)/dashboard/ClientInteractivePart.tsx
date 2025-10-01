@@ -131,7 +131,7 @@ export default function ClientInteractivePart({ user: serverUser }: ClientIntera
 
           {/* ✅ Account Overview - Wallet + USDT */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-            <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200 hover:shadow-2xl transition-all duration-300 group">
+            <div className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-2xl transition-all duration-300 group">
               <div className="text-center">
                 <div className="text-3xl font-extrabold text-indigo-600 mb-2 group-hover:scale-110 transition-transform duration-300">
                   ₹{(user.wallet || 0).toFixed(2)}
@@ -139,7 +139,7 @@ export default function ClientInteractivePart({ user: serverUser }: ClientIntera
                 <div className="text-sm font-medium text-gray-600">Wallet Balance (Points)</div>
               </div>
             </div>
-            <div className="bg-white shadow-xl rounded-2xl p-6 border border-gray-200 hover:shadow-2xl transition-all duration-300 group">
+            <div className="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-2xl transition-all duration-300 group">
               <div className="text-center">
                 <div className="text-3xl font-extrabold text-green-600 mb-2 group-hover:scale-110 transition-transform duration-300">
                   ${(user.usdtBalance || 0).toFixed(4)}
@@ -152,7 +152,7 @@ export default function ClientInteractivePart({ user: serverUser }: ClientIntera
           {/* Components */}
           <div className="space-y-8">
             {/* ✨ Referral Earnings - Stylish */}
-            <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-100 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 group">
+            <div className="bg-white shadow-lg rounded-2xl p-8 border border-gray-200 hover:shadow-2xl transition-all duration-500 group">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">💰 Referral Earnings</h2>
                 <div className="p-3 bg-purple-100 rounded-full">
@@ -175,7 +175,7 @@ export default function ClientInteractivePart({ user: serverUser }: ClientIntera
               <ReferralStats count={user.referralsCount || 0} code={user.referralCode || ''} />
             </div>
             {/* 💰 Your Wallet - Stylish */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 group">
+            <div className="bg-white shadow-lg rounded-2xl p-8 border border-gray-200 hover:shadow-2xl transition-all duration-500 group">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900"> 💰 Your Wallet</h2>
                 <div className="p-3 bg-green-100 rounded-full">
@@ -199,7 +199,7 @@ export default function ClientInteractivePart({ user: serverUser }: ClientIntera
             </div>
 
             {/* 🧠 Quiz Earnings - Stylish */}
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-500 group">
+            <div className="bg-white shadow-lg rounded-2xl p-8 border border-gray-200 hover:shadow-2xl transition-all duration-500 group">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">📝Quiz Earnings</h2>
                 <div className="p-3 bg-blue-100 rounded-full">

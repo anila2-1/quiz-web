@@ -38,7 +38,6 @@ export default function ReferralStats({ count, code }: { count: number; code: st
 
       {/* Card Content */}
       <div className="relative z-10">
-        {/* <h3 className="text-lg font-semibold text-gray-800 mb-2">💰 Referral Earnings</h3> */}
         <div className="text-3xl font-extrabold bg-gradient-to-r from-green-600 to-purple-600 bg-clip-text text-transparent mb-4">
           {totalReferralPoints * 10} Points
         </div>

@@ -39,12 +39,12 @@ export default function Sidebar() {
   )
 
   const Navigation = () => (
-    <nav className="mt-4 px-2">
+    <nav className="mt-8 px-2">
       <ul className="space-y-1">
         {menuItems.map((item) => (
           <MenuItemComponent key={item.key} item={item} />
         ))}
-        <li className="mt-6 px-6">
+        <li className="mt-8 px-6">
           <Link
             href="/"
             className="flex items-center space-x-2 text-gray-500 hover:text-indigo-600 font-medium"
