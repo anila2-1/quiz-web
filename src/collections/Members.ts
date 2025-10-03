@@ -99,27 +99,27 @@ const Members: CollectionConfig = {
       required: false,
     },
 
-    {
-      name: 'completedBlogs',
-      type: 'array',
-      label: 'Completed Articles',
-      fields: [
-        {
-          name: 'blog',
-          type: 'relationship',
-          relationTo: 'blogs',
-        },
-        {
-          name: 'completedAt',
-          type: 'date',
-          defaultValue: () => new Date().toISOString(),
-        },
-        {
-          name: 'score',
-          type: 'number',
-        },
-      ],
-    },
+    // {
+    //   name: 'completedBlogs',
+    //   type: 'array',
+    //   label: 'Completed Articles',
+    //   fields: [
+    //     {
+    //       name: 'blog',
+    //       type: 'relationship',
+    //       relationTo: 'blogs',
+    //     },
+    //     {
+    //       name: 'completedAt',
+    //       type: 'date',
+    //       defaultValue: () => new Date().toISOString(),
+    //     },
+    //     {
+    //       name: 'score',
+    //       type: 'number',
+    //     },
+    //   ],
+    // },
     {
       name: 'completedQuizIds',
       type: 'array',

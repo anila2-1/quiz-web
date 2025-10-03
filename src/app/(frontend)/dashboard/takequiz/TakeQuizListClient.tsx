@@ -8,13 +8,42 @@ import Sidebar from '@/components/Sidebar'
 export default function TakeQuizListClient() {
   const [articles, setArticles] = useState<any[]>([])
   const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([])
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 25
+  const [isManualSearch, setIsManualSearch] = useState(false)
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm)
 
-  // Fetch categories (once)
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      setIsManualSearch(true)
+      setDebouncedSearchTerm(searchTerm)
+    }
+  }
+
+  const handleSearchClick = () => {
+    setIsManualSearch(true)
+    setDebouncedSearchTerm(searchTerm)
+  }
+
+  useEffect(() => {
+    if (isManualSearch) return
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 6000) // 6 seconds debounce
+    return () => clearTimeout(handler)
+  }, [searchTerm, isManualSearch])
+
+  useEffect(() => {
+    if (isManualSearch) {
+      setIsManualSearch(false)
+    }
+  }, [debouncedSearchTerm])
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -34,33 +63,19 @@ export default function TakeQuizListClient() {
     fetchCategories()
   }, [])
 
-  // Fetch incomplete articles
   useEffect(() => {
-    const fetchIncompleteArticles = async () => {
+    setCurrentPage(1)
+  }, [debouncedSearchTerm, selectedCategorySlug])
+
+  useEffect(() => {
+    const fetchAllBlogsWithQuizzes = async () => {
       setLoading(true)
       try {
-        // Get member_id from cookies (client-side)
-        const memberId =
-          typeof window !== 'undefined'
-            ? document.cookie
-                .split('; ')
-                .find((row) => row.startsWith('member_id='))
-                ?.split('=')[1]
-            : null
-
-        if (!memberId) {
-          console.warn('No member_id cookie found')
-          setArticles([])
-          setLoading(false)
-          return
-        }
-
-        const res = await fetch('/api/get-incomplete-articles', {
+        const res = await fetch('/api/get-all-blogs-with-quizzes', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            memberId,
-            searchTerm,
+            searchTerm: debouncedSearchTerm,
             categorySlug: selectedCategorySlug,
             page: currentPage,
             limit: itemsPerPage,
@@ -75,15 +90,27 @@ export default function TakeQuizListClient() {
           setArticles([])
         }
       } catch (error) {
-        console.error('Failed to fetch incomplete articles:', error)
+        console.error('Failed to fetch blogs with quizzes:', error)
         setArticles([])
       } finally {
         setLoading(false)
       }
     }
 
-    fetchIncompleteArticles()
-  }, [searchTerm, selectedCategorySlug, currentPage])
+    fetchAllBlogsWithQuizzes()
+  }, [debouncedSearchTerm, selectedCategorySlug, currentPage])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (isCategoryOpen) {
+        setIsCategoryOpen(false)
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [isCategoryOpen])
 
   if (loading) {
     return (
@@ -94,8 +121,10 @@ export default function TakeQuizListClient() {
         <div className="flex-1 p-4 sm:p-6 md:ml-64 flex justify-center items-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-6 mx-auto"></div>
-            <p className="text-xl font-semibold text-gray-700">Loading...</p>
-            <p className="text-sm text-gray-500 mt-2">Almost there — just a moment please 😊</p>
+            <p className="text-xl font-semibold text-gray-700 animate-pulse">Loading...</p>
+            <p className="text-sm text-gray-500 mt-2 animate-fade-in">
+              Almost there — just a moment please 😊
+            </p>
           </div>
         </div>
       </div>
@@ -108,98 +137,172 @@ export default function TakeQuizListClient() {
         <Sidebar />
       </div>
 
-      <div className="flex-1 p-4 sm:p-6 md:ml-64">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
-            📝 TakeQuiz: Incomplete Articles
-          </h1>
-          <p className="text-gray-600 mb-8">
-            Complete these articles to earn points and unlock rewards.
-          </p>
+      <div className="flex-1 p-4 sm:p-6  md:ml-64">
+        <div className="max-w-6xl mx-auto">
+          {/* Filters - Fully Responsive */}
+          <div className="flex mt-10 flex-col sm:flex-row gap-3 sm:gap-4 mb-8">
+            {/* Search - Full width on mobile, auto on larger */}
+            <div className="relative flex-1 min-w-0">
+              <div className="relative flex">
+                <input
+                  type="text"
+                  placeholder="Search quizzes..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="w-full px-4 py-2.5 pl-10 text-sm sm:px-5 sm:py-3 sm:text-base border border-gray-300 rounded-l-lg sm:rounded-l-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
+                />
+                <button
+                  onClick={handleSearchClick}
+                  className="px-3 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-r-lg sm:rounded-r-2xl hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap"
+                >
+                  Search
+                </button>
+              </div>
+            </div>
 
-          {/* Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <input
-              type="text"
-              placeholder="Search by title, category, or keyword..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+            {/* Category Dropdown - Full width on mobile */}
+            <div className="relative flex-1 min-w-0">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsCategoryOpen(!isCategoryOpen)
+                }}
+                className="w-full px-4 py-2.5 text-left text-sm sm:px-5 sm:py-3 sm:text-base border border-gray-300 rounded-lg sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm bg-white flex justify-between items-center"
+              >
+                <span className="truncate">
+                  {selectedCategorySlug
+                    ? categories.find((cat) => cat.slug === selectedCategorySlug)?.name ||
+                      'Select Category'
+                    : 'All Categories'}
+                </span>
+                <svg
+                  className={`h-4 w-4 sm:h-5 sm:w-5 text-gray-400 transition-transform duration-200 ${isCategoryOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
 
-            <select
-              value={selectedCategorySlug || ''}
-              onChange={(e) => setSelectedCategorySlug(e.target.value || null)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="">All Categories</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.slug}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+              {/* Dropdown Menu */}
+              {isCategoryOpen && (
+                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-lg sm:rounded-xl shadow-lg max-h-60 overflow-auto">
+                  <div
+                    className="px-4 py-2.5 text-sm sm:px-5 sm:py-3 sm:text-base hover:bg-gray-50 cursor-pointer text-gray-700"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSelectedCategorySlug(null)
+                      setIsCategoryOpen(false)
+                    }}
+                  >
+                    All Categories
+                  </div>
+                  {categories.map((cat) => (
+                    <div
+                      key={cat.id}
+                      className="px-4 py-2.5 text-sm sm:px-5 sm:py-3 sm:text-base hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer text-gray-700 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSelectedCategorySlug(cat.slug)
+                        setIsCategoryOpen(false)
+                      }}
+                    >
+                      {cat.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
+            {/* Reset Button - Full width on mobile when needed */}
             {(searchTerm || selectedCategorySlug) && (
               <button
                 onClick={() => {
                   setSearchTerm('')
                   setSelectedCategorySlug(null)
+                  setCurrentPage(1)
+                  setDebouncedSearchTerm('')
                 }}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                className="px-4 py-2.5 text-sm sm:px-5 sm:py-3 sm:text-base bg-gray-200 text-gray-700 rounded-lg sm:rounded-2xl hover:bg-gray-300 transition shadow-sm whitespace-nowrap"
               >
                 Reset Filters
               </button>
             )}
           </div>
 
-          {/* Article List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles.length > 0 ? (
-              articles.map((article) => (
-                <Link
+          {/* Quiz List */}
+          {articles.length > 0 ? (
+            <ul className="space-y-3">
+              {articles.map((article) => (
+                <li
                   key={article.id}
-                  href={`/blog/${article.slug}`}
-                  className="block p-4 bg-white rounded-xl shadow hover:shadow-md transition-shadow border border-gray-200"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 group"
                 >
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{article.title}</h3>
-                  {article.category?.title && (
-                    <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full mb-2">
-                      {article.category.title}
-                    </span>
-                  )}
-                  <p className="text-gray-600 text-sm line-clamp-3">{article.excerpt}</p>
-                  <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-                    <span>{article.readTime} min read</span>
-                    <span>
-                      ✅ {article.completedQuizzes || 0}/{article.totalQuizzes} quizzes
-                    </span>
+                  <div className="flex-1 min-w-0 mb-3 sm:mb-0">
+                    <Link
+                      href={`/${article.slug}`}
+                      className="text-base sm:text-lg font-medium text-gray-900 hover:text-indigo-700 transition-colors truncate block"
+                    >
+                      {article.title}
+                    </Link>
                   </div>
-                </Link>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12 text-gray-500">
-                No incomplete articles found. 🎉 You’ve completed them all!
-              </div>
-            )}
-          </div>
+                  <Link
+                    href={`/${article.slug}`}
+                    className="w-full sm:w-auto px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-sm hover:shadow-md text-center"
+                  >
+                    🚀 Take Quiz
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 text-center border border-gray-200">
+              <svg
+                className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              <h3 className="mt-4 text-lg sm:text-xl font-medium text-gray-900">
+                No quizzes found
+              </h3>
+              <p className="mt-2 text-gray-500 text-sm sm:text-base">
+                Try changing your search or browse new content.
+              </p>
+            </div>
+          )}
 
           {/* Pagination */}
-          {articles.length === itemsPerPage && (
-            <div className="flex justify-center mt-8">
+          {articles.length > 0 && articles.length === itemsPerPage && (
+            <div className="flex flex-wrap justify-center gap-2 mt-8">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 mx-1 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50"
+                className="px-3 py-2 text-sm sm:px-5 sm:py-3 sm:text-base mx-0.5 sm:mx-1 bg-white text-gray-700 rounded-lg sm:rounded-xl border border-gray-300 disabled:opacity-50 hover:bg-gray-50 transition shadow-sm"
               >
                 Previous
               </button>
-              <span className="px-4 py-2 mx-1 bg-indigo-600 text-white rounded-lg">
+              <span className="px-3 py-2 text-sm sm:px-5 sm:py-3 sm:text-base mx-0.5 sm:mx-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg sm:rounded-xl shadow-sm">
                 Page {currentPage}
               </span>
               <button
                 onClick={() => setCurrentPage((prev) => prev + 1)}
-                className="px-4 py-2 mx-1 bg-gray-200 text-gray-700 rounded-lg"
+                className="px-3 py-2 text-sm sm:px-5 sm:py-3 sm:text-base mx-0.5 sm:mx-1 bg-white text-gray-700 rounded-lg sm:rounded-xl border border-gray-300 hover:bg-gray-50 transition shadow-sm"
               >
                 Next
               </button>

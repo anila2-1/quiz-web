@@ -15,7 +15,7 @@ export default function Sidebar() {
 
   const menuItems: MenuItem[] = [
     { key: 'overview', label: 'Overview', icon: '📊', href: '/dashboard' },
-    { key: 'blog', label: 'Blog', icon: '📝', href: '/blog' }, // ADDED BLOG
+    // { key: 'blog', label: 'Blog', icon: '📝', href: '/blog' }, // ADDED BLOG
     { key: 'referral', label: 'Referral', icon: '🔗', href: '/dashboard/referral' },
     { key: 'withdrawals', label: 'Withdrawals', icon: '💰', href: '/dashboard/withdrawals' },
     { key: 'takequiz', label: 'TakeQuiz', icon: '📋', href: '/dashboard/takequiz' },

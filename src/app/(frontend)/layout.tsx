@@ -12,8 +12,6 @@ const poppins = Poppins({
   variable: '--font-poppins',
 })
 
-// 🔹 SEO metadata completely removed
-
 export default function FrontendLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">

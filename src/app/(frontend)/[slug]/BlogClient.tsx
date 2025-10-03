@@ -145,19 +145,6 @@ export function BlogClient({
     }, 150)
   }
 
-  // Add this right after your state declarations — BEFORE return
-  // if (user === undefined) {
-  //   return (
-  //     <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-  //       <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-  //       <p className="text-xl font-semibold text-gray-700 animate-pulse">Loading...</p>
-  //       <p className="text-sm text-gray-500 mt-2 animate-fade-in">
-  //         Almost there — just a moment please 😊
-  //       </p>
-  //     </div>
-  //   )
-  // }
-
   // Update handleSubmitQuiz
   const handleSubmitQuiz = async (quizId: string) => {
     // ✅ Only redirect if user is null (logged out)
