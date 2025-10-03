@@ -4,3 +4,8 @@ export const getClientSideURL = (): string => {
   }
   return process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 }
+
+export const getServerSideURL = (): string => {
+  // For server-side, use NEXT_PUBLIC_SERVER_URL or fallback
+  return process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+}

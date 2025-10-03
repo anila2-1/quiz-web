@@ -108,12 +108,8 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
-  globals: {
-    'site-settings': SiteSetting;
-  };
-  globalsSelect: {
-    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
-  };
+  globals: {};
+  globalsSelect: {};
   locale: null;
   user:
     | (User & {
@@ -1350,105 +1346,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * Global settings for the entire site
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings".
- */
-export interface SiteSetting {
-  id: string;
-  siteTitle: string;
-  tagline?: string | null;
-  seo?: {
-    title?: string | null;
-  };
-  /**
-   * Upload a 32x32 PNG image for favicon
-   */
-  favicon?: (string | null) | Media;
-  /**
-   * Main logo for light backgrounds
-   */
-  logo?: (string | null) | Media;
-  /**
-   * Optional: Logo for dark mode or backgrounds
-   */
-  logoDark?: (string | null) | Media;
-  socialLinks?: {
-    facebook?: string | null;
-    twitter?: string | null;
-    instagram?: string | null;
-    youtube?: string | null;
-    linkedin?: string | null;
-  };
-  footerText?: string | null;
-  /**
-   * User must have at least this many points to request withdrawal
-   */
-  minWithdrawalPoints?: number | null;
-  /**
-   * Points awarded to referrer when someone signs up via their link
-   */
-  referralPoints?: number | null;
-  /**
-   * Default points awarded for each correct quiz answer
-   */
-  quizPointsPerCorrect?: number | null;
-  /**
-   * Show a banner at the top of the site (optional)
-   */
-  announcement?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "site-settings_select".
- */
-export interface SiteSettingsSelect<T extends boolean = true> {
-  siteTitle?: T;
-  tagline?: T;
-  seo?:
-    | T
-    | {
-        title?: T;
-      };
-  favicon?: T;
-  logo?: T;
-  logoDark?: T;
-  socialLinks?:
-    | T
-    | {
-        facebook?: T;
-        twitter?: T;
-        instagram?: T;
-        youtube?: T;
-        linkedin?: T;
-      };
-  footerText?: T;
-  minWithdrawalPoints?: T;
-  referralPoints?: T;
-  quizPointsPerCorrect?: T;
-  announcement?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

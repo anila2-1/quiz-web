@@ -1,7 +1,7 @@
 // src/app/(frontend)/blog/AnimatedBlogCard.tsx
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 
 export default function AnimatedBlogCard({ post }: { post: any }) {

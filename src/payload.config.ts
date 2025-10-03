@@ -25,8 +25,6 @@ import Members from './collections/Members'
 import Pages from './collections/Pages'
 import { Categories } from './collections/Categories'
 
-import SiteSettings from './globals/sitesettings'
-
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -38,7 +36,6 @@ export default buildConfig({
     },
   },
   collections: [Users, Media, Pages, Blogs, Members, Quizzes, Withdrawals, Categories],
-  globals: [SiteSettings],
   editor: lexicalEditor(),
 
   blocks: [Banner, CallToAction, Archive, Content, FormBlock, MediaBlock],

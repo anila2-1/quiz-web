@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "lib": [
       "DOM",
       "DOM.Iterable",
       "ES2022"
     ],
-    "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
@@ -30,7 +30,8 @@
         "./src/payload.config.ts"
       ]
     },
-    "target": "ES2022"
+    "target": "ES2022",
+    "allowJs": true
   },
   "include": [
     "next-env.d.ts",
@@ -40,5 +41,5 @@
   ],
   "exclude": [
     "node_modules"
-  ],
+  ]
 }

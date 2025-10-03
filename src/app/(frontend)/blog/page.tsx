@@ -1,28 +1,13 @@
 // src/app/(frontend)/blog/page.tsx
-import { Metadata } from 'next'
 import BlogListClient from './BlogListClient'
+import { generateStaticMetadata } from '@/utilities/generateStaticMetadata'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: 'Learn & Earn Blog | Discover Articles & Earn Rewards',
-    description:
-      'Explore insightful articles, tips, and guides to boost your knowledge and earn rewards through quizzes.',
-    openGraph: {
-      title: 'Learn & Earn Blog | QuizEarn',
-      description: 'Boost your knowledge and earn rewards through quizzes.',
-      type: 'website',
-      url: '/blog',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: 'Learn & Earn Blog | QuizEarn',
-      description: 'Boost your knowledge and earn rewards through quizzes.',
-    },
-    alternates: {
-      canonical: '/blog',
-    },
-  }
-}
+export const metadata = generateStaticMetadata({
+  title: 'Learn & Earn Blog',
+  description:
+    'Explore insightful articles, tips, and guides to boost your knowledge and earn rewards through quizzes.',
+  url: '/blog',
+})
 
 export default async function BlogList({
   searchParams,
@@ -34,7 +19,6 @@ export default async function BlogList({
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      {/* Hero Section */}
       <div className="relative px-6 py-16 sm:py-20 md:py-24 text-center">
         <h1 className="text-4xl p-2.5 sm:text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 tracking-tight">
           Learn & Earn Blog
@@ -44,7 +28,6 @@ export default async function BlogList({
         </p>
       </div>
 
-      {/* Client-Side Blog List with Loading */}
       <BlogListClient initialPage={currentPage} />
     </div>
   )

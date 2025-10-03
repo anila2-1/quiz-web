@@ -61,12 +61,6 @@ export default function BlogListClient({ initialPage = 1 }: { initialPage?: numb
   if (loading) {
     return (
       <div className="px-4 sm:px-6 lg:px-8 pb-12">
-        {/* Hero Skeleton - Match CategoryLoading style */}
-        {/* <div className="relative px-6 py-16 sm:py-20 md:py-24 text-center mb-12">
-          <div className="h-10 w-64 mx-auto bg-gray-200 rounded animate-pulse mb-4"></div>
-          <div className="h-6 w-96 mx-auto bg-gray-200 rounded animate-pulse"></div>
-        </div> */}
-
         {/* Blog Grid Skeleton - EXACTLY like CategoryLoading */}
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

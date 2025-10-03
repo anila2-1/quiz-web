@@ -1,3 +1,4 @@
+// src/lib/getBlogBySlug.ts
 import { cache } from 'react'
 
 export type Blog = {
@@ -24,23 +25,9 @@ export type Blog = {
       filename: string
     }
   }
-  quizzes?: Quiz[]
+  quizzes?: any[]
 }
 
-type Quiz = {
-  id: string
-  title: string
-  questions: Question[]
-}
-
-type Question = {
-  id: string
-  questionText: string
-  options: { label: string; value: string }[]
-  correctAnswer: string
-}
-
-// 🔁 Exported and cached
 export const getBlogBySlug = cache(async (slug: string): Promise<Blog | null> => {
   try {
     const API_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
@@ -51,7 +38,6 @@ export const getBlogBySlug = cache(async (slug: string): Promise<Blog | null> =>
         headers: {
           'Content-Type': 'application/json',
         },
-        // 🔁 Revalidate every 60 seconds
         next: { tags: ['blog', `blog-${slug}`], revalidate: 60 },
       },
     )
@@ -62,12 +48,7 @@ export const getBlogBySlug = cache(async (slug: string): Promise<Blog | null> =>
     }
 
     const json = await res.json()
-
-    if (!json.docs || json.docs.length === 0) {
-      return null
-    }
-
-    return json.docs[0]
+    return json.docs?.[0] || null
   } catch (error) {
     console.error('Error fetching blog by slug:', error)
     return null
