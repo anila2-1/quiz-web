@@ -15,9 +15,8 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
-  // Show sidebar toggle only on Dashboard (mobile)
-  const shouldShowSidebarToggle = ['/dashboard'].includes(pathname)
-
+  // Show sidebar toggle on Dashboard + mobile
+  const shouldShowSidebarToggle = pathname.startsWith('/dashboard')
   useEffect(() => {
     const fetchMember = async () => {
       try {
@@ -50,7 +49,8 @@ export default function Navbar() {
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false)
-  }, [pathname])
+    setSidebarOpen(false)
+  }, [pathname, setSidebarOpen])
 
   return (
     <nav

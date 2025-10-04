@@ -21,7 +21,6 @@ export async function POST(req: NextRequest) {
 
     const payload = await getPayload({ config })
 
-    // Get the quiz with all details including points
     const quiz = await payload.findByID({
       collection: 'quizzes',
       id: quizId,
@@ -37,7 +36,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Answers length mismatch' }, { status: 400 })
     }
 
-    // ✅ Give full points regardless of correctness
     const pointsEarned = quiz.points || 10
     const totalQuestions = quiz.questions.length
 
@@ -50,22 +48,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Member not found' }, { status: 404 })
     }
 
-    // Update member in a single operation
+    // ✅ Check if already completed
+    const alreadyCompleted = (member.completedQuizIds || []).some(
+      (item: any) => item.quizId === quizId
+    )
+
+    if (alreadyCompleted) {
+      return NextResponse.json({ error: 'You have already completed this quiz' }, { status: 400 })
+    }
+
+    // ✅ Update only wallet and completedQuizIds
     const updatedMember = await payload.update({
       collection: 'members',
       id: memberId,
       data: {
         wallet: (member.wallet || 0) + pointsEarned,
-        completedBlogs: [
-          ...(member.completedBlogs || []),
-          {
-            blog: blogId,
-            score: pointsEarned,
-            completedAt: new Date().toISOString(),
-          },
-        ],
         completedQuizIds: [
-          ...(member.completedQuizIds || []).filter((item: any) => item.quizId !== quizId),
+          ...(member.completedQuizIds || []),
           { quizId, score: pointsEarned, completedAt: new Date().toISOString() },
         ],
       },
@@ -73,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       result: {
-        score: totalQuestions, // 👈 Show full score in UI
+        score: totalQuestions,
         total: totalQuestions,
         pointsEarned,
         member: updatedMember,

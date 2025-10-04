@@ -4,11 +4,14 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Sidebar from '@/components/Sidebar'
+import { useSidebar } from '../../SidebarContext'
 
 export default function TakeQuizListClient() {
   const [articles, setArticles] = useState<any[]>([])
   const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([])
   const [isCategoryOpen, setIsCategoryOpen] = useState(false)
+  const { sidebarOpen, setSidebarOpen } = useSidebar()
+
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null)
@@ -34,7 +37,7 @@ export default function TakeQuizListClient() {
     if (isManualSearch) return
     const handler = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm)
-    }, 6000) // 6 seconds debounce
+    }, 6000)
     return () => clearTimeout(handler)
   }, [searchTerm, isManualSearch])
 
@@ -54,7 +57,7 @@ export default function TakeQuizListClient() {
             id: cat.id,
             name: cat.title || cat.name,
             slug: cat.slug,
-          })),
+          }))
         )
       } catch (error) {
         console.error('Failed to fetch categories:', error)
@@ -102,7 +105,7 @@ export default function TakeQuizListClient() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = () => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (isCategoryOpen) {
         setIsCategoryOpen(false)
       }
@@ -114,17 +117,19 @@ export default function TakeQuizListClient() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
-        <div className="hidden md:block">
-          <Sidebar />
-        </div>
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <Sidebar />
+        {sidebarOpen && (
+          <div
+            className="fixed top-0 right-0 bottom-0 left-64 bg-transparent z-40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
         <div className="flex-1 p-4 sm:p-6 md:ml-64 flex justify-center items-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-6 mx-auto"></div>
             <p className="text-xl font-semibold text-gray-700 animate-pulse">Loading...</p>
-            <p className="text-sm text-gray-500 mt-2 animate-fade-in">
-              Almost there — just a moment please 😊
-            </p>
+            <p className="text-sm text-gray-500 mt-2">Almost there — just a moment please 😊</p>
           </div>
         </div>
       </div>
@@ -132,36 +137,44 @@ export default function TakeQuizListClient() {
   }
 
   return (
-    <>
-      <div className="hidden md:block">
-        <Sidebar />
-      </div>
+    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Sidebar */}
+      <Sidebar />
 
-      <div className="flex-1 p-4 sm:p-6  md:ml-64">
+      {/* Click outside to close on mobile */}
+      {sidebarOpen && (
+        <div
+          className="fixed top-0 right-0 bottom-0 left-64 bg-transparent z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main Content */}
+      <div className="flex-1 p-4 mt-10 sm:p-6 md:ml-64">
         <div className="max-w-6xl mx-auto">
-          {/* Filters - Fully Responsive */}
-          <div className="flex mt-10 flex-col sm:flex-row gap-3 sm:gap-4 mb-8">
-            {/* Search - Full width on mobile, auto on larger */}
-            <div className="relative flex-1 min-w-0">
-              <div className="relative flex">
+          {/* Filters */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-8">
+            {/* Search */}
+            <div className="flex-1 min-w-0">
+              <div className="flex">
                 <input
                   type="text"
                   placeholder="Search quizzes..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="w-full px-4 py-2.5 pl-10 text-sm sm:px-5 sm:py-3 sm:text-base border border-gray-300 rounded-l-lg sm:rounded-l-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm"
+                  className="w-full px-4 py-2.5 pl-10 text-sm sm:text-base border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
                 />
                 <button
                   onClick={handleSearchClick}
-                  className="px-3 py-2.5 text-sm sm:px-6 sm:py-3 sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-r-lg sm:rounded-r-2xl hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap"
+                  className="px-3 py-2.5 text-sm sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-r-lg hover:from-indigo-700 hover:to-purple-700 transition shadow-sm whitespace-nowrap"
                 >
                   Search
                 </button>
               </div>
             </div>
 
-            {/* Category Dropdown - Full width on mobile */}
+            {/* Category */}
             <div className="relative flex-1 min-w-0">
               <button
                 type="button"
@@ -169,7 +182,7 @@ export default function TakeQuizListClient() {
                   e.stopPropagation()
                   setIsCategoryOpen(!isCategoryOpen)
                 }}
-                className="w-full px-4 py-2.5 text-left text-sm sm:px-5 sm:py-3 sm:text-base border border-gray-300 rounded-lg sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent shadow-sm bg-white flex justify-between items-center"
+                className="w-full px-4 py-2.5 text-left text-sm sm:text-base border border-gray-300 rounded-lg bg-white flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
               >
                 <span className="truncate">
                   {selectedCategorySlug
@@ -178,7 +191,7 @@ export default function TakeQuizListClient() {
                     : 'All Categories'}
                 </span>
                 <svg
-                  className={`h-4 w-4 sm:h-5 sm:w-5 text-gray-400 transition-transform duration-200 ${isCategoryOpen ? 'rotate-180' : ''}`}
+                  className={`h-4 w-4 sm:h-5 sm:w-5 text-gray-400 transition-transform ${isCategoryOpen ? 'rotate-180' : ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -192,13 +205,14 @@ export default function TakeQuizListClient() {
                 </svg>
               </button>
 
-              {/* Dropdown Menu */}
               {isCategoryOpen && (
-                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-lg sm:rounded-xl shadow-lg max-h-60 overflow-auto">
+                <div
+                  className="absolute z-20 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div
-                    className="px-4 py-2.5 text-sm sm:px-5 sm:py-3 sm:text-base hover:bg-gray-50 cursor-pointer text-gray-700"
-                    onClick={(e) => {
-                      e.stopPropagation()
+                    className="px-4 py-2.5 text-sm sm:text-base hover:bg-gray-50 cursor-pointer"
+                    onClick={() => {
                       setSelectedCategorySlug(null)
                       setIsCategoryOpen(false)
                     }}
@@ -208,9 +222,8 @@ export default function TakeQuizListClient() {
                   {categories.map((cat) => (
                     <div
                       key={cat.id}
-                      className="px-4 py-2.5 text-sm sm:px-5 sm:py-3 sm:text-base hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer text-gray-700 transition-colors"
-                      onClick={(e) => {
-                        e.stopPropagation()
+                      className="px-4 py-2.5 text-sm sm:text-base hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer transition-colors"
+                      onClick={() => {
                         setSelectedCategorySlug(cat.slug)
                         setIsCategoryOpen(false)
                       }}
@@ -222,7 +235,7 @@ export default function TakeQuizListClient() {
               )}
             </div>
 
-            {/* Reset Button - Full width on mobile when needed */}
+            {/* Reset */}
             {(searchTerm || selectedCategorySlug) && (
               <button
                 onClick={() => {
@@ -231,32 +244,30 @@ export default function TakeQuizListClient() {
                   setCurrentPage(1)
                   setDebouncedSearchTerm('')
                 }}
-                className="px-4 py-2.5 text-sm sm:px-5 sm:py-3 sm:text-base bg-gray-200 text-gray-700 rounded-lg sm:rounded-2xl hover:bg-gray-300 transition shadow-sm whitespace-nowrap"
+                className="px-4 py-2.5 text-sm sm:text-base bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition shadow-sm whitespace-nowrap"
               >
-                Reset Filters
+                Reset
               </button>
             )}
           </div>
 
-          {/* Quiz List */}
+          {/* Results */}
           {articles.length > 0 ? (
             <ul className="space-y-3">
               {articles.map((article) => (
                 <li
                   key={article.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300 group"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition"
                 >
-                  <div className="flex-1 min-w-0 mb-3 sm:mb-0">
-                    <Link
-                      href={`/${article.slug}`}
-                      className="text-base sm:text-lg font-medium text-gray-900 hover:text-indigo-700 transition-colors truncate block"
-                    >
-                      {article.title}
-                    </Link>
-                  </div>
                   <Link
                     href={`/${article.slug}`}
-                    className="w-full sm:w-auto px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-sm hover:shadow-md text-center"
+                    className="flex-1 min-w-0 mb-2 sm:mb-0 text-sm sm:text-base font-medium text-gray-900 hover:text-indigo-700 truncate"
+                  >
+                    {article.title}
+                  </Link>
+                  <Link
+                    href={`/${article.slug}`}
+                    className="w-full sm:w-auto px-3 py-2 text-sm sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition text-center"
                   >
                     🚀 Take Quiz
                   </Link>
@@ -264,9 +275,9 @@ export default function TakeQuizListClient() {
               ))}
             </ul>
           ) : (
-            <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 text-center border border-gray-200">
+            <div className="bg-white rounded-xl shadow-lg p-6 text-center border border-gray-200">
               <svg
-                className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-gray-300"
+                className="mx-auto h-12 w-12 text-gray-300"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -278,12 +289,8 @@ export default function TakeQuizListClient() {
                   d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                 />
               </svg>
-              <h3 className="mt-4 text-lg sm:text-xl font-medium text-gray-900">
-                No quizzes found
-              </h3>
-              <p className="mt-2 text-gray-500 text-sm sm:text-base">
-                Try changing your search or browse new content.
-              </p>
+              <h3 className="mt-4 text-lg font-medium text-gray-900">No quizzes found</h3>
+              <p className="mt-2 text-gray-500">Try changing your search or browse new content.</p>
             </div>
           )}
 
@@ -293,16 +300,16 @@ export default function TakeQuizListClient() {
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-2 text-sm sm:px-5 sm:py-3 sm:text-base mx-0.5 sm:mx-1 bg-white text-gray-700 rounded-lg sm:rounded-xl border border-gray-300 disabled:opacity-50 hover:bg-gray-50 transition shadow-sm"
+                className="px-3 py-2 text-sm sm:text-base bg-white text-gray-700 rounded-lg border border-gray-300 disabled:opacity-50 hover:bg-gray-50 transition shadow-sm"
               >
                 Previous
               </button>
-              <span className="px-3 py-2 text-sm sm:px-5 sm:py-3 sm:text-base mx-0.5 sm:mx-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg sm:rounded-xl shadow-sm">
+              <span className="px-3 py-2 text-sm sm:text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-sm">
                 Page {currentPage}
               </span>
               <button
                 onClick={() => setCurrentPage((prev) => prev + 1)}
-                className="px-3 py-2 text-sm sm:px-5 sm:py-3 sm:text-base mx-0.5 sm:mx-1 bg-white text-gray-700 rounded-lg sm:rounded-xl border border-gray-300 hover:bg-gray-50 transition shadow-sm"
+                className="px-3 py-2 text-sm sm:text-base bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 transition shadow-sm"
               >
                 Next
               </button>
@@ -310,6 +317,6 @@ export default function TakeQuizListClient() {
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
