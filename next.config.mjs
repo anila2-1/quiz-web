@@ -2,11 +2,6 @@ import { withPayload } from '@payloadcms/next/withPayload'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -22,14 +17,6 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    // Disable Vercel's auto-injected flags
-    disableExperimentalReactCompiler: true,
-  },
-
-  // Force Vercel to use standard build
-  output: 'standalone',
-
   webpack: (webpackConfig) => {
     // Extension aliasing
     webpackConfig.resolve.extensionAlias = {
