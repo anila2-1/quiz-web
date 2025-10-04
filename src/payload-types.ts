@@ -781,6 +781,14 @@ export interface Member {
   referralsCount?: number | null;
   referredBy?: (string | null) | Member;
   walletAddress?: string | null;
+  completedBlogs?:
+    | {
+        blog?: (string | null) | Blog;
+        completedAt?: string | null;
+        score?: number | null;
+        id?: string | null;
+      }[]
+    | null;
   completedQuizIds?:
     | {
         quizId?: string | null;
@@ -1080,6 +1088,14 @@ export interface MembersSelect<T extends boolean = true> {
   referralsCount?: T;
   referredBy?: T;
   walletAddress?: T;
+  completedBlogs?:
+    | T
+    | {
+        blog?: T;
+        completedAt?: T;
+        score?: T;
+        id?: T;
+      };
   completedQuizIds?:
     | T
     | {

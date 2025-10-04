@@ -68,7 +68,7 @@ export function BlogClient({
       const initial = post.quizzes.reduce(
         (acc, quiz) => {
           const isCompleted =
-            user?.completedQuizIds?.some((item) => item.quizId === quiz.id) || false
+            user?.completedQuizIds?.some((item: any) => item.quizId === quiz.id) || false
           const questionsLength = quiz.questions?.length || 0
 
           acc[quiz.id] = {
@@ -81,7 +81,7 @@ export function BlogClient({
           }
           return acc
         },
-        {} as Record<string, QuizState>,
+        {} as Record<string, QuizState>
       )
       setQuizStates(initial)
     }
